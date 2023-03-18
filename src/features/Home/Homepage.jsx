@@ -1,9 +1,9 @@
-import React from "react"
-import Breadcrumb from "../../components/Breadcrumb"
+import React, { useState } from "react"
 import ProductCard from "../../components/ProductCard"
 import { Link } from "react-router-dom"
 import { AiOutlineCaretDown } from "react-icons/ai"
 import { IoLocationSharp } from "react-icons/io5"
+import LoginForm from "../Auth/LoginForm"
 
 const Homepage = () => {
     const findNewBar = (
@@ -36,10 +36,23 @@ const Homepage = () => {
     )
 
     return (
-        <div className="pt-3 mx-auto bg-gray-300">
+        <div className="py-3 mx-auto bg-gray-300">
             {findNewBar}
-            <div className="desktop:w-desktop m-auto h-screen">
+            <div className="desktop:w-desktop m-auto ">
                 <div className="grid grid-cols-5 gap-2">
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
+                    <ProductCard imageUrl={"../../1228831.jpg"} />
                     <ProductCard imageUrl={"../../1228831.jpg"} />
                     <ProductCard imageUrl={"../../1228831.jpg"} />
                     <ProductCard imageUrl={"../../1228831.jpg"} />

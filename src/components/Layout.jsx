@@ -10,9 +10,26 @@ import { AiFillMessage } from "react-icons/ai"
 
 // styles
 import { BgLinegradianet } from "../styles/customStyles"
+import LoginForm from "../features/Auth/LoginForm"
+import RegisterForm from "../features/Auth/RegisterForm"
+import { useDispatch, useSelector } from "react-redux"
 
 const Layout = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const dispatch = useDispatch()
+    const [isLoggining, setIsLogining] = useState(false)
+    const [isRegistering, setIsRegistering] = useState(false)
+
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
+
+    const switchLoginUI = () => {
+        setIsRegistering(false)
+        setIsLogining(!isLoggining)
+    }
+
+    const switchRegisterUI = () => {
+        setIsLogining(false)
+        setIsRegistering(!isRegistering)
+    }
 
     const Header = (
         <header>
@@ -48,10 +65,16 @@ const Layout = () => {
                         </>
                     ) : (
                         <>
-                            <div className="px-2 font-medium hover:underline">
+                            <div
+                                className="px-2 font-medium hover:underline"
+                                onClick={switchRegisterUI}
+                            >
                                 <NavLink>Đăng ký</NavLink>
                             </div>
-                            <div className="px-2 font-medium hover:underline">
+                            <div
+                                className="px-2 font-medium hover:underline"
+                                onClick={switchLoginUI}
+                            >
                                 <NavLink>Đăng nhập</NavLink>
                             </div>
                         </>
@@ -71,7 +94,7 @@ const Layout = () => {
     )
 
     const Footer = (
-        <>
+        <footer>
             <div className=" bg-neutral-700 py-6 text-gray-300">
                 <div className="desktop:w-desktop  m-auto">
                     <div className="flex items-center">
@@ -218,15 +241,39 @@ const Layout = () => {
                     </p>
                 </div>
             </div>
-        </>
+        </footer>
     )
 
     return (
         <>
-            {Header}
+            {isLoggining ? (
+                <div className="absolute top-0 left-0 right-0 bottom-0 min-h-[200rem] z-40  bg-black/40">
+                    {" "}
+                    <LoginForm
+                        closeUI={switchLoginUI}
+                        toRegisterForm={switchRegisterUI}
+                    />
+                </div>
+            ) : (
+                <></>
+            )}
+            {isRegistering ? (
+                <div className="absolute top-0 left-0 right-0 bottom-0 min-h-[200rem] z-40  bg-black/40">
+                    {" "}
+                    <RegisterForm
+                        closeUI={switchRegisterUI}
+                        toLoginForm={switchLoginUI}
+                    />
+                </div>
+            ) : (
+                <></>
+            )}
+            <>
+                {Header}
 
-            <Outlet />
-            {Footer}
+                <Outlet />
+                {Footer}
+            </>
         </>
     )
 }
