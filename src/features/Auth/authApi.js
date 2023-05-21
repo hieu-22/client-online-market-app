@@ -1,0 +1,98 @@
+import axios from "../../axios"
+import {
+    differenceInHours,
+    differenceInMinutes,
+    differenceInDays,
+    differenceInMonths,
+    differenceInYears,
+} from "date-fns"
+const uniqueParam = new Date().getTime()
+
+export const login = async (credentials) => {
+    const responses = await axios.post("/login", credentials)
+    // console.log(">>> server reponses: ", responses)
+    return responses.data
+}
+
+export const register = async (credentials) => {
+    const responses = await axios.post("/register", credentials)
+    // console.log(">>> server reponses: ", responses)
+    return responses.data
+}
+
+export const updatePhoneNumber = async (phoneNumber, userId) => {
+    const responses = await axios.patch(
+        `/user/${userId}/update-user-information?cacheBust=${uniqueParam}`,
+        {
+            phoneNumber,
+        }
+    )
+    // console.log(">>> server reponses: ", responses)
+    return responses.data
+}
+
+export const updateAvatar = async (formData, userId) => {
+    const responses = await axios.patch(
+        `/user/${userId}/update-avatar?cacheBust=${uniqueParam}`,
+
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    )
+    console.log(">>> server reponses: ", responses)
+    return responses.data
+}
+
+export const getPostByUserId = async ({ userId }) => {
+    const responses = await axios.get(`/posts/getByUserId?userId=${userId}`)
+    const posts = responses.data?.posts
+    if (!posts) {
+        return responses.data
+    }
+    const updatedPosts = await posts.map((post) => {
+        const now = new Date()
+        const postCreatedTime = new Date(post.createdAt)
+        const timeAgoInMinutes = differenceInMinutes(now, postCreatedTime)
+        if (timeAgoInMinutes < 61) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInMinutes.toString()} phút`,
+            }
+        }
+
+        const timeAgoInHours = differenceInHours(now, postCreatedTime)
+        if (timeAgoInHours < 25) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInHours.toString()} giờ trước`,
+            }
+        }
+
+        const timeAgoInDays = differenceInDays(now, postCreatedTime)
+        if (timeAgoInDays < 31) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInDays.toString()} ngày trước`,
+            }
+        }
+
+        const timeAgoInMonths = differenceInMonths(now, postCreatedTime)
+        if (timeAgoInMonths < 13) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInMonths.toString()} tháng trước`,
+            }
+        }
+
+        const timeAgoInYears = differenceInYears(now, postCreatedTime)
+        return {
+            ...post,
+            timeAgo: `${timeAgoInYears.toString()} năm trước`,
+        }
+    })
+    const updatedReponse = { ...responses.data, posts: updatedPosts }
+    return updatedReponse
+}

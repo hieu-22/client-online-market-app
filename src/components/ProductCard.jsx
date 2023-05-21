@@ -1,57 +1,87 @@
 import React from "react"
 import { MdDone } from "react-icons/md"
 import { GoLocation } from "react-icons/go"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
+import { formatNumstrToCurrency } from "../utils/NumberUtils"
 
-const ProductCard = ({ imageUrl }) => {
+const ProductCard = ({
+    title,
+    price,
+    author,
+    timeAgo,
+    address,
+    postUrl,
+    imageUrl,
+}) => {
+    const navigate = useNavigate()
+
     const productImage = (
-        <div className={`h-[240px] border-b-2 `}>
+        <div className={`relative h-[240px]  p-4 pb-0`}>
             <img
-                className="object-cover h-full"
+                className="object-cover h-full w-full rounded-sm"
                 src={imageUrl ? `${imageUrl}` : ""}
                 alt="product image"
             />
         </div>
     )
 
+    const saveProduct = (
+        <div className="px-3 py-1">
+            {/* if user like a product, AiFillHeart icons */}
+        </div>
+    )
     const productDetails = (
         <div className="productDetails px-3 py-2">
-            <div className="flex items-center">
-                <span className="text-primary mr-2 text-sm font-medium">
-                    user1
-                </span>
-                <span className="h-[12px] w-[12px] rounded-50 bg-gray-300 ">
-                    <MdDone className="h-[12px] w-[12px]" />
-                </span>
-            </div>
-            <div className="max-h-[42px] overflow-hidden">
+            <div className="h-[50px] overflow-hidden">
                 <Link
-                    to={""}
-                    className="text-sm font-medium text-gray-700 hover:underline "
+                    to={`/posts/${postUrl}`}
+                    className="text-lg font-medium text-gray-700 hover:text-primary"
                 >
-                    <h2>
-                        Thinkpad x1 carbon gen6 limit 40 characters Lorem ipsum
-                        dolor sit amet consectetur adipisicing elit. Eius,
-                        fugiat laborum ullam quaerat molestias accusamus
-                        quisquam tenetur? Blanditiis, aut deserunt!
-                    </h2>
+                    <h2 className="">{title}</h2>
                 </Link>
             </div>
-            <div className="text-xl font-bold">3.000.000 đ</div>
-            <div className="flex justify-between items-center text-xs text-gray-600">
-                <div className="flex items-center ">
-                    <span>
-                        <GoLocation className="text-base"></GoLocation>
-                    </span>
-                    <span>Ha noi</span>
+            <div className="flex justify-between items-center mt-2">
+                {" "}
+                <div className="text-lg font-bold text-red-700">
+                    {formatNumstrToCurrency(price, "0,0", "đ")}
                 </div>
-                <div className="bg-gray-300 rounded p-2">new 100%</div>
+                <div className="mr-2">
+                    <AiOutlineHeart className=" text-red-700 text-2xl  hover:scale-[1.2]" />
+                    {/* <AiFillHeart className=" text-red-700 text-2xl  hover:scale-[1.2]" */}
+                </div>
+            </div>
+
+            <div className="my-2 flex justify-start items-center text-xs text-gray-400 tracking-wide ">
+                <div className="rounded-[50%] w-5 h-5 bg-primary">
+                    <img
+                        src={author?.avatar}
+                        alt=""
+                        className="w-full h-full object-cover rounded-[50%]"
+                    />
+                </div>
+                <span className="px-[2px] -translate-y-[1px]">
+                    &nbsp;·&nbsp;{" "}
+                </span>
+                <div className="">{timeAgo}</div>
+                <span className="px-[2px] -translate-y-[1px]">
+                    &nbsp;·&nbsp;{" "}
+                </span>
+                <div className="truncate w-[100px]">
+                    {address ? address.split(",")[3] : ""}
+                </div>
             </div>
         </div>
     )
     const card = (
-        <div className="bg-white hover:shadow-lg hover:shadow-gray-200 hover:translate-y-[-4px]">
+        <div
+            className="bg-white hover:shadow-boxMd hover:shadow-gray-400 hover:z-10 cursor-pointer border-b-[1px] border-t-gray-200"
+            onClick={() => {
+                navigate(`/posts/${postUrl}`)
+            }}
+        >
             {productImage}
+            {saveProduct}
             {productDetails}
         </div>
     )

@@ -1,17 +1,226 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit"
 import storage from "redux-persist/lib/storage"
 import autoMergeLevel2 from "redux-persist/es/stateReconciler/autoMergeLevel2"
 import { persistReducer } from "redux-persist"
 
+import {
+    login,
+    register,
+    updatePhoneNumber,
+    updateAvatar,
+    getPostByUserId,
+} from "./authApi"
+
 const initialState = {
     isLoggedIn: false,
     token: null,
+    user: null,
+    status: "idle",
+    error: null,
 }
+
+export const loginThunk = createAsyncThunk(
+    "auth/login",
+    async (credentials, { rejectWithValue }) => {
+        try {
+            const data = await login(credentials)
+            // console.log(">>> data returned: ", data)
+            return data
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(">>> Error at loginThunk, response: ", {
+                    data: error.response.data,
+                    status: error.response.status,
+                    header: error.response.headers,
+                })
+                return rejectWithValue({
+                    data: error.response.data,
+                    status: error.response.status,
+                    header: error.response.headers,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(">>> Error at loginThunk, request:", error.request)
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+            }
+        }
+    }
+)
+
+export const registerThunk = createAsyncThunk(
+    "auth/register",
+    async (credentials, { rejectWithValue }) => {
+        try {
+            const data = await register(credentials)
+            return data
+        } catch (error) {
+            // console.log(">>> Error at registerThunk: ", error)
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
+
+export const getPostByUserIdThunk = createAsyncThunk(
+    "auth/getPostByUserIdThunk",
+    async ({ userId }, { rejectWithValue }) => {
+        try {
+            const data = await getPostByUserId({ userId })
+            console.log(">>> At getPostByUserIdThunk, data: ", data)
+            return data
+        } catch (error) {
+            console.log(">>> Error at getPostByUserIdThunk: ", error)
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
+
+export const updatePhoneNumberThunk = createAsyncThunk(
+    "auth/updatePhoneNumber",
+    async ({ phoneNumber, userId }, { rejectWithValue }) => {
+        try {
+            const data = await updatePhoneNumber(phoneNumber, userId)
+            return data
+        } catch (error) {
+            // console.log(">>> Error at updatePhoneNumberThunk: ", error)
+
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
+
+export const updateAvatarThunk = createAsyncThunk(
+    "auth/updateAvatar",
+    async ({ formData, userId }, { rejectWithValue }) => {
+        try {
+            const data = await updateAvatar(formData, userId)
+            // console.log("==> data: ", data)
+            return data
+        } catch (error) {
+            console.log(">>> Error at updateAvatarThunk: ", error)
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
-    reducers: {},
+    reducers: {
+        logout: (state, action) => {
+            state.user = null
+            state.isLoggedIn = false
+        },
+        deleteErrorMessage: (state, action) => {
+            if (state.error) {
+                state.error.message = null
+            }
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            // loginThunk
+            .addCase(loginThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(loginThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user = action.payload.user
+                state.token = action.payload.token
+                state.isLoggedIn = true
+            })
+            .addCase(loginThunk.rejected, (state, action) => {
+                state.status = "failed"
+                console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+
+            // registerThunk
+            .addCase(registerThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(registerThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user = action.payload.user
+                state.token = action.payload.token
+                state.isLoggedIn = true
+            })
+            .addCase(registerThunk.rejected, (state, action) => {
+                state.status = "failed"
+                state.error = action.payload
+            })
+
+            // updatePhoneNumberThunk
+            .addCase(updatePhoneNumberThunk.pending, (state) => {
+                state.status = "loadding"
+            })
+            .addCase(updatePhoneNumberThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user = action.payload.user
+            })
+            .addCase(updatePhoneNumberThunk.rejected, (state, action) => {
+                state.status = "failed"
+                state.error = action.payload
+            })
+
+            // updateAvatarThunk
+            .addCase(updateAvatarThunk.pending, (state) => {
+                state.status = "loadding"
+            })
+            .addCase(updateAvatarThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user = action.payload.user
+            })
+            .addCase(updateAvatarThunk.rejected, (state, action) => {
+                state.status = "failed"
+                state.error = action.payload
+            })
+            .addCase(getPostByUserIdThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(getPostByUserIdThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user.posts = action.payload.posts
+            })
+            .addCase(getPostByUserIdThunk.rejected, (state, action) => {
+                state.status = "failed"
+                console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+    },
 })
 
 // configure Redux-Persist reducer
@@ -20,6 +229,11 @@ export const authPersistConfig = {
     storage,
     stateReconciler: autoMergeLevel2,
 }
+
+export const selectAuthStatus = (state) => state.auth.status
+export const selectUser = (state) => state.auth.user
+export const selectError = (state) => state.auth.error
+export const { logout, deleteErrorMessage } = authSlice.actions
 
 // export authReducer
 export default persistReducer(authPersistConfig, authSlice.reducer)

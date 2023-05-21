@@ -1,0 +1,83 @@
+import React, { useState } from "react"
+import ProductCard from "../../components/ProductCard"
+import {
+    getFirstPostsThunk,
+    selectFetchedPosts,
+    getNextPostsThunk,
+} from "../Post/postSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
+import { useEffect } from "react"
+
+const NewPosts = () => {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const fetchedPosts = useSelector(selectFetchedPosts)
+    const [noMorePost, setNoMorePost] = useState(false)
+
+    useEffect(() => {
+        ;(async () => {
+            const res = await dispatch(
+                getFirstPostsThunk({ limit: 2 })
+            ).unwrap()
+            setNoMorePost(false)
+        })()
+    }, [])
+
+    const handleGetNextPosts = async () => {
+        const lastPostCreatedAt =
+            fetchedPosts[fetchedPosts.length - 1].createdAt
+        const res = await dispatch(
+            getNextPostsThunk({ limit: 2, lastPostCreatedAt })
+        ).unwrap()
+        // console.log(">>> At handleGetNextPosts: ", res)
+        if (res.posts.length === 0) {
+            setNoMorePost(true)
+        }
+    }
+    return (
+        <div className="laptop:w-laptop m-auto my-5 bg-white">
+            <div className="">
+                <h3 className="text-text text-lg py-2 font-semibold px-5">
+                    Tin đăng mới
+                </h3>
+            </div>
+            <div className=" bg-white grid grid-cols-4 border-t border-gray-200">
+                {fetchedPosts.map((post, index) => {
+                    return (
+                        <ProductCard
+                            key={index}
+                            title={post.title}
+                            price={post.price}
+                            author={post.author}
+                            timeAgo={post.timeAgo}
+                            address={post.address}
+                            postUrl={post.post_url}
+                            imageUrl={post.images[0].imageUrl}
+                        />
+                    )
+                })}
+            </div>
+            <div className="flex justify-center py-1 border-t border-gray-100 bg-customWhite">
+                {noMorePost ? (
+                    <button
+                        className="py-1 px-3 text-lg disabled:text-gray-400"
+                        disabled
+                    >
+                        Không còn tin nào khác
+                    </button>
+                ) : (
+                    <button
+                        className="py-1 px-3 text-lg cursor-pointer hover:text-gray-400"
+                        onClick={handleGetNextPosts}
+                    >
+                        Xem thêm
+                    </button>
+                )}
+            </div>
+        </div>
+    )
+}
+
+export default NewPosts

@@ -1,13 +1,14 @@
 import React, { useState } from "react"
-import ProductCard from "../../components/ProductCard"
 import { Link } from "react-router-dom"
 import { AiOutlineCaretDown } from "react-icons/ai"
 import { IoLocationSharp } from "react-icons/io5"
-import LoginForm from "../Auth/LoginForm"
+import BannerSlider from "./BannerSlider"
+import NewPosts from "./NewPosts"
 
 const Homepage = () => {
+    // Components
     const findNewBar = (
-        <div className="desktop:w-desktop my-6 mx-auto bg-white rounded-t-xl p-3 flex items-center justify-between ">
+        <div className="laptop:w-laptop my-6 mx-auto bg-white rounded-t-xl p-3 flex items-center justify-between ">
             <div className="flex items-center gap-4">
                 <div>Sắp xếp theo</div>
                 <div className="rounded-[10px] p-3 text-gray-800 font-medium bg-gray-300">
@@ -36,32 +37,9 @@ const Homepage = () => {
     )
 
     return (
-        <div className="py-3 mx-auto bg-gray-300">
-            {findNewBar}
-            <div className="desktop:w-desktop m-auto ">
-                <div className="grid grid-cols-5 gap-2">
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                    <ProductCard imageUrl={"../../1228831.jpg"} />
-                </div>
-            </div>
+        <div className="py-3 mx-auto bg-customWhite">
+            <BannerSlider />
+            <NewPosts />
         </div>
     )
 }

@@ -1,57 +1,108 @@
 import React, { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { GrClose } from "react-icons/gr"
-import { useRegisterUserMutation } from "../User/userApiSlice"
+import Logo from "../../utils/Logo.png"
+import { useDispatch } from "react-redux"
+import { registerThunk } from "./authSlice"
+import Breadcrumb from "../../components/Breadcrumb"
 
-const LoginForm = ({ closeUI, toLoginForm }) => {
-    const [accountName, setAccountName] = useState("")
+const LoginForm = () => {
+    const [userAccount, setUserAccount] = useState("")
     const [password, setPassword] = useState("")
     const [repeatedPassword, setRepeatedPassword] = useState("")
     const [samePassword, setSamePassword] = useState(true)
+    const [isEmail, setIsEmail] = useState(true)
 
-    const [registerUser, {}] = useRegisterUserMutation()
+    const [isAccountFieldEmpty, setIsAccountFieldEmpty] = useState(false)
+    const [isPasswordFieldEmpty, setIsPasswordFieldEmpty] = useState(false)
+    const [isRepeatPasswordFieldEmpty, setIsRepeatPasswordFieldEmpty] =
+        useState(false)
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const handleRegister = async () => {
+        if (userAccount === "") {
+            setIsAccountFieldEmpty(true)
+            return
+        }
+        if (password === "") {
+            setIsPasswordFieldEmpty(true)
+            return
+        }
+        if (repeatedPassword === "") {
+            setIsRepeatPasswordFieldEmpty(true)
+            return
+        }
+
         if (password !== repeatedPassword) {
             setSamePassword(false)
             return
         }
+        if (!emailRegex.test(userAccount)) {
+            setIsEmail(false)
+            return
+        }
 
         try {
-            const request = await registerUser({
-                userAccount: accountName,
-                password,
-            }).unwrap()
-            console.log(request)
+            await dispatch(
+                registerThunk({
+                    userAccount,
+                    password,
+                })
+            ).unwrap()
+            navigate("/")
         } catch (error) {
             console.log(error)
         }
     }
 
+    // UI
     const AccountField = (
         <div className="relative  m-auto my-6">
             <input
-                className="peer w-full outline-gray-400 outline-2 focus:outline-primary  outline-none placeholder-transparent px-3 py-2 rounded-sm "
-                type="text"
+                className={
+                    `peer w-full outline-gray-400 outline-2 focus:outline-primary  outline-none placeholder-transparent px-3 py-2 rounded-sm` +
+                    (isEmail ? " " : " outline-red-600 text-red-500")
+                }
+                type="email"
                 name="account"
                 id="account"
-                placeholder="Số ĐT/Email"
-                value={accountName}
-                onChange={(event) => setAccountName(event.target.value)}
+                placeholder="Email"
+                value={userAccount}
+                onChange={(event) => setUserAccount(event.target.value)}
+                onClick={() => {
+                    setIsAccountFieldEmpty(false)
+                    setIsEmail(true)
+                }}
             />
             <label
                 htmlFor="account"
                 className={
                     `absolute ` +
-                    (accountName
+                    (userAccount
                         ? `-top-3.5 left-2 text-gray-700 text-sm`
                         : `left-3 top-[7px]`) +
                     ` cursor-text bg-white z-10  
                         peer-focus:text-sm peer-focus:text-gray-700 peer-focus:left-2 peer-focus:-top-3.5 ease-linear duration-100`
                 }
             >
-                Số ĐT/Email của bạn
+                Email của bạn
             </label>
+            {!isEmail && isAccountFieldEmpty === false ? (
+                <div className="text-red-600 mt-2">
+                    Sai định dạng email. Ví dụ "emarket123@gmail.com"
+                </div>
+            ) : (
+                <></>
+            )}
+            {isAccountFieldEmpty ? (
+                <div className="text-red-600 mt-2">Bạn chưa nhập Email</div>
+            ) : (
+                <></>
+            )}
         </div>
     )
 
@@ -65,6 +116,9 @@ const LoginForm = ({ closeUI, toLoginForm }) => {
                 placeholder="Password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                onClick={() => {
+                    setIsPasswordFieldEmpty(false)
+                }}
             />
             <label
                 htmlFor="password"
@@ -79,29 +133,34 @@ const LoginForm = ({ closeUI, toLoginForm }) => {
             >
                 Mật khẩu
             </label>
+            {isPasswordFieldEmpty ? (
+                <div className="text-red-600 mt-2">Bạn chưa nhập mật khẩu</div>
+            ) : (
+                <></>
+            )}
         </div>
     )
 
-    const RepeatPassowrdFiled = (
+    const RepeatPasswordFiled = (
         <>
             <div className="relative  m-auto mt-6">
                 <input
                     className="peer w-full outline-gray-400 outline-2 focus:outline-primary outline-none placeholder-transparent px-3 py-2 rounded-sm "
                     type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Password"
+                    name="repeatpassword"
+                    id="repeatpassword"
+                    placeholder="Repeat password"
                     value={repeatedPassword}
                     onChange={(event) =>
                         setRepeatedPassword(event.target.value)
                     }
-                    onKeyDown={() => {
-                        if (samePassword) return
+                    onClick={() => {
+                        setIsRepeatPasswordFieldEmpty(false)
                         setSamePassword(true)
                     }}
                 />
                 <label
-                    htmlFor="password"
+                    htmlFor="repeatpassword"
                     className={
                         `absolute ` +
                         (repeatedPassword
@@ -117,6 +176,13 @@ const LoginForm = ({ closeUI, toLoginForm }) => {
             {!samePassword ? (
                 <div className="text-red-600 mt-2">
                     Mật khẩu không trùng khớp
+                </div>
+            ) : (
+                <></>
+            )}
+            {isRepeatPasswordFieldEmpty ? (
+                <div className="text-red-600 mt-2">
+                    Bạn chưa nhập lại mật khẩu
                 </div>
             ) : (
                 <></>
@@ -137,7 +203,7 @@ const LoginForm = ({ closeUI, toLoginForm }) => {
                 </p>
             </div>
             <div
-                className="mt-10 bg-primary text-white text-lg font-semibold py-2 flex rounded-md opacity-100 hover:opacity-90 cursor-pointer"
+                className={`mt-10 bg-primary  text-white text-lg font-semibold py-2 flex rounded-md opacity-100 hover:opacity-90 cursor-pointer`}
                 onClick={handleRegister}
             >
                 <p className="m-auto">Đăng ký</p>
@@ -146,8 +212,8 @@ const LoginForm = ({ closeUI, toLoginForm }) => {
                 <p>
                     Bạn đã có tài khoản?{" "}
                     <Link
+                        to="../login"
                         className="text-primary font-semibold hover:font-bold"
-                        onClick={toLoginForm}
                     >
                         Đăng nhập
                     </Link>
@@ -157,24 +223,34 @@ const LoginForm = ({ closeUI, toLoginForm }) => {
     )
 
     return (
-        <div className="bg-white m-auto w-[450px] border-[1px] rounded-md border-gray-200 py-4  px-6 shadow-lg shadow-gray-400 translate-y-[-50%] translate-x-[-50%] fixed top-[40%] left-[50%] z-50">
-            <span
-                className="absolute top-0 right-0 p-2 hover:bg-gray-300 cursor-pointer active:bg-gray-100 rounded"
-                onClick={closeUI}
+        <>
+            <Breadcrumb title1={"Đăng Ký"} />
+            <div
+                className="relative -top-20 bg-white m-auto my-12 w-[450px] border-[1px] rounded-md border-gray-200 py-4  px-8 shadow-lg shadow-gray-400"
+                onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                        handleRegister()
+                    }
+                }}
             >
-                <GrClose />
-            </span>
-            <h2 className="text-2xl font-bold py-6 flex justify-left items-center">
-                <span className="mr-3">Đăng ký</span>
-                <span className=" bg-primary rounded-50 px-4 py-2 mx-4 pb-3 text-gray-100 text-xl ">
-                    eMarket
-                </span>
-            </h2>
-            {AccountField}
-            {PassowrdFiled}
-            {RepeatPassowrdFiled}
-            {Footer}
-        </div>
+                <h2 className="text-2xl font-bold py-6  flex justify-between items-center">
+                    <div className="mr-3">
+                        <div className="text-primary text-3xl">Đăng ký</div>
+                        <div className="mt-1 text-base text-gray-600">
+                            Tạo tài khoản eMarket ngay
+                        </div>
+                    </div>
+
+                    <div className="mr-5 w-[80px] h-[80px]">
+                        <img src={Logo} alt="" />
+                    </div>
+                </h2>
+                {AccountField}
+                {PassowrdFiled}
+                {RepeatPasswordFiled}
+                {Footer}
+            </div>
+        </>
     )
 }
 

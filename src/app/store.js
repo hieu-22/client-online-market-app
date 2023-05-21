@@ -1,7 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit"
-import { setupListeners } from "@reduxjs/toolkit/dist/query"
-import apiReducer, { apiSlice } from "./api/apiSlice"
 import authReducer from "../features/Auth/authSlice"
+import locationReducer from "../features/Post/locationSlice"
+import postReducer from "../features/Post/postSlice"
+import userReducer from "../features/User/userSlice"
+
 import {
     persistStore,
     FLUSH,
@@ -15,7 +17,9 @@ import {
 export const store = configureStore({
     reducer: {
         auth: authReducer,
-        [apiSlice.reducerPath]: apiReducer,
+        location: locationReducer,
+        post: postReducer,
+        user: userReducer,
     },
 
     middleware: (getDefaultMiddleware) =>
@@ -30,9 +34,7 @@ export const store = configureStore({
                     REGISTER,
                 ],
             },
-        }).concat(apiSlice.middleware),
+        }),
 })
 
 export const persistor = persistStore(store)
-
-setupListeners(store.dispatch)
