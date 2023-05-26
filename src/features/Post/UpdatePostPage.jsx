@@ -7,14 +7,17 @@ import { TiDelete } from "react-icons/ti"
 import AddressForm from "./AddressForm"
 import { useDispatch, useSelector } from "react-redux"
 import { selectAddress, addPostThunk } from "./locationSlice"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { selectUser } from "../Auth/authSlice"
+import { selectPost, getPostByUrlThunk, resetPostStatus } from "./postSlice"
 
-const AddPostPage = () => {
+const UpdatePostPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const params = useParams()
 
     const user = useSelector(selectUser)
+    const post = useSelector(selectPost)
 
     const [postTitle, setPostTitle] = useState("")
     const [postTitleEmpty, setPostTitleEmpty] = useState(false)
@@ -31,7 +34,7 @@ const AddPostPage = () => {
     const [postDescriptionEmpty, setPostDescriptionEmpty] = useState(false)
 
     const [showAddressForm, setShowAddressForm] = useState(false)
-
+    const [postAddress, setPostAddress] = useState("")
     const stateAddress = useSelector(selectAddress)
     const [addressEmpty, setAddressEmpty] = useState(false)
 
@@ -55,10 +58,28 @@ const AddPostPage = () => {
     const { getRootProps, getInputProps } = useDropzone({
         onDrop,
     })
+    /**EFFECTS */
+    useEffect(() => {
+        ;(async () => {
+            const { postUrl } = params
+            const res = await dispatch(getPostByUrlThunk({ postUrl })).unwrap()
+            console.log("=> getPostByUrlThunk result: ", res)
+            dispatch(resetPostStatus())
+        })()
+    }, [])
 
+    useEffect(() => {
+        if (!post) {
+            return
+        }
+        setPostTitle(post.title)
+        setPostPrice(post.price)
+        setPostProductCondition(post.product_condition)
+        setPostDescription(post.description)
+        setPostAddress(post.address)
+    }, [post])
     /**HANDLERS */
-
-    const handleAddPost = async () => {
+    const handleUpdatePost = async () => {
         if (!postTitle) {
             setPostTitleEmpty(true)
         }
@@ -471,7 +492,7 @@ const AddPostPage = () => {
                     value={
                         stateAddress?.detailAddress
                             ? `${stateAddress.detailAddress}, ${stateAddress.ward}, ${stateAddress.district}, ${stateAddress.province}`
-                            : stateAddress.detailAddress
+                            : postAddress
                     }
                     onClick={(event) => {
                         event.stopPropagation()
@@ -535,9 +556,9 @@ const AddPostPage = () => {
                         </button>
                         <button
                             className=" block w-[50%] py-2 bg-primary text-white rounded-md hover:bg-light-primary"
-                            onClick={handleAddPost}
+                            onClick={handleUpdatePost}
                         >
-                            ĐĂNG TIN
+                            CẬP NHẬP
                         </button>
                     </div>
                 </div>
@@ -546,4 +567,4 @@ const AddPostPage = () => {
     )
 }
 
-export default AddPostPage
+export default UpdatePostPage

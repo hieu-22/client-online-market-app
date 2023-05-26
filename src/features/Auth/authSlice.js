@@ -9,6 +9,10 @@ import {
     updatePhoneNumber,
     updateAvatar,
     getPostByUserId,
+    savePost,
+    getSavedPostsByUserId,
+    deleteSavedPost,
+    deletePostById,
 } from "./authApi"
 
 const initialState = {
@@ -17,8 +21,10 @@ const initialState = {
     user: null,
     status: "idle",
     error: null,
+    message: null,
 }
 
+/**CREATE */
 export const loginThunk = createAsyncThunk(
     "auth/login",
     async (credentials, { rejectWithValue }) => {
@@ -71,6 +77,26 @@ export const registerThunk = createAsyncThunk(
     }
 )
 
+export const savePostThunk = createAsyncThunk(
+    "auth/savePostThunk",
+    async ({ userId, postId }, { rejectWithValue }) => {
+        try {
+            const data = await savePost({ userId, postId })
+            console.log(">>> At savePostThunk, data: ", data)
+            return data
+        } catch (error) {
+            console.log(">>> Error at savePostThunk: ", error)
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
+
+/**READ */
 export const getPostByUserIdThunk = createAsyncThunk(
     "auth/getPostByUserIdThunk",
     async ({ userId }, { rejectWithValue }) => {
@@ -90,6 +116,44 @@ export const getPostByUserIdThunk = createAsyncThunk(
     }
 )
 
+export const getSavedPostsByUserIdThunk = createAsyncThunk(
+    "auth/getSavedPostsByUserIdThunk",
+    async ({ userId }, { rejectWithValue }) => {
+        try {
+            const data = await getSavedPostsByUserId(userId)
+            console.log(">>> At getSavedPostsByUserIdThunk, data: ", data)
+            return data
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(
+                    ">>> Error at getSavedPostsByUserIdThunk, response: ",
+                    {
+                        data: error.response.data,
+                        status: error.response.status,
+                        header: error.response.headers,
+                    }
+                )
+                return rejectWithValue({
+                    data: error.response.data,
+                    status: error.response.status,
+                    header: error.response.headers,
+                })
+            } else if (error.request) {
+                console.log(">>> Error at loginThunk, request:", error.request)
+                return rejectWithValue({
+                    message: "ClientSide error",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+            }
+        }
+    }
+)
+
+/**UPDATE */
 export const updatePhoneNumberThunk = createAsyncThunk(
     "auth/updatePhoneNumber",
     async ({ phoneNumber, userId }, { rejectWithValue }) => {
@@ -127,6 +191,59 @@ export const updateAvatarThunk = createAsyncThunk(
         }
     }
 )
+/**DELETE */
+export const deleteSavedPostThunk = createAsyncThunk(
+    "auth/deleteSavedPostThunk",
+    async ({ userId, postId }, { rejectWithValue }) => {
+        try {
+            const data = await deleteSavedPost({ userId, postId })
+            return data
+        } catch (error) {
+            if (error.response) {
+                console.log("axios error.response: ", error.response)
+                return rejectWithValue({
+                    data: error.response.data,
+                    status: error.response.status,
+                    header: error.response.headers,
+                })
+            } else if (error.request) {
+                console.log("=> axios error.request: ", error.request)
+                return rejectWithValue({
+                    message: "ClientSide error",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+            }
+        }
+    }
+)
+export const deletePostByIdThunk = createAsyncThunk(
+    "auth/deletePostByIdThunk",
+    async ({ postId, userId }, { rejectWithValue }) => {
+        try {
+            const data = await deletePostById({ postId, userId })
+            return data
+        } catch (error) {
+            if (error.response) {
+                console.log("axios error.response: ", error.response)
+                return rejectWithValue({
+                    data: error.response.data,
+                    status: error.response.status,
+                    header: error.response.headers,
+                })
+            } else if (error.request) {
+                console.log("=> axios error.request: ", error.request)
+                return rejectWithValue({
+                    message: "ClientSide error",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+            }
+        }
+    }
+)
 
 const authSlice = createSlice({
     name: "auth",
@@ -140,6 +257,9 @@ const authSlice = createSlice({
             if (state.error) {
                 state.error.message = null
             }
+        },
+        resetStatus: (state, action) => {
+            state.status = "idle"
         },
     },
     extraReducers: (builder) => {
@@ -206,6 +326,8 @@ const authSlice = createSlice({
                 state.status = "failed"
                 state.error = action.payload
             })
+
+            //getPostByUserIdThunk
             .addCase(getPostByUserIdThunk.pending, (state) => {
                 state.status = "loading"
                 state.error = null
@@ -216,6 +338,75 @@ const authSlice = createSlice({
                 state.user.posts = action.payload.posts
             })
             .addCase(getPostByUserIdThunk.rejected, (state, action) => {
+                state.status = "failed"
+                console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+
+            //savePostThunk
+            .addCase(savePostThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(savePostThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user.savedPosts = [
+                    ...state.user.savedPosts,
+                    action.payload.savedPost,
+                ]
+            })
+            .addCase(savePostThunk.rejected, (state, action) => {
+                state.status = "failed"
+                console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+
+            //getSavedPostsByUserIdThunk
+            .addCase(getSavedPostsByUserIdThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(getSavedPostsByUserIdThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user.savedPosts = action.payload.savedPosts
+            })
+            .addCase(getSavedPostsByUserIdThunk.rejected, (state, action) => {
+                state.status = "failed"
+                console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+
+            //deleteSavedPostThunk
+            .addCase(deleteSavedPostThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(deleteSavedPostThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user.savedPosts = action.payload.updatedSavedPosts
+                state.message = action.payload.message
+            })
+            .addCase(deleteSavedPostThunk.rejected, (state, action) => {
+                state.status = "failed"
+                console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+
+            //deletePostByIdThunk
+            .addCase(deletePostByIdThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(deletePostByIdThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.user.posts = action.payload.posts
+                state.message = action.payload.message
+            })
+            .addCase(deletePostByIdThunk.rejected, (state, action) => {
                 state.status = "failed"
                 console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
@@ -233,7 +424,7 @@ export const authPersistConfig = {
 export const selectAuthStatus = (state) => state.auth.status
 export const selectUser = (state) => state.auth.user
 export const selectError = (state) => state.auth.error
-export const { logout, deleteErrorMessage } = authSlice.actions
+export const { logout, deleteErrorMessage, resetStatus } = authSlice.actions
 
 // export authReducer
 export default persistReducer(authPersistConfig, authSlice.reducer)

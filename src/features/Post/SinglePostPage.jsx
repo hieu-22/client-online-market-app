@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import Breadcrumb from "../../components/Breadcrumb"
 import Slider from "react-slick"
 import numeral from "numeral"
+import ConfirmationWindow from "../../components/ConfirmationWindow"
 // react-ioncs
 import {
     MdOutlineKeyboardArrowRight,
@@ -16,10 +17,19 @@ import { BsFillTelephoneForwardFill } from "react-icons/bs"
 import { BiShareAlt } from "react-icons/bi"
 import { TbMessageCircle2Filled } from "react-icons/tb"
 import { FaUserCircle } from "react-icons/fa"
+import { BiHide } from "react-icons/bi"
+import { AiOutlineEdit } from "react-icons/ai"
 
 // redux
 import { useDispatch, useSelector } from "react-redux"
-import { selectUser } from "../Auth/authSlice"
+import {
+    selectUser,
+    deletePostByIdThunk,
+    resetStatus,
+    savePostThunk,
+    deleteSavedPostThunk,
+} from "../Auth/authSlice"
+
 import {
     selectPost,
     selectPostImagesUrls,
@@ -49,6 +59,29 @@ const SinglePostPage = () => {
 
     const [showAuthorPhoneNumber, setShowAuthorPhoneNumber] = useState(false)
     const [authorFieldFixed, setAuthorFieldFixed] = useState(false)
+    const [showDeletPostByIdConfirmation, setShowDeletPostByIdConfirmation] =
+        useState(false)
+    const [deleteConfirmationResult, setDeleteConfirmationResult] =
+        useState(null)
+
+    /**EFFECTS */
+    // run handleDeletePostById
+    useEffect(() => {
+        if (deleteConfirmationResult === null) {
+            return
+        }
+
+        if (deleteConfirmationResult === false) {
+            return () => {
+                setDeleteConfirmationResult(null)
+            }
+        }
+
+        handleDeletePostById()
+        return () => {
+            setDeleteConfirmationResult(null)
+        }
+    }, [deleteConfirmationResult])
 
     useEffect(() => {
         ;(async () => {
@@ -59,15 +92,6 @@ const SinglePostPage = () => {
             console.log(">>> At useEffect, post: ", result)
         })()
     }, [])
-    // create a function to listen changes of status and error of that request (redux state), alert status and error to user in a friendly way
-    useEffect(() => {
-        if (postStatus === "failed" && postError?.code) {
-            alert(
-                `Error: ${postError.code}\nStatusCode:${postError.statusCode}\nStatusText:  ${postError.statusText}`
-            )
-        }
-    }, [postStatus, postError])
-
     useEffect(() => {
         const handleScroll = () => {
             const scrollPosition = window.pageYOffset
@@ -135,6 +159,54 @@ const SinglePostPage = () => {
         navigate(`/user/${userId}`)
     }
 
+    const handleConfirmDeletePost = () => {
+        setShowDeletPostByIdConfirmation(false)
+        setDeleteConfirmationResult(true)
+    }
+
+    const handleCancelDeletePost = () => {
+        setShowDeletPostByIdConfirmation(false)
+        setDeleteConfirmationResult(false)
+    }
+
+    const handleDeletePostById = async () => {
+        const postId = post?.id
+        const userId = user?.id
+        const res = await dispatch(
+            deletePostByIdThunk({ postId, userId })
+        ).unwrap()
+        console.log("=> At handleDeletePostById, res: ", res)
+        dispatch(resetStatus())
+        navigate("/")
+    }
+
+    const handleSavedPost = async () => {
+        const userId = user?.id
+        const postId = post?.id
+
+        const res = await dispatch(savePostThunk({ userId, postId })).unwrap()
+        console.log("=> savePostThunk res: ", res)
+        dispatch(resetStatus())
+    }
+    const handleDeleteSavedPost = async () => {
+        const userId = user?.id
+        const postId = post?.id
+        const res = await dispatch(
+            deleteSavedPostThunk({ userId, postId })
+        ).unwrap()
+        console.log("=> handleDeleteSavedPost res: ", res)
+        dispatch(resetStatus())
+    }
+
+    const handleCheckPostSaved = () => {
+        const savedPosts = user?.savedPosts
+        const postId = post?.id
+        const checkRes = savedPosts?.some((post) => {
+            return +post.post_id === +postId
+        })
+        return checkRes
+    }
+
     const quickQuestionList = [
         "Bạn còn sản phẩm này không?",
         "Bạn có ship hàng không?",
@@ -165,7 +237,7 @@ const SinglePostPage = () => {
             {/* product images */}
             <div className="w-full h-[460px] relative">
                 {ProductImageSlider}
-                <div className="absolute bottom-0 w-full z-10 flex justify-end py-1 pr-2 bg-black-0.5">
+                <div className="absolute bottom-0 w-full z-10 flex justify-end py-1 pr-2 bg-black-0.5 text-sm">
                     <p className="text-white">
                         Tin đăng {post?.timeAgo ? post.timeAgo : "...loading"}{" "}
                         trước
@@ -175,14 +247,14 @@ const SinglePostPage = () => {
 
             {/* product information */}
             <div className="pt-6 pb-3">
-                <h1 className="text-xl font-semibold">
+                <h1 className="text-lg font-semibold">
                     {post?.title ? post?.title : ""}
                 </h1>
             </div>
 
             {/* price and like post  */}
             <div className="pb-3 flex justify-between items-center text-red-500 font-medium">
-                <div className="text-xl">
+                <div className="text-lg">
                     <p>
                         {post?.price
                             ? numeral(post.price)
@@ -192,30 +264,47 @@ const SinglePostPage = () => {
                         &nbsp;đ
                     </p>
                 </div>
-                <div className="border border-red-500 rounded-[20px] flex items-center py-1 px-2">
-                    <span>Lưu tin</span>
-                    <span className="pl-2">
-                        {true ? <AiFillHeart /> : <AiOutlineHeart />}
-                    </span>
-                </div>
+                {!handleCheckPostSaved() ? (
+                    <div
+                        className="border border-red-500 rounded-[20px] flex items-center py-1 px-2 cursor-pointer"
+                        onClick={handleSavedPost}
+                    >
+                        <span>Lưu tin</span>
+                        <span className="pl-2">
+                            <AiOutlineHeart className="hover:scale-110 cursor-pointer" />
+                        </span>
+                    </div>
+                ) : (
+                    <div
+                        className="border border-red-500 rounded-[20px] flex items-center py-1 px-2 cursor-pointer"
+                        onClick={handleDeleteSavedPost}
+                    >
+                        <span>Hủy lưu</span>
+                        <span className="pl-2">
+                            <AiFillHeart className="hover:scale-110 cursor-pointer" />
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* description */}
             <div className="pb-3">
-                <div className="text-lg font-semibold text-gray-500">Mô Tả</div>
-                <p className="w-full whitespace-normal break-words">
+                <div className="text-base font-semibold text-gray-500">
+                    Mô Tả
+                </div>
+                <p className="w-full whitespace-normal break-words text-sm">
                     {post?.description ? post.description : "...loading"}
                 </p>
             </div>
 
             {/* phone Number, true to hide phoneNumber, false to show phoneNumber */}
-            <div>
-                <div className="text-lg font-semibold text-gray-500">
+            <div className=" text-sm">
+                <div className="text-base font-semibold text-gray-500">
                     Liên hệ
                 </div>
                 <p
                     className={
-                        `text-blue-400 underline cursor-pointer ` +
+                        `text-blue-400 underline cursor-pointer` +
                         (showAuthorPhoneNumber
                             ? "no-underline !text-black"
                             : "")
@@ -245,8 +334,8 @@ const SinglePostPage = () => {
             </div>
 
             {/* Areas  */}
-            <div className="pb-3">
-                <div className="py-2 border-b border-gray-200 text-gray-500 text-lg font-medium">
+            <div className="pb-3 text-sm">
+                <div className="py-2 border-b border-gray-200 text-gray-500 text-base font-medium">
                     Địa chỉ
                 </div>
                 <div className="flex items-center justify-start gap-1 py-1">
@@ -259,8 +348,8 @@ const SinglePostPage = () => {
                 </div>
             </div>
             {/* Quick Chat  */}
-            {/* <div className="pb-3">
-                <div className="pb-2 border-b border-gray-200 text-gray-500 text-lg font-medium">
+            <div className="pb-3 text-sm">
+                <div className="pb-2 border-b border-gray-200 text-gray-500 text-base font-medium">
                     Hỏi người bán qua chat
                 </div>
                 <div className="w-full overflow-x-scroll flex gap-6 py-3">
@@ -272,11 +361,11 @@ const SinglePostPage = () => {
                         )
                     })}
                 </div>
-            </div> */}
+            </div>
 
             {/* share post */}
             <div className="pb-3">
-                <div className="pb-2 border-b border-gray-200 text-gray-500 text-lg font-medium">
+                <div className="pb-2 border-b border-gray-200 text-gray-500 text-base font-medium">
                     Chia sẻ tin đăng này cho bạn bè
                 </div>
                 <div className="py-2">
@@ -319,7 +408,7 @@ const SinglePostPage = () => {
                     )}
                 </div>
                 <div className="flex flex-col justify-between ml-[-12px]">
-                    <div className="text-lg text-blue-800 font-medium hover:text-gray-700 hover:underline ">
+                    <div className="text-base text-blue-800 font-medium hover:text-gray-700 hover:underline ">
                         {author?.userName ? author.userName : ""}
                     </div>
                     <div className="flex items-center gap-x-2 w-[140px] mb-2">
@@ -333,7 +422,7 @@ const SinglePostPage = () => {
                         ></div>
                         <div
                             className={
-                                "text-xs font-medium " +
+                                "text-2xs font-medium " +
                                 (author?.isOnline
                                     ? "text-green-700"
                                     : "text-gray-600")
@@ -352,62 +441,108 @@ const SinglePostPage = () => {
                 </div>
             </div>
             <div className="my-2 py-2 border-t border-b border-gray-200">
-                <div className="text-gray-400 text-base font-semibold">
+                <div className="text-gray-400 text-sm font-semibold">
                     Đánh giá:{" "}
                     <span className="px-2"> {true ? "---" : "starts"}</span>
                 </div>
             </div>
             <div>
-                <div
-                    className={
-                        " my-2 flex items-end" +
-                        (author?.phoneNumber && showAuthorPhoneNumber
-                            ? " justify-around "
-                            : " justify-between ") +
-                        "border border-gray-300 rounded-md py-3 px-3 w-full text-lg cursor-pointer font-semibold text-gray-700 hover:bg-gray-200"
-                    }
-                    onClick={() => {
-                        if (!showAuthorPhoneNumber)
-                            return setShowAuthorPhoneNumber(true)
-
-                        navigator.clipboard.writeText(author?.phoneNumber)
-                        alert("Đã sao chép SĐT")
-                    }}
-                >
-                    {author?.phoneNumber ? (
-                        showAuthorPhoneNumber ? (
-                            author.phoneNumber
-                        ) : (
-                            <>
-                                <div className="flex">
-                                    <div>
-                                        <BsFillTelephoneForwardFill className="w-6 h-6 mt-[2px]" />
-                                    </div>
-                                    <div className="pl-4">
-                                        {author?.phoneNumber.slice(0, -5) +
-                                            "*****"}
-                                    </div>
+                {user?.id === post?.user_id ? (
+                    <>
+                        <div
+                            className={
+                                " my-2 flex items-center justify-center text-sm bg-light-primary rounded-md py-3 px-3 w-full  cursor-pointer font-semibold text-white hover:bg-primary"
+                            }
+                            onClick={(event) => {
+                                event.stopPropagation()
+                                setShowDeletPostByIdConfirmation(true)
+                            }}
+                        >
+                            <div className="flex">
+                                <div className="mr-2">
+                                    <BiHide className="w-6 h-6" />
                                 </div>
-
-                                <div className="font-semibold ">
-                                    Bấm để hiện số
-                                </div>
-                            </>
-                        )
-                    ) : (
-                        "...loading"
-                    )}
-
-                    {}
-                </div>
-                <div className="my-2 flex items-end justify-between  rounded-md py-3 px-3 w-full text-lg cursor-pointer bg-light-primary text-white hover:opacity-80">
-                    <div className="flex">
-                        <div>
-                            <TbMessageCircle2Filled className="w-7 h-7" />
+                            </div>
+                            <div className="font-semibold  hover:underline">
+                                Đã bán/Ẩn tin
+                            </div>
                         </div>
-                    </div>
-                    <div className="font-semibold ">Chat với người bán</div>
-                </div>
+                        <div
+                            className="my-2 flex items-end justify-center border border-gray-300  rounded-md py-3 px-3 w-full text-sm cursor-pointer hover:bg-slate-100 text-gray-700 "
+                            onClick={() => {
+                                navigate(`/update-post/:${post?.post_url}`)
+                            }}
+                        >
+                            <div className="flex">
+                                <div className="mr-2">
+                                    <AiOutlineEdit className="w-6 h-6" />
+                                </div>
+                            </div>
+                            <div className="font-semibold  hover:underline">
+                                Sửa tin
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div
+                            className={
+                                " my-2 flex items-end" +
+                                (author?.phoneNumber && showAuthorPhoneNumber
+                                    ? " justify-around "
+                                    : " justify-between ") +
+                                "border border-gray-300 rounded-md py-3 px-3 w-full text-sm cursor-pointer font-semibold text-gray-700 hover:bg-gray-200"
+                            }
+                            onClick={() => {
+                                if (!showAuthorPhoneNumber)
+                                    return setShowAuthorPhoneNumber(true)
+
+                                navigator.clipboard.writeText(
+                                    author?.phoneNumber
+                                )
+                                alert("Đã sao chép SĐT")
+                            }}
+                        >
+                            {author?.phoneNumber ? (
+                                showAuthorPhoneNumber ? (
+                                    author.phoneNumber
+                                ) : (
+                                    <>
+                                        <div className="flex items-end">
+                                            <div>
+                                                <BsFillTelephoneForwardFill className="w-6 h-6 mt-[2px]" />
+                                            </div>
+                                            <div className="pl-4">
+                                                {author?.phoneNumber.slice(
+                                                    0,
+                                                    -5
+                                                ) + "*****"}
+                                            </div>
+                                        </div>
+
+                                        <div className="font-semibold ">
+                                            Bấm để hiện số
+                                        </div>
+                                    </>
+                                )
+                            ) : (
+                                "...loading"
+                            )}
+
+                            {}
+                        </div>
+                        <div className="my-2 flex items-end justify-between  rounded-md py-3 px-3 w-full text-sm cursor-pointer bg-light-primary text-white hover:opacity-80">
+                            <div className="flex">
+                                <div>
+                                    <TbMessageCircle2Filled className="w-7 h-7" />
+                                </div>
+                            </div>
+                            <div className="font-semibold ">
+                                Chat với người bán
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     )
@@ -417,7 +552,7 @@ const SinglePostPage = () => {
             <div className="laptop:w-laptop bg-white m-auto px-6">
                 <Breadcrumb
                     title1={"Bài đăng"}
-                    link1={"/posts"}
+                    link1={"/"}
                     title2={post?.title ? post.title : "...loading"}
                 ></Breadcrumb>
             </div>
@@ -425,6 +560,19 @@ const SinglePostPage = () => {
                 <div className="w-[600px] pl-6 pb-3">{PostField}</div>
                 <div className="flex-1 px-6 pb-3">{AuthorFiled}</div>
             </div>
+
+            {/* Other Windows  */}
+            {showDeletPostByIdConfirmation ? (
+                <ConfirmationWindow
+                    message={"Bạn có chắc muốn xóa bài viết"}
+                    confirmText={"Xóa"}
+                    onConfirm={handleConfirmDeletePost}
+                    cancelText={"Hủy"}
+                    onCancel={handleCancelDeletePost}
+                />
+            ) : (
+                <></>
+            )}
         </div>
     )
 }

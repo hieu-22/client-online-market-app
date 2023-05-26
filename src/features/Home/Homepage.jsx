@@ -1,11 +1,20 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { AiOutlineCaretDown } from "react-icons/ai"
 import { IoLocationSharp } from "react-icons/io5"
 import BannerSlider from "./BannerSlider"
 import NewPosts from "./NewPosts"
+import { useDispatch, useSelector } from "react-redux"
+import {
+    selectUser,
+    resetStatus,
+    getSavedPostsByUserIdThunk,
+} from "../Auth/authSlice"
 
 const Homepage = () => {
+    const dispatch = useDispatch()
+    const user = useSelector(selectUser)
+
     // Components
     const findNewBar = (
         <div className="laptop:w-laptop my-6 mx-auto bg-white rounded-t-xl p-3 flex items-center justify-between ">
@@ -35,6 +44,19 @@ const Homepage = () => {
             </div>
         </div>
     )
+    useEffect(() => {
+        ;(async () => {
+            const userId = user?.id
+            const res = await dispatch(
+                getSavedPostsByUserIdThunk({ userId: userId })
+            ).unwrap()
+            console.log(
+                "=> At Homepage, getSavedPostsByUserIdThunk result: ",
+                res
+            )
+            dispatch(resetStatus())
+        })()
+    }, [])
 
     return (
         <div className="py-3 mx-auto bg-customWhite">

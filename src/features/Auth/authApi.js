@@ -96,3 +96,80 @@ export const getPostByUserId = async ({ userId }) => {
     const updatedReponse = { ...responses.data, posts: updatedPosts }
     return updatedReponse
 }
+
+export const savePost = async ({ userId, postId }) => {
+    const responses = await axios.post(
+        `/user/${userId}/save-post?postId=${postId}`,
+        {}
+    )
+    console.log(">>> At savePost, server reponses: ", responses)
+    return responses.data
+}
+
+export const getSavedPostsByUserId = async (userId) => {
+    const responses = await axios.get(`/user/get-saved-posts?userId=${userId}`)
+    console.log(">>> At getSavedPostsByUserId, server reponses: ", responses)
+    return responses.data
+}
+
+export const deleteSavedPost = async ({ userId, postId }) => {
+    const responses = await axios.delete(
+        `/user/delete-saved-post?userId=${userId}&postId=${postId}`
+    )
+    console.log(">>> At deleteSavedPost, server reponses: ", responses)
+    return responses.data
+}
+
+export const deletePostById = async ({ postId, userId }) => {
+    const responses = await axios.delete(
+        `/posts/${postId}/delete?userId=${userId}`
+    )
+    console.log(">>> At deletePostById, server reponses: ", responses)
+    const posts = responses.data?.posts
+    if (!posts) {
+        return responses.data
+    }
+    const updatedPosts = await posts.map((post) => {
+        const now = new Date()
+        const postCreatedTime = new Date(post.createdAt)
+        const timeAgoInMinutes = differenceInMinutes(now, postCreatedTime)
+        if (timeAgoInMinutes < 61) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInMinutes.toString()} phút`,
+            }
+        }
+
+        const timeAgoInHours = differenceInHours(now, postCreatedTime)
+        if (timeAgoInHours < 25) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInHours.toString()} giờ trước`,
+            }
+        }
+
+        const timeAgoInDays = differenceInDays(now, postCreatedTime)
+        if (timeAgoInDays < 31) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInDays.toString()} ngày trước`,
+            }
+        }
+
+        const timeAgoInMonths = differenceInMonths(now, postCreatedTime)
+        if (timeAgoInMonths < 13) {
+            return {
+                ...post,
+                timeAgo: `${timeAgoInMonths.toString()} tháng trước`,
+            }
+        }
+
+        const timeAgoInYears = differenceInYears(now, postCreatedTime)
+        return {
+            ...post,
+            timeAgo: `${timeAgoInYears.toString()} năm trước`,
+        }
+    })
+    const updatedReponse = { ...responses.data, posts: updatedPosts }
+    return updatedReponse
+}

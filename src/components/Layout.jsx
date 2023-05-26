@@ -5,6 +5,7 @@ import {
     useLocation,
     Link,
     NavLink,
+    ScrollRestoration,
 } from "react-router-dom"
 
 // react-icons
@@ -12,8 +13,7 @@ import { MdPostAdd } from "react-icons/md"
 import { FiSearch } from "react-icons/fi"
 import { BiUser, BiBell, BiChat, BiCart, BiUserCircle } from "react-icons/bi"
 import { GrUserManager } from "react-icons/gr"
-import { GiShoppingBag } from "react-icons/gi"
-import { MdStickyNote2, MdHelpCenter } from "react-icons/md"
+import { MdHelpCenter } from "react-icons/md"
 import { AiFillHeart, AiFillSetting } from "react-icons/ai"
 import { BsFillBookmarkFill, BsStarFill } from "react-icons/bs"
 import { RiPencilFill } from "react-icons/ri"
@@ -24,6 +24,8 @@ import CustomToastify from "./CustomToastify"
 
 // redux
 import { logout } from "../features/Auth/authSlice"
+import { fetchPostsBySearchKeysThunk } from "../features/Post/postSlice"
+import { selectSearchedPosts } from "../features/Post/postSlice"
 import Loader from "./Loader"
 
 import { selectAuthStatus } from "../features/Auth/authSlice"
@@ -32,25 +34,32 @@ const Layout = () => {
     const navigate = useNavigate()
     const location = useLocation()
 
-    // const [isLoggining, setIsLogining] = useState(false)
-    // const [isRegistering, setIsRegistering] = useState(false)
+    // COMPONENT'S STATES
     const [isfullScreenAndNoScroll, setIsfullScreenAndNoScroll] = useState(null)
     const [isAccountWindowShowed, setIsAccountWindowShowed] = useState(false)
     const [isNotificationWindowShowed, setIsNotificationWindowShowed] =
         useState(false)
     const [Loading, setLoading] = useState(false)
     const [footerHidden, setFooterHidden] = useState(false)
+    const [searchkeys, setSearchKeys] = useState("")
+    const [notificationWindowStatus, setNotificationWindowStatus] =
+        useState("onActivities") // onActivities or onNews
+    const [searchHintsShowed, setSearchHintsShowed] = useState(false)
 
+    // REDUX STATES
     const user = useSelector((state) => state.auth.user)
     const authStatus = useSelector(selectAuthStatus)
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
+    const searchedPosts = useSelector(selectSearchedPosts)
 
+    // EFFECTS
     useEffect(() => {
         setIsAccountWindowShowed(false)
         setIsNotificationWindowShowed(false)
         setLoading(true)
         setTimeout(() => {
             setLoading(false)
-        }, 500)
+        }, 200)
     }, [location.pathname])
 
     useEffect(() => {
@@ -64,19 +73,41 @@ const Layout = () => {
         setIsfullScreenAndNoScroll(false)
     }, [location.pathname])
 
-    const [notificationWindowStatus, setNotificationWindowStatus] =
-        useState("onActivities") // onActivities or onNews
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [location.pathname])
 
-    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
+    useEffect(() => {
+        let timerId
+        ;(async () => {
+            // Cancel any previous timer
+            clearTimeout(timerId)
+            // Set a new timer to trigger the API call after a certain delay (e.g., 500ms)
+            timerId = setTimeout(async () => {
+                const res = await dispatch(
+                    fetchPostsBySearchKeysThunk(searchkeys)
+                ).unwrap()
+                // console.log("At Layout, search result: ", res)
+            }, 500)
+        })()
+        // Cleanup function to cancel the timer if the component is unmounted or query changes
+        return () => clearTimeout(timerId)
+    }, [searchkeys])
 
+    /**HANDLERS */
     const handleReload = () => {
         window.location.reload()
     }
 
     const handleCloseAllWindows = (event) => {
-        if (isAccountWindowShowed || isNotificationWindowShowed) {
+        if (
+            isAccountWindowShowed ||
+            isNotificationWindowShowed ||
+            searchHintsShowed
+        ) {
             setIsAccountWindowShowed(false)
             setIsNotificationWindowShowed(false)
+            setSearchHintsShowed(false)
         }
     }
 
@@ -96,14 +127,12 @@ const Layout = () => {
         navigate("posts/new-post")
     }
 
-    // /logout
-
     const handleLogout = async () => {
         dispatch(logout())
         setLoading(true)
         setTimeout(() => {
             setLoading(false)
-        }, 500)
+        }, 200)
         setIsAccountWindowShowed(false)
         navigate("/")
     }
@@ -239,7 +268,12 @@ const Layout = () => {
                 <div className="px-3 py-1 bg-primary text-base text-white font-semibold">
                     Tiện ích
                 </div>
-                <div className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer">
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        navigate("/posts/my-saved-posts")
+                    }}
+                >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-red-500">
                         <AiFillHeart className="text-white" />
                     </div>
@@ -356,6 +390,9 @@ const Layout = () => {
                     <div
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer "
                         onClick={() => {
+                            if (!isLoggedIn) {
+                                return navigate("/login")
+                            }
                             navigate("/dashboard/posts")
                         }}
                     >
@@ -369,6 +406,9 @@ const Layout = () => {
                     <div
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer"
                         onClick={() => {
+                            if (!isLoggedIn) {
+                                return navigate("/login")
+                            }
                             navigate("/chat")
                         }}
                     >
@@ -443,16 +483,76 @@ const Layout = () => {
                 </div>
             </div>
 
-            <div className=" flex justify-between items-center mx-auto laptop:w-laptop w-100 ">
+            <div
+                className=" flex justify-between items-center mx-auto laptop:w-laptop w-100 "
+                onClick={(event) => {
+                    event.stopPropagation()
+                }}
+            >
                 <div className="flex items-center  w-full relative">
                     <input
                         className="px-4 w-full rounded border-[1px] border-gray-200 shadow-boxMd py-2  text-sm p-1 focus:outline-4 outline-primary"
                         type="text"
-                        placeholder="Search"
+                        placeholder="Tìm kiếm bài đăng . . ."
+                        name="searchkey"
+                        value={searchkeys}
+                        onChange={(event) => {
+                            setSearchKeys(event.target.value)
+                        }}
+                        onFocus={() => {
+                            if (!searchHintsShowed) {
+                                setSearchHintsShowed(true)
+                            }
+                        }}
                     />
                     <span className="absolute  right-0  inline-flex items-center justify-center  rounded-r  bg-button h-9 w-9 bg-primary active:opacity-80 cursor-pointer ">
                         <FiSearch className="text-white "></FiSearch>
                     </span>
+                    {searchHintsShowed ? (
+                        <div
+                            className="absolute z-20 top-[40px] shadow-big w-full bg-white rounded-sm pb-2"
+                            onClick={(event) => {
+                                event.stopPropagation()
+                            }}
+                        >
+                            <div className="text-gray-400 font-normal text-sm pl-4 mt-2 mb-1">
+                                Kết quả:
+                            </div>
+                            {searchedPosts?.length > 0 ? (
+                                <div className="">
+                                    {searchedPosts.map((post, index) => {
+                                        return (
+                                            <div
+                                                className="cursor-pointer hover:bg-slate-100 py-2 pl-4 text-sm text-gray-800"
+                                                key={index}
+                                                onClick={() => {
+                                                    setSearchHintsShowed(false)
+                                                    setSearchKeys(post.title)
+                                                }}
+                                            >
+                                                {post?.title ? post.title : ""}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            ) : (
+                                <>
+                                    {searchedPosts ? (
+                                        <div className="bg-hover-primary py-2 pl-4 text-sm text-gray-800">
+                                            Không tìm thấy nội dung phù hợp
+                                        </div>
+                                    ) : (
+                                        <div className="pb-1 pl-4 text-sm text-gray-800">
+                                            {" "}
+                                            Nhập từ khóa để tìm kiếm
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    ) : (
+                        <></>
+                    )}
                 </div>
                 <div className="flex items-center justify-end gap-x-1 flex-row min-w-[160px]">
                     <div onClick={handleAddNewPost}>

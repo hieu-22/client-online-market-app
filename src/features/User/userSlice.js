@@ -30,7 +30,7 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         resetUserStatus: (state, action) => {
-            state.error = "idle"
+            state.status = "idle"
         },
     },
     extraReducers: (builder) => {

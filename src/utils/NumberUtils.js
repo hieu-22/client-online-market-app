@@ -10,7 +10,9 @@ export const formatNumstrToCurrency = (
 
     // Format the number as Vietnamese currency
     const formattedCurrency =
-        numeral(number).format(format).replace(",", ".") + " " + currencySymbol
+        numeral(number).format(format).replaceAll(",", ".") +
+        " " +
+        currencySymbol
 
     return formattedCurrency
 }

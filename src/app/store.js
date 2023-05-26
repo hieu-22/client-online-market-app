@@ -3,6 +3,7 @@ import authReducer from "../features/Auth/authSlice"
 import locationReducer from "../features/Post/locationSlice"
 import postReducer from "../features/Post/postSlice"
 import userReducer from "../features/User/userSlice"
+import chatReducer from "../features/Chat/chatSlice"
 
 import {
     persistStore,
@@ -20,6 +21,7 @@ export const store = configureStore({
         location: locationReducer,
         post: postReducer,
         user: userReducer,
+        chat: chatReducer,
     },
 
     middleware: (getDefaultMiddleware) =>

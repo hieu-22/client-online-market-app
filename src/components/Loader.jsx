@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { BeatLoader } from "react-spinners"
+import { BeatLoader, HashLoader } from "react-spinners"
 
 const Loader = () => {
     return (

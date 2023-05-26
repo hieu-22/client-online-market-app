@@ -183,7 +183,7 @@ const OtherUserPage = () => {
                     {user?.posts?.length || 0} tin
                 </span>
             </div>
-            {user?.posts ? (
+            {user?.posts?.length > 0 ? (
                 // show posts
                 <>
                     {user.posts.map((post, index) => {

@@ -1,5 +1,10 @@
 import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit"
-import { getPostByUrl, getFirstPosts, getNextPosts } from "./postApi"
+import {
+    getPostByUrl,
+    getFirstPosts,
+    getNextPosts,
+    fetchPostsBySearchKeys,
+} from "./postApi"
 import {
     differenceInHours,
     differenceInMinutes,
@@ -11,6 +16,7 @@ import {
 const initialState = {
     post: null,
     fetchedPosts: [],
+    searchedPosts: [],
     status: "idle",
     error: null,
 }
@@ -65,6 +71,32 @@ export const getNextPostsThunk = createAsyncThunk(
                 statusCode: error.response.status,
                 statusText: error.response.statusText,
             })
+        }
+    }
+)
+
+export const fetchPostsBySearchKeysThunk = createAsyncThunk(
+    "post/fetchPostsBySearchKeysThunk",
+    async (searchKeys, { rejectWithValue }) => {
+        try {
+            const data = await fetchPostsBySearchKeys(searchKeys)
+            return data
+        } catch (error) {
+            if (error.response) {
+                return rejectWithValue({
+                    error: error.response.data,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    headers: error.response.headers,
+                })
+            }
+            if (error.request) {
+                return rejectWithValue({
+                    error: error.request,
+                })
+            }
+
+            console.log("Error", error.message)
         }
     }
 )
@@ -157,14 +189,29 @@ const postSlice = createSlice({
                 // console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
             })
+            .addCase(fetchPostsBySearchKeysThunk.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(fetchPostsBySearchKeysThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.error = null
+                state.searchedPosts = action.payload.matchedPosts
+            })
+            .addCase(fetchPostsBySearchKeysThunk.rejected, (state, action) => {
+                state.status = "failed"
+                // console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
     },
 })
 
 export const selectPost = (state) => state.post.post?.post
-export const selectFetchedPosts = (state) => state.post.fetchedPosts
+export const selectFetchedPosts = (state) => state.post?.fetchedPosts
 export const selectPostImagesUrls = (state) => state.post.post?.imageUrls
 export const selectPostStatus = (state) => state.post.status
 export const selectPostError = (state) => state.post.error
+export const selectSearchedPosts = (state) => state.post?.searchedPosts
 
 export const { resetPostStatus } = postSlice.actions
 

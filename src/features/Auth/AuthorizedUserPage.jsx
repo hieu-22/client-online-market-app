@@ -52,10 +52,10 @@ const AuthorizedUserPage = () => {
             const result = await dispatch(
                 getPostByUserIdThunk({ userId })
             ).unwrap()
-            console.log(
-                ">>> At AuthorizedUserPage, getPostByUserIdThunk result: ",
-                result
-            )
+            // console.log(
+            //     ">>> At AuthorizedUserPage, getPostByUserIdThunk result: ",
+            //     result
+            // )
         })()
     }, [])
 
@@ -241,7 +241,7 @@ const AuthorizedUserPage = () => {
                 </span>
             </div>
             <div>
-                {userPosts ? (
+                {userPosts?.length > 0 ? (
                     // show posts
                     <>
                         {userPosts.map((post, index) => {
