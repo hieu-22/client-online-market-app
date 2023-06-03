@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Routes, Route } from "react-router-dom"
 import Layout from "./components/Layout"
 import Homepage from "./features/Home/Homepage"
@@ -16,8 +16,24 @@ import PostDashboard from "./features/Post/PostDashboard"
 import UpdatePostPage from "./features/Post/UpdatePostPage"
 import SavedPostsPage from "./features/Post/SavedPostsPage"
 import SingleChatPage from "./features/Chat/SingleChatPage"
+import { socket } from "./socket"
+import { useSelector } from "react-redux"
+import { selectUser } from "./features/Auth/authSlice"
 
 const App = () => {
+    const user = useSelector(selectUser)
+
+    useEffect(() => {
+        if (user) {
+            console.log("run")
+            socket.connect()
+            socket.emit("activateUserOnlineStatus", user.id)
+            return () => {
+                socket.disconnect()
+            }
+        }
+        socket.disconnect()
+    }, [user])
     return (
         <main>
             <Routes>

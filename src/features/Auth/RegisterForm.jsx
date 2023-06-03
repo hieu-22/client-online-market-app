@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { GrClose } from "react-icons/gr"
-import Logo from "../../utils/Logo.png"
+import Logo from "../../utils/images/Logo.png"
 import { useDispatch } from "react-redux"
 import { registerThunk } from "./authSlice"
 import Breadcrumb from "../../components/Breadcrumb"

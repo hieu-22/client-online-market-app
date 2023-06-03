@@ -47,12 +47,29 @@ export const getFirstPostsThunk = createAsyncThunk(
             return data
         } catch (error) {
             console.log(">>> Error at getFirstPostsThunk: ", error)
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    isReponseError: true,
+                    data: error.response.data,
+                    status: error.response.status,
+                    headers: error.response.headers,
+                    message: error.response.data.message,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request)
+                return rejectWithValue({
+                    isRequestError: true,
+                    message: error.message,
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+            }
         }
     }
 )

@@ -38,12 +38,8 @@ import {
     getPostByUrlThunk,
     resetPostStatus,
 } from "../Post/postSlice"
-import {
-    getUserByIdThunk,
-    selectUserError,
-    selectUserStatus,
-    resetUserStatus,
-} from "../User/userSlice"
+
+import { addChatThunk } from "../Chat/chatSlice"
 
 const SinglePostPage = () => {
     const navigate = useNavigate()
@@ -143,6 +139,7 @@ const SinglePostPage = () => {
         },
     }
 
+    // HANDLERS
     const handleShareUrl = () => {
         // Get the current URL
         const url = window.location.href
@@ -205,6 +202,18 @@ const SinglePostPage = () => {
             return +post.post_id === +postId
         })
         return checkRes
+    }
+
+    const handleChatWithAuthour = async () => {
+        const addChatRes = await dispatch(
+            addChatThunk({ userId: user.id, postId: post.id })
+        ).unwrap()
+        console.log("=> addChatRes: ", addChatRes)
+        if (addChatRes.errorCode === 1) {
+            return navigate(`/chat/${addChatRes.chatId}`)
+        }
+        const chatId = addChatRes.chat.id
+        navigate(`/chat/${chatId}`)
     }
 
     const quickQuestionList = [
@@ -531,7 +540,10 @@ const SinglePostPage = () => {
 
                             {}
                         </div>
-                        <div className="my-2 flex items-end justify-between  rounded-md py-3 px-3 w-full text-sm cursor-pointer bg-light-primary text-white hover:opacity-80">
+                        <div
+                            className="my-2 flex items-end justify-between  rounded-md py-3 px-3 w-full text-sm cursor-pointer bg-light-primary text-white hover:opacity-80"
+                            onClick={handleChatWithAuthour}
+                        >
                             <div className="flex">
                                 <div>
                                     <TbMessageCircle2Filled className="w-7 h-7" />

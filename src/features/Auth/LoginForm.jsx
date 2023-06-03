@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { GrClose } from "react-icons/gr"
-import Logo from "../../utils/Logo.png"
+import Logo from "../../utils/images/Logo.png"
 import {
     loginThunk,
     deleteErrorMessage,

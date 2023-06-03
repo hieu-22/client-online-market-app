@@ -124,7 +124,10 @@ const Layout = () => {
     }
 
     const handleAddNewPost = () => {
-        navigate("posts/new-post")
+        if (!user) {
+            return navigate("/login")
+        }
+        navigate("/posts/new-post")
     }
 
     const handleLogout = async () => {
@@ -279,14 +282,38 @@ const Layout = () => {
                     </div>
                     <div className="font-light">Tin đăng đã lưu</div>
                 </div>
-                <div className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer">
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        if (!user) {
+                            return navigate("/login")
+                        }
+                        alert("Chức năng đang cập nhật!")
+                    }}
+                >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-blue-400">
                         <BsFillBookmarkFill className="text-white scale-[0.85]" />
                     </div>
                     <div className="font-light">Tìm kiếm đã lưu</div>
                 </div>
-                <div className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-yellow-500">
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        if (!user) {
+                            return navigate("/login")
+                        }
+                        alert("Chức năng đang cập nhật!")
+                    }}
+                >
+                    <div
+                        className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-yellow-500"
+                        onClick={() => {
+                            if (!user) {
+                                return navigate("/login")
+                            }
+                            alert("Chức năng đang cập nhật!")
+                        }}
+                    >
                         <BsStarFill className="text-white" />
                     </div>
                     <div className="font-light">Đánh giá từ tôi</div>
@@ -297,13 +324,29 @@ const Layout = () => {
                 <div className="px-3 py-1 bg-primary text-base text-white font-semibold">
                     Khác
                 </div>
-                <div className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer">
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        if (!user) {
+                            return navigate("/login")
+                        }
+                        navigate("user/setting/profile")
+                    }}
+                >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-gray-400">
                         <AiFillSetting className="text-white" />
                     </div>
                     <div className="font-light">Cài đặt tài khoản</div>
                 </div>
-                <div className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer">
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        if (!user) {
+                            return navigate("/login")
+                        }
+                        alert("Chức năng đang cập nhật!")
+                    }}
+                >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%]  bg-gray-400">
                         <MdHelpCenter className="text-white" />
                     </div>
@@ -356,27 +399,51 @@ const Layout = () => {
             </div>
             {notificationWindowStatus === "onActivities" ? (
                 <>
-                    <div className="p-3">
-                        <div className="text-center">
-                            Vui lòng đăng nhập để xem hoạt động
+                    {user ? (
+                        <div className="p-3">
+                            <div className="text-center">
+                                Chức năng đang được cập nhật!
+                            </div>
                         </div>
-                    </div>
-                    <div className="py-3 flex justify-center">
-                        <span className="text-white bg-primary text-base font-semibold py-2 px-3 rounded-md hover:opacity-70 active:opacity-100 cursor-pointer">
-                            Đăng ký/Đăng nhập
-                        </span>
-                    </div>
+                    ) : (
+                        <>
+                            <div className="p-3">
+                                <div className="text-center">
+                                    Vui lòng đăng nhập để xem hoạt động
+                                </div>
+                            </div>
+                            <div
+                                className="py-3 flex justify-center"
+                                onClick={() => {
+                                    navigate("/login")
+                                }}
+                            >
+                                <span className="text-white bg-primary text-base font-semibold py-2 px-3 rounded-md hover:opacity-70 active:opacity-100 cursor-pointer">
+                                    Đăng ký/Đăng nhập
+                                </span>
+                            </div>
+                        </>
+                    )}
                 </>
             ) : (
                 <></>
             )}
             {notificationWindowStatus === "onNews" ? (
-                <div className="p-3">
-                    <div className="">
-                        Chúng tôi không có cập nhật nào, vui lòng kiểm tra lại
-                        sau
-                    </div>
-                </div>
+                <>
+                    {user ? (
+                        <div className="p-3">
+                            <div className="text-center">
+                                Hiện bạn không có cập nhật nào
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="p-3">
+                            <div className="text-center">
+                                Hiện bạn không có cập nhật nào
+                            </div>
+                        </div>
+                    )}
+                </>
             ) : (
                 <></>
             )}
@@ -555,11 +622,12 @@ const Layout = () => {
                     )}
                 </div>
                 <div className="flex items-center justify-end gap-x-1 flex-row min-w-[160px]">
-                    <div onClick={handleAddNewPost}>
-                        <NavLink className="flex items-center text-sm py-[6px] px-2  text-white bg-primary hover:bg-light-primary rounded">
-                            <MdPostAdd className="h-6 w-6" />
-                            <span className="ml-2 font-semibold">ĐĂNG TIN</span>
-                        </NavLink>
+                    <div
+                        onClick={handleAddNewPost}
+                        className="flex items-center text-sm py-[6px] px-2  text-white bg-primary hover:bg-light-primary rounded cursor-pointer"
+                    >
+                        <MdPostAdd className="h-6 w-6" />
+                        <span className="ml-2 font-semibold">ĐĂNG TIN</span>
                     </div>
                 </div>
             </div>
