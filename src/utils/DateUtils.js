@@ -54,6 +54,8 @@ export const addTimeAgo = async (array, itemProp) => {
     return updatedArray
 }
 export const toTimeAgo = (timeStamp) => {
+    if (!timeStamp) return
+
     const now = new Date()
     const from = new Date(timeStamp)
 

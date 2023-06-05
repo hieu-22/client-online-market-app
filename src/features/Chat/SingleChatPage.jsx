@@ -418,8 +418,8 @@ const ChatPage = () => {
                                 className={` py-3 px-2 cursor-pointer border border-slate-200 border-t-0 hover:bg-slate-100 ${
                                     +chatId === +chat.id ? "bg-slate-200" : ""
                                 } ${
-                                    !chat.messages[0].is_read_by_another
-                                        ? chat.messages[0].user_id !== user.id
+                                    !chat.messages[0]?.is_read_by_another
+                                        ? chat.messages[0]?.user_id !== user.id
                                             ? "bg-slate-100"
                                             : ""
                                         : ""
@@ -526,9 +526,9 @@ const ChatPage = () => {
                                             <div
                                                 className={`w-full truncate text-xs text-gray-400 font-light ${
                                                     !chat.messages[0]
-                                                        .is_read_by_another
+                                                        ?.is_read_by_another
                                                         ? chat.messages[0]
-                                                              .user_id !==
+                                                              ?.user_id !==
                                                           user.id
                                                             ? "text-gray-800 font-medium"
                                                             : ""

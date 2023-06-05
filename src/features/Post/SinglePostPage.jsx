@@ -39,6 +39,8 @@ import {
     resetPostStatus,
 } from "../Post/postSlice"
 
+import { toTimeAgo } from "../../utils/DateUtils"
+
 import { addChatThunk } from "../Chat/chatSlice"
 
 const SinglePostPage = () => {
@@ -85,7 +87,7 @@ const SinglePostPage = () => {
             const result = await dispatch(
                 getPostByUrlThunk({ postUrl })
             ).unwrap()
-            console.log(">>> At useEffect, post: ", result)
+            // console.log(">>> At useEffect, post: ", result)
         })()
     }, [])
     useEffect(() => {
@@ -172,7 +174,7 @@ const SinglePostPage = () => {
         const res = await dispatch(
             deletePostByIdThunk({ postId, userId })
         ).unwrap()
-        console.log("=> At handleDeletePostById, res: ", res)
+        // console.log("=> At handleDeletePostById, res: ", res)
         dispatch(resetStatus())
         navigate("/")
     }
@@ -182,7 +184,7 @@ const SinglePostPage = () => {
         const postId = post?.id
 
         const res = await dispatch(savePostThunk({ userId, postId })).unwrap()
-        console.log("=> savePostThunk res: ", res)
+        // console.log("=> savePostThunk res: ", res)
         dispatch(resetStatus())
     }
     const handleDeleteSavedPost = async () => {
@@ -191,7 +193,7 @@ const SinglePostPage = () => {
         const res = await dispatch(
             deleteSavedPostThunk({ userId, postId })
         ).unwrap()
-        console.log("=> handleDeleteSavedPost res: ", res)
+        // console.log("=> handleDeleteSavedPost res: ", res)
         dispatch(resetStatus())
     }
 
@@ -208,7 +210,7 @@ const SinglePostPage = () => {
         const addChatRes = await dispatch(
             addChatThunk({ userId: user.id, postId: post.id })
         ).unwrap()
-        console.log("=> addChatRes: ", addChatRes)
+        // console.log("=> addChatRes: ", addChatRes)
         if (addChatRes.errorCode === 1) {
             return navigate(`/chat/${addChatRes.chatId}`)
         }
@@ -216,12 +218,7 @@ const SinglePostPage = () => {
         navigate(`/chat/${chatId}`)
     }
 
-    const quickQuestionList = [
-        "Bạn còn sản phẩm này không?",
-        "Bạn có ship hàng không?",
-        "Sản phẩm còn bảo hành không không?",
-        "Sản phẩm còn bảo hành không không?",
-    ]
+    const quickQuestionList = []
 
     const ProductImageSlider = (
         <Slider {...sliderSettings}>
@@ -357,7 +354,7 @@ const SinglePostPage = () => {
                 </div>
             </div>
             {/* Quick Chat  */}
-            <div className="pb-3 text-sm">
+            {/* <div className="pb-3 text-sm">
                 <div className="pb-2 border-b border-gray-200 text-gray-500 text-base font-medium">
                     Hỏi người bán qua chat
                 </div>
@@ -370,7 +367,7 @@ const SinglePostPage = () => {
                         )
                     })}
                 </div>
-            </div>
+            </div> */}
 
             {/* share post */}
             <div className="pb-3">
@@ -381,7 +378,7 @@ const SinglePostPage = () => {
                     <div
                         className="w-10 h-10 rounded-[50%] bg-light-primary flex items-center justify-center hover:bg-primary cursor-pointer"
                         onClick={(event) => {
-                            console.log("Click event:", event.target)
+                            // console.log("Click event:", event.target)
                             handleShareUrl()
                         }}
                     >
@@ -437,9 +434,11 @@ const SinglePostPage = () => {
                                     : "text-gray-600")
                             }
                         >
-                            {author?.isOnline
-                                ? "Đang hoạt động"
-                                : "Không hoạt động"}
+                            {author?.isOnline ? (
+                                "Đang hoạt động"
+                            ) : (
+                                <>{toTimeAgo(author?.updatedAt)}</>
+                            )}
                         </div>
                     </div>
                 </div>

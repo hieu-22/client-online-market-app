@@ -4,6 +4,7 @@ import Breadcrumb from "../../components/Breadcrumb"
 import Dropzone from "../../components/Dropzone"
 import Loader from "../../components/Loader"
 import numeral from "numeral"
+import { toTimeAgo } from "../../utils/DateUtils"
 // icons
 import {
     BsStar,
@@ -133,6 +134,24 @@ const AuthorizedUserPage = () => {
                 <div className="flex-1">
                     <div className="text-lg my-2 font-semibold">
                         {user?.userName ? user.userName : ""}
+                        {user?.userName ? user.userName : ""}
+                        <span
+                            className={
+                                `ml-3 inline-block mx-1  w-2 h-2 rounded-[50%] ` +
+                                (user?.isOnline
+                                    ? "bg-green-600"
+                                    : "bg-gray-600")
+                            }
+                        ></span>
+                        {user?.isOnline ? (
+                            <span className="text-green-600 text-xs">
+                                Đang hoạt động
+                            </span>
+                        ) : (
+                            <span className="text-gray-600 text-xs">
+                                {toTimeAgo(user.updatedAt)}
+                            </span>
+                        )}
                     </div>
                     <div className="flex justify-between text-sm my-2 pr-[120px]">
                         <div>
