@@ -82,7 +82,7 @@ export const savePostThunk = createAsyncThunk(
     async ({ userId, postId }, { rejectWithValue }) => {
         try {
             const data = await savePost({ userId, postId })
-            console.log(">>> At savePostThunk, data: ", data)
+            // console.log(">>> At savePostThunk, data: ", data)
             return data
         } catch (error) {
             console.log(">>> Error at savePostThunk: ", error)
@@ -102,7 +102,7 @@ export const getPostByUserIdThunk = createAsyncThunk(
     async ({ userId }, { rejectWithValue }) => {
         try {
             const data = await getPostByUserId({ userId })
-            console.log(">>> At getPostByUserIdThunk, data: ", data)
+            // console.log(">>> At getPostByUserIdThunk, data: ", data)
             return data
         } catch (error) {
             console.log(">>> Error at getPostByUserIdThunk: ", error)
@@ -121,7 +121,7 @@ export const getSavedPostsByUserIdThunk = createAsyncThunk(
     async ({ userId }, { rejectWithValue }) => {
         try {
             const data = await getSavedPostsByUserId(userId)
-            console.log(">>> At getSavedPostsByUserIdThunk, data: ", data)
+            // console.log(">>> At getSavedPostsByUserIdThunk, data: ", data)
             return data
         } catch (error) {
             if (error.response) {
@@ -233,7 +233,7 @@ export const deletePostByIdThunk = createAsyncThunk(
                     header: error.response.headers,
                 })
             } else if (error.request) {
-                console.log("=> axios error.request: ", error.request)
+                console.log("axios error.request: ", error.request)
                 return rejectWithValue({
                     message: "ClientSide error",
                 })

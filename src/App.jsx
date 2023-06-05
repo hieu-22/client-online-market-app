@@ -25,7 +25,6 @@ const App = () => {
 
     useEffect(() => {
         if (user) {
-            console.log("run")
             socket.connect()
             socket.emit("activateUserOnlineStatus", user.id)
             return () => {

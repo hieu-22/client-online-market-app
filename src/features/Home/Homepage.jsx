@@ -50,10 +50,10 @@ const Homepage = () => {
             const res = await dispatch(
                 getSavedPostsByUserIdThunk({ userId: userId })
             ).unwrap()
-            console.log(
-                "=> At Homepage, getSavedPostsByUserIdThunk result: ",
-                res
-            )
+            // console.log(
+            //     "=> At Homepage, getSavedPostsByUserIdThunk result: ",
+            //     res
+            // )
             dispatch(resetStatus())
         })()
     }, [])

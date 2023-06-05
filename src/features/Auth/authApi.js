@@ -42,7 +42,7 @@ export const updateAvatar = async (formData, userId) => {
             },
         }
     )
-    console.log(">>> server reponses: ", responses)
+    // console.log(">>> server reponses: ", responses)
     return responses.data
 }
 
@@ -102,13 +102,13 @@ export const savePost = async ({ userId, postId }) => {
         `/user/${userId}/save-post?postId=${postId}`,
         {}
     )
-    console.log(">>> At savePost, server reponses: ", responses)
+    // console.log(">>> At savePost, server reponses: ", responses)
     return responses.data
 }
 
 export const getSavedPostsByUserId = async (userId) => {
     const responses = await axios.get(`/user/get-saved-posts?userId=${userId}`)
-    console.log(">>> At getSavedPostsByUserId, server reponses: ", responses)
+    // console.log(">>> At getSavedPostsByUserId, server reponses: ", responses)
     return responses.data
 }
 
@@ -116,7 +116,7 @@ export const deleteSavedPost = async ({ userId, postId }) => {
     const responses = await axios.delete(
         `/user/delete-saved-post?userId=${userId}&postId=${postId}`
     )
-    console.log(">>> At deleteSavedPost, server reponses: ", responses)
+    // console.log(">>> At deleteSavedPost, server reponses: ", responses)
     return responses.data
 }
 
@@ -124,7 +124,7 @@ export const deletePostById = async ({ postId, userId }) => {
     const responses = await axios.delete(
         `/posts/${postId}/delete?userId=${userId}`
     )
-    console.log(">>> At deletePostById, server reponses: ", responses)
+    // console.log(">>> At deletePostById, server reponses: ", responses)
     const posts = responses.data?.posts
     if (!posts) {
         return responses.data

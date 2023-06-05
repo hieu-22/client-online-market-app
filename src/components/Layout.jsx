@@ -23,10 +23,18 @@ import { useDispatch, useSelector } from "react-redux"
 import CustomToastify from "./CustomToastify"
 
 // redux
-import { logout } from "../features/Auth/authSlice"
-import { fetchPostsBySearchKeysThunk } from "../features/Post/postSlice"
+import { logout, selectError } from "../features/Auth/authSlice"
+import {
+    selectPostError,
+    fetchPostsBySearchKeysThunk,
+} from "../features/Post/postSlice"
+import { selectChatError } from "../features/Chat/chatSlice"
+import { selectUserError } from "../features/User/userSlice"
+
+import { selectLocationError } from "../features/Post/locationSlice"
 import { selectSearchedPosts } from "../features/Post/postSlice"
 import Loader from "./Loader"
+import { ToastContainer, toast } from "react-toastify"
 
 import { selectAuthStatus } from "../features/Auth/authSlice"
 const Layout = () => {
@@ -51,8 +59,31 @@ const Layout = () => {
     const authStatus = useSelector(selectAuthStatus)
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
     const searchedPosts = useSelector(selectSearchedPosts)
+    const authError = useSelector(selectError)
+    const locationError = useSelector(selectLocationError)
+    const chatError = useSelector(selectChatError)
+    const userError = useSelector(selectUserError)
+    const postError = useSelector(selectPostError)
 
     // EFFECTS
+    // ERROR NOTIFICATION FOR EACH STATE
+    useEffect(() => {
+        if (authError) {
+            toast.error(authError.message || `something wrong!`)
+        }
+        if (locationError) {
+            toast.error(locationError.message || `something wrong!`)
+        }
+        if (chatError) {
+            toast.error(chatError.message || `something wrong!`)
+        }
+        if (userError) {
+            toast.error(userError.message || `something wrong!`)
+        }
+        if (postError) {
+            toast.error(postError.message || `something wrong!`)
+        }
+    }, [authError, locationError, chatError, userError, postError])
     useEffect(() => {
         setIsAccountWindowShowed(false)
         setIsNotificationWindowShowed(false)
@@ -87,7 +118,6 @@ const Layout = () => {
                 const res = await dispatch(
                     fetchPostsBySearchKeysThunk(searchkeys)
                 ).unwrap()
-                // console.log("At Layout, search result: ", res)
             }, 500)
         })()
         // Cleanup function to cancel the timer if the component is unmounted or query changes

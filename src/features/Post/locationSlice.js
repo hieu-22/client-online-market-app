@@ -149,6 +149,7 @@ export const selectAllDistricts = (state) => {
 }
 export const selectAllWards = (state) => state.location.wards
 export const selectAddress = (state) => state.location.address
+export const selectLocationError = (state) => state.location.error
 
 export const { updateAddress } = locationSlice.actions
 
