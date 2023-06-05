@@ -13,7 +13,8 @@ const CustomToastify = ({ status }) => {
     return (
         <ToastContainer
             position="top-right"
-            autoClose={false}
+            autoClose={2000}
+            limit={2}
             hideProgressBar={false}
             newestOnTop={false}
             closeOnClick

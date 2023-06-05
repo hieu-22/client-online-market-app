@@ -26,6 +26,7 @@ import {
 import { getPostByUserIdThunk } from "./authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
+import { ToastContainer, toast } from "react-toastify"
 
 const AuthorizedUserPage = () => {
     const dispatch = useDispatch()
@@ -134,7 +135,6 @@ const AuthorizedUserPage = () => {
                 <div className="flex-1">
                     <div className="text-lg my-2 font-semibold">
                         {user?.userName ? user.userName : ""}
-                        {user?.userName ? user.userName : ""}
                         <span
                             className={
                                 `ml-3 inline-block mx-1  w-2 h-2 rounded-[50%] ` +
@@ -143,15 +143,6 @@ const AuthorizedUserPage = () => {
                                     : "bg-gray-600")
                             }
                         ></span>
-                        {user?.isOnline ? (
-                            <span className="text-green-600 text-xs">
-                                Đang hoạt động
-                            </span>
-                        ) : (
-                            <span className="text-gray-600 text-xs">
-                                {toTimeAgo(user.updatedAt)}
-                            </span>
-                        )}
                     </div>
                     <div className="flex justify-between text-sm my-2 pr-[120px]">
                         <div>
@@ -186,7 +177,35 @@ const AuthorizedUserPage = () => {
                                         <div>
                                             <BsShare></BsShare>
                                         </div>
-                                        <div className="font-normal">
+                                        <div
+                                            className="font-normal"
+                                            onClick={(event) => {
+                                                event.stopPropagation()
+                                                const url = window.location.href
+                                                navigator.clipboard
+                                                    .readText()
+                                                    .then((clipboardText) => {
+                                                        if (
+                                                            clipboardText ===
+                                                            url
+                                                        ) {
+                                                            return setUserMenuShowed(
+                                                                false
+                                                            )
+                                                        } else {
+                                                            navigator.clipboard.writeText(
+                                                                url
+                                                            )
+                                                            toast(
+                                                                "Copy link successfully!"
+                                                            )
+                                                            setUserMenuShowed(
+                                                                false
+                                                            )
+                                                        }
+                                                    })
+                                            }}
+                                        >
                                             Sao chép liên kết
                                         </div>
                                     </div>

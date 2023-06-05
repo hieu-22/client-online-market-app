@@ -423,7 +423,7 @@ const ChatPage = () => {
                                             ? "bg-slate-100"
                                             : ""
                                         : ""
-                                }`}
+                                } ${!chat.messages[0] ? "bg-white" : ""}`}
                             >
                                 <Link
                                     className="flex justify-between"
