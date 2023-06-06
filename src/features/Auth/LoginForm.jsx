@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { GrClose } from "react-icons/gr"
@@ -10,6 +10,7 @@ import {
 } from "../Auth/authSlice"
 import { useNavigate } from "react-router-dom"
 import Breadcrumb from "../../components/Breadcrumb"
+import { toast } from "react-toastify"
 
 const LoginForm = () => {
     const dispatch = useDispatch()
@@ -28,6 +29,24 @@ const LoginForm = () => {
     const authStatus = useSelector(selectAuthStatus)
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    // useEffect
+    // hande notifications for loginthunk
+    useEffect(() => {
+        if (authStatus === "Đăng đăng nhập ...") {
+            toast.info(authStatus, {
+                hideProgressBar: false,
+            })
+        }
+        if (authStatus === "Đăng nhập thành công") {
+            toast.dismiss()
+            // toast.success(authStatus)
+        }
+        if (authStatus === "Đăng nhập thất bại") {
+            toast.dismiss()
+            // toast.error(authStatus)
+        }
+    }, [authStatus])
 
     const handleLogin = async () => {
         // /handle input before dispatch
@@ -164,7 +183,7 @@ const LoginForm = () => {
             ) : (
                 <></>
             )}
-            {error?.message === "Wrong password" ? (
+            {error?.message === "WRONG PASSWORD" ? (
                 <div className="text-red-600 mt-2">Sai mật khẩu</div>
             ) : (
                 <></>

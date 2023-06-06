@@ -68,23 +68,6 @@ const Layout = () => {
     // EFFECTS
     // ERROR NOTIFICATION FOR EACH STATE
     useEffect(() => {
-        if (authError) {
-            toast.error(authError.message || `something wrong!`)
-        }
-        if (locationError) {
-            toast.error(locationError.message || `something wrong!`)
-        }
-        if (chatError) {
-            toast.error(chatError.message || `something wrong!`)
-        }
-        if (userError) {
-            toast.error(userError.message || `something wrong!`)
-        }
-        if (postError) {
-            toast.error(postError.message || `something wrong!`)
-        }
-    }, [authError, locationError, chatError, userError, postError])
-    useEffect(() => {
         setIsAccountWindowShowed(false)
         setIsNotificationWindowShowed(false)
         setLoading(true)

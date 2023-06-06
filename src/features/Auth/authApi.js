@@ -33,7 +33,7 @@ export const updatePhoneNumber = async (phoneNumber, userId) => {
 
 export const updateAvatar = async (formData, userId) => {
     const responses = await axios.patch(
-        `/user/${userId}/update-avatar?cacheBust=${uniqueParam}`,
+        `/user/${userId}/changeAvatar?cacheBust=${uniqueParam}`,
 
         formData,
         {

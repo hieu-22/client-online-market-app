@@ -22,6 +22,7 @@ import {
     selectError,
     selectAuthStatus,
     updateAvatarThunk,
+    resetStatus,
 } from "./authSlice"
 import { getPostByUserIdThunk } from "./authSlice"
 import { useDispatch, useSelector } from "react-redux"
@@ -60,14 +61,30 @@ const AuthorizedUserPage = () => {
             // )
         })()
     }, [])
-
     useEffect(() => {
-        if (status === "failed" && error?.code) {
-            alert(
-                `Error: ${error.code}\nStatusCode:${error.statusCode}\nStatusText:  ${error.statusText}`
-            )
+        dispatch(resetStatus())
+    }, [window.performance.navigation.type])
+    useEffect(() => {
+        if (status === "Đang cập nhật ảnh ...") {
+            toast.dismiss()
+            toast.info(status, {
+                autoClose: 5000,
+            })
         }
-    }, [status, error])
+        if (status === "Cập nhật ảnh thành công") {
+            toast.dismiss()
+            toast.success(status, {
+                hideProgressBar: true,
+            })
+        }
+        if (status === "Cập nhật ảnh thất bại") {
+            toast.dismiss()
+            toast.error(status, {
+                hideProgressBar: true,
+            })
+        }
+    }, [status])
+
     const handleCloseAllWindows = () => {
         if (userMenuShowed) {
             setUserMenuShowed(false)
@@ -96,13 +113,47 @@ const AuthorizedUserPage = () => {
         }
         const userId = user.id
 
-        handleCloseImageUploader()
-        // console.log("===> saved avatar: ", formData.get("avatar"))
         const result = await dispatch(
             updateAvatarThunk({ formData, userId })
         ).unwrap()
-        console.log("===> Update Avatar Result: ", result)
+        handleCloseImageUploader()
+        // console.log("===> saved avatar: ", formData.get("avatar"))
         setAvatarImage([])
+
+        // const updatePromise = new Promise((resolve, reject) => {
+        //     const timeoutId = setTimeout(() => {
+        //         clearTimeout(timeoutId)
+        //         reject("failed to update avatar")
+        //     }, 5000)
+
+        //     new Promise(async () => {
+        //         const result = await dispatch(
+        //             updateAvatarThunk({ formData, userId })
+        //         ).unwrap()
+        //         resolve(result)
+        //     })
+        //         .then((result) => {
+        //             clearTimeout(timeoutId)
+        //             resolve(result)
+        //             handleCloseImageUploader()
+        //             // console.log("===> saved avatar: ", formData.get("avatar"))
+        //             setAvatarImage([])
+        //         })
+        //         .catch((error) => {
+        //             clearTimeout(timeoutId)
+        //             reject(error)
+        //         })
+        // })
+        // // console.log("===> Update Avatar Result: ", result)
+        // toast.promise(updatePromise, {
+        //     pending: "Đăng cập nhật ảnh đại diện",
+        //     success: "Cập nhật thành công",
+        //     error: {
+        //         render() {
+        //             return `Cập nhật thất bại`
+        //         },
+        //     },
+        // })
     }
 
     /**COMPONENTS */
@@ -373,7 +424,6 @@ const AuthorizedUserPage = () => {
 
     return (
         <div className="bg-customWhite " onClick={handleCloseAllWindows}>
-            {status === "loadding" ? <Loader /> : <></>}
             <Breadcrumb title1={`Trang cá nhân của ${user?.userName}`} />
             {userInformatiion}
             {UserPostsField}

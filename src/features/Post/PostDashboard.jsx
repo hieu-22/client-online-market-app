@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { selectUser } from "../Auth/authSlice"
+import { selectAuthStatus, selectUser } from "../Auth/authSlice"
 import { useNavigate } from "react-router-dom"
 import numeral from "numeral"
 // components
@@ -10,6 +10,7 @@ import {
     deletePostByIdThunk,
     resetStatus,
 } from "../Auth/authSlice"
+import ConfirmationWindow from "../../components/ConfirmationWindow"
 
 //icons
 import { FaUserCircle } from "react-icons/fa"
@@ -28,6 +29,29 @@ const PostDashboard = () => {
     const [nonexpiredPosts, setNonexpiredPosts] = useState([])
     const user = useSelector(selectUser)
     const userPosts = user?.posts
+    const authStatus = useSelector(selectAuthStatus)
+    const [showDeletPostByIdConfirmation, setShowDeletPostByIdConfirmation] =
+        useState(false)
+    const [deleteConfirmationResult, setDeleteConfirmationResult] =
+        useState(null)
+    const [aimDeletedPostId, setAimDeletedPostId] = useState(null)
+
+    useEffect(() => {
+        if (authStatus === "Đang ẩn bài đăng ...") {
+            toast.info(authStatus, {
+                autoClose: 5000,
+            })
+        }
+        if (authStatus === "Ẩn bài đăng thành công") {
+            toast.dismiss()
+        }
+        if (authStatus === "Ẩn bài đăng thất bại") {
+            toast.dismiss()
+            toast.error(authStatus, {
+                hideProgressBar: false,
+            })
+        }
+    }, [authStatus])
 
     useEffect(() => {
         if (!userPosts) return
@@ -36,13 +60,31 @@ const PostDashboard = () => {
         )
         setExpiredPosts(filterdPosts)
     }, [userPosts])
+
     useEffect(() => {
         if (!userPosts) return
         const filterdPosts = userPosts.filter(
             (post) => new Date(post.expiryDate) > new Date()
         )
         setNonexpiredPosts(filterdPosts)
-    }, [userPosts])
+    }, [user])
+
+    useEffect(() => {
+        if (deleteConfirmationResult === null) {
+            return
+        }
+
+        if (deleteConfirmationResult === false) {
+            return () => {
+                setDeleteConfirmationResult(null)
+            }
+        }
+
+        handleDeletePostById(aimDeletedPostId)
+        return () => {
+            setDeleteConfirmationResult(null)
+        }
+    }, [deleteConfirmationResult])
 
     /**EFFECTS */
     useEffect(() => {
@@ -59,6 +101,15 @@ const PostDashboard = () => {
     }, [])
 
     /**HANDLERS */
+    const handleConfirmDeletePost = () => {
+        setShowDeletPostByIdConfirmation(false)
+        setDeleteConfirmationResult(true)
+    }
+    const handleCancelDeletePost = () => {
+        setShowDeletPostByIdConfirmation(false)
+        setDeleteConfirmationResult(false)
+    }
+
     const handleSetPostType = (type) => {
         if (postType === type) {
             return
@@ -160,7 +211,10 @@ const PostDashboard = () => {
                                             <div className="w-[15%] h-full rounded-sm">
                                                 <img
                                                     src={
-                                                        post.images[0].imageUrl
+                                                        post?.images
+                                                            ? post.images[0]
+                                                                  .imageUrl
+                                                            : ""
                                                     }
                                                     alt="post image"
                                                     className="w-full h-full object-cover rounded-sm"
@@ -198,7 +252,10 @@ const PostDashboard = () => {
                                             className="text-blue-400 flex w-[50%] py-2 border border-gray-300 justify-center cursor-pointer "
                                             onClick={(event) => {
                                                 event.stopPropagation()
-                                                handleDeletePostById(post.id)
+                                                setAimDeletedPostId(post.id)
+                                                setShowDeletPostByIdConfirmation(
+                                                    true
+                                                )
                                             }}
                                         >
                                             <div className="mr-2">
@@ -208,7 +265,15 @@ const PostDashboard = () => {
                                                 Đã bán/Ẩn tin
                                             </div>
                                         </div>
-                                        <div className="text-blue-400 flex  w-[50%] py-2 border border-gray-300 justify-center cursor-pointer ">
+                                        <div
+                                            className="text-blue-400 flex  w-[50%] py-2 border border-gray-300 justify-center cursor-pointer"
+                                            onClick={(event) => {
+                                                event.stopPropagation()
+                                                navigate(
+                                                    `/update-post/${post.post_url}`
+                                                )
+                                            }}
+                                        >
                                             <div className="mr-2">
                                                 <AiOutlineEdit className="w-6 h-6" />
                                             </div>
@@ -316,7 +381,10 @@ const PostDashboard = () => {
                                             className="text-blue-400 flex w-[50%] py-2 border border-gray-300 justify-center cursor-pointer "
                                             onClick={(event) => {
                                                 event.stopPropagation()
-                                                handleDeletePostById(post.id)
+                                                setAimDeletedPostId(post.id)
+                                                setShowDeletPostByIdConfirmation(
+                                                    true
+                                                )
                                             }}
                                         >
                                             <div className="mr-2">
@@ -397,6 +465,17 @@ const PostDashboard = () => {
                             : ""}
                     </div>
                 </div>
+                {showDeletPostByIdConfirmation ? (
+                    <ConfirmationWindow
+                        message={"Bạn có chắc muốn xóa bài viết"}
+                        confirmText={"Xóa"}
+                        onConfirm={handleConfirmDeletePost}
+                        cancelText={"Hủy"}
+                        onCancel={handleCancelDeletePost}
+                    />
+                ) : (
+                    <></>
+                )}
             </div>
         </>
     )

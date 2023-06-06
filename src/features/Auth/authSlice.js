@@ -181,7 +181,7 @@ export const updateAvatarThunk = createAsyncThunk(
             // console.log("==> data: ", data)
             return data
         } catch (error) {
-            console.log(">>> Error at updateAvatarThunk: ", error)
+            // console.log(">>> Error at updateAvatarThunk: ", error)
             return rejectWithValue({
                 code: error.code,
                 message: error.response.data.message,
@@ -266,20 +266,20 @@ const authSlice = createSlice({
         builder
             // loginThunk
             .addCase(loginThunk.pending, (state) => {
-                state.status = "loading"
+                state.status = "Đăng đăng nhập ..."
                 state.error = null
             })
             .addCase(loginThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
+                state.status = "Đăng nhập thành công"
                 state.error = null
                 state.user = action.payload.user
                 state.token = action.payload.token
                 state.isLoggedIn = true
             })
             .addCase(loginThunk.rejected, (state, action) => {
-                state.status = "failed"
+                state.status = "Đăng nhập thất bại"
                 console.log(">>>rejected payload: ", action.payload)
-                state.error = action.payload
+                state.error = action.payload.data
             })
 
             // registerThunk
@@ -315,15 +315,15 @@ const authSlice = createSlice({
 
             // updateAvatarThunk
             .addCase(updateAvatarThunk.pending, (state) => {
-                state.status = "loadding"
+                state.status = "Đang cập nhật ảnh ..."
             })
             .addCase(updateAvatarThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
+                state.status = "Cập nhật ảnh thành công"
                 state.error = null
                 state.user = action.payload.user
             })
             .addCase(updateAvatarThunk.rejected, (state, action) => {
-                state.status = "failed"
+                state.status = "Cập nhật ảnh thất bại"
                 state.error = action.payload
             })
 
@@ -399,17 +399,17 @@ const authSlice = createSlice({
 
             //deletePostByIdThunk
             .addCase(deletePostByIdThunk.pending, (state) => {
-                state.status = "loading"
+                state.status = "Đang ẩn bài đăng ..."
                 state.error = null
             })
             .addCase(deletePostByIdThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
+                state.status = "Ẩn bài đăng thành công"
                 state.error = null
                 state.user.posts = action.payload.posts
                 state.message = action.payload.message
             })
             .addCase(deletePostByIdThunk.rejected, (state, action) => {
-                state.status = "failed"
+                state.status = "Ẩn bài đăng thất bại"
                 console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
             })

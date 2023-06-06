@@ -28,6 +28,7 @@ import {
     resetStatus,
     savePostThunk,
     deleteSavedPostThunk,
+    selectAuthStatus,
 } from "../Auth/authSlice"
 
 import {
@@ -42,6 +43,7 @@ import {
 import { toTimeAgo } from "../../utils/DateUtils"
 
 import { addChatThunk } from "../Chat/chatSlice"
+import { toast } from "react-toastify"
 
 const SinglePostPage = () => {
     const navigate = useNavigate()
@@ -54,6 +56,7 @@ const SinglePostPage = () => {
     const postImagesUrls = useSelector(selectPostImagesUrls)
     const postStatus = useSelector(selectPostError)
     const postError = useSelector(selectPostError)
+    const authStatus = useSelector(selectAuthStatus)
 
     const [showAuthorPhoneNumber, setShowAuthorPhoneNumber] = useState(false)
     const [authorFieldFixed, setAuthorFieldFixed] = useState(false)
@@ -63,6 +66,22 @@ const SinglePostPage = () => {
         useState(null)
 
     /**EFFECTS */
+    useEffect(() => {
+        if (authStatus === "Đang ẩn bài đăng ...") {
+            toast.info(authStatus, {
+                autoClose: 5000,
+            })
+        }
+        if (authStatus === "Ẩn bài đăng thành công") {
+            toast.dismiss()
+        }
+        if (authStatus === "Ẩn bài đăng thất bại") {
+            toast.dismiss()
+            toast.error(authStatus, {
+                hideProgressBar: false,
+            })
+        }
+    }, [authStatus])
     // run handleDeletePostById
     useEffect(() => {
         if (deleteConfirmationResult === null) {
