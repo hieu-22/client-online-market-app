@@ -31,6 +31,21 @@ export const updatePhoneNumber = async (phoneNumber, userId) => {
     return responses.data
 }
 
+export const updateUserInfo = async (updatedInfo, userId) => {
+    const response = await axios.patch(
+        `user/${userId}/update-user-information`,
+        updatedInfo
+    )
+    return response.data
+}
+
+export const updatePassword = async (updatedInfo, userId) => {
+    const response = await axios.patch(
+        `user/${userId}/update-password`,
+        updatedInfo
+    )
+    return response.data
+}
 export const updateAvatar = async (formData, userId) => {
     const responses = await axios.patch(
         `/user/${userId}/changeAvatar?cacheBust=${uniqueParam}`,

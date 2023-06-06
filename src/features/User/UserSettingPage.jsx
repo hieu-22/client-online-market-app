@@ -1,11 +1,17 @@
 import React, { useEffect } from "react"
 import Breadcrumb from "../../components/Breadcrumb"
 import { useDispatch, useSelector } from "react-redux"
-import { selectUser } from "../Auth/authSlice"
+import { resetStatus, selectAuthStatus, selectUser } from "../Auth/authSlice"
 import { useState } from "react"
 import Dropzone from "../../components/Dropzone"
-import { updateAvatarThunk } from "../Auth/authSlice"
-
+import {
+    updateAvatarThunk,
+    updateUserInfoThunk,
+    updatePasswordThunk,
+    selectAuthError,
+    resetError,
+} from "../Auth/authSlice"
+import { toast } from "react-toastify"
 // import icons
 import { BsFillCameraFill } from "react-icons/bs"
 import { FaUserCircle } from "react-icons/fa"
@@ -13,6 +19,8 @@ import { FaUserCircle } from "react-icons/fa"
 const UserSettingPage = () => {
     const dispatch = useDispatch()
     const user = useSelector(selectUser)
+    const status = useSelector(selectAuthStatus)
+    const authError = useSelector(selectAuthError)
 
     const [userEmail, setUserEmail] = useState(user?.email)
     const [userName, setUserName] = useState(user?.userName)
@@ -32,6 +40,8 @@ const UserSettingPage = () => {
         setChangePasswordSubmitButtonDisabled,
     ] = useState(null)
 
+    const [showPasswordHints, setShowPasswordHints] = useState(true)
+
     // handlers for ui
     // - handle disable InforSubmitButtonDisabled
     useEffect(() => {
@@ -42,12 +52,12 @@ const UserSettingPage = () => {
         if (
             userPhoneNumber !== user?.phoneNumber ||
             userIntroduction !== user?.introduction ||
-            avatarImage.length !== 0
+            userName !== user?.userName
         ) {
             return setInforSubmitButtonDisabled(false)
         }
         setInforSubmitButtonDisabled(true)
-    }, [userPhoneNumber, userIntroduction, avatarImage])
+    }, [userPhoneNumber, userIntroduction, userName])
     // - handle disable ChangePasswordSubmitButtonDisabled
     useEffect(() => {
         if (ChangePasswordSubmitButtonDisabled === null) {
@@ -59,6 +69,74 @@ const UserSettingPage = () => {
         }
         setChangePasswordSubmitButtonDisabled(true)
     }, [password, newPassword, newRepeatedPassword])
+
+    // NOTIFICATIONS
+    useEffect(() => {
+        if (status === "Đang cập nhật ảnh ...") {
+            toast.dismiss()
+            toast.info(status, {
+                autoClose: 5000,
+            })
+        }
+        if (status === "Cập nhật ảnh thành công") {
+            toast.dismiss()
+            toast.success(status, {
+                hideProgressBar: true,
+            })
+        }
+        if (status === "Cập nhật ảnh thất bại") {
+            toast.dismiss()
+            toast.error(status, {
+                hideProgressBar: true,
+            })
+        }
+
+        if (status === "Đang cập nhật thông tin ...") {
+            toast.dismiss()
+            toast.info(status, {
+                autoClose: 5000,
+            })
+        }
+        if (status === "Cập nhật thông tin thành công") {
+            toast.dismiss()
+            toast.success(status, {
+                hideProgressBar: true,
+            })
+            setInforSubmitButtonDisabled(false)
+        }
+        if (status === "Cập nhật thông tin thất bại") {
+            toast.dismiss()
+            toast.error(status, {
+                hideProgressBar: true,
+            })
+        }
+
+        if (status === "Đang cập nhật mật khẩu ...") {
+            toast.dismiss()
+            toast.info(status, {
+                autoClose: 5000,
+            })
+        }
+        if (status === "Cập nhật mật khẩu thành công") {
+            toast.dismiss()
+            toast.success(status, {
+                hideProgressBar: true,
+            })
+            setInforSubmitButtonDisabled(false)
+        }
+        if (status === "Cập nhật mật khẩu thất bại") {
+            toast.dismiss()
+            toast.error(status, {
+                hideProgressBar: true,
+            })
+        }
+    }, [status])
+
+    // reset state after refreshing page
+    useEffect(() => {
+        dispatch(resetStatus())
+        dispatch(resetError())
+    }, window.performance.navigation.type === 1)
 
     const handleCloseImageUploader = () => {
         if (showImageUploader) {
@@ -84,6 +162,26 @@ const UserSettingPage = () => {
         ).unwrap()
         console.log("===> Update Avatar Result: ", result)
         setAvatarImage([])
+    }
+
+    // handleUpdateInfo
+    const handleUpdateInfo = async () => {
+        const userId = user.id
+        const updatedInfo = {
+            userName: userName,
+            phoneNumber: userPhoneNumber,
+            introduction: userIntroduction,
+        }
+        await dispatch(updateUserInfoThunk({ updatedInfo, userId })).unwrap()
+        dispatch(resetStatus())
+    }
+    // handleUpdatePassword
+    const handleUpdatePassword = async () => {
+        const userId = user.id
+        await dispatch(
+            updatePasswordThunk({ password, newPassword, userId })
+        ).unwrap()
+        dispatch(resetStatus())
     }
 
     // components
@@ -287,6 +385,9 @@ const UserSettingPage = () => {
                 disabled:bg-gray-300 disabled:cursor-not-allowed
                 `}
             disabled={InforSubmitButtonDisabled}
+            onClick={() => {
+                handleUpdateInfo()
+            }}
         >
             Lưu thay đổi
         </button>
@@ -299,6 +400,7 @@ const UserSettingPage = () => {
                 disabled:bg-gray-300 disabled:cursor-not-allowed
                 `}
             disabled={ChangePasswordSubmitButtonDisabled}
+            onClick={handleUpdatePassword}
         >
             Đổi mật khẩu
         </button>
@@ -320,8 +422,7 @@ const UserSettingPage = () => {
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
                         onClick={() => {
-                            // dispatch(deleteErrorMessage())
-                            // setIsPasswordFieldEmpty(false)
+                            setShowPasswordHints(false)
                         }}
                     />
                     <label
@@ -338,16 +439,11 @@ const UserSettingPage = () => {
                         Mật khẩu hiện tại{" "}
                         <span className="text-red-500 px-[2px]">*</span>
                     </label>
-                    {/* {isPasswordFieldEmpty ? (
-                <div className="text-red-600 mt-2">Bạn chưa nhập mật khẩu</div>
-            ) : (
-                <></>
-            )}
-            {error?.message === "Wrong password" ? (
-                <div className="text-red-600 mt-2">Sai mật khẩu</div>
-            ) : (
-                <></>
-            )} */}
+                    {authError?.statusCode === 401 && showPasswordHints ? (
+                        <div className="text-red-600 mt-2">Sai mật khẩu</div>
+                    ) : (
+                        <></>
+                    )}
                 </div>
 
                 {/* Mật khẩu mới  */}
@@ -362,10 +458,6 @@ const UserSettingPage = () => {
                         placeholder="Mật khẩu mới"
                         value={newPassword}
                         onChange={(event) => setNewPassword(event.target.value)}
-                        onClick={() => {
-                            // dispatch(deleteErrorMessage())
-                            // setIsPasswordFieldEmpty(false)
-                        }}
                     />
                     <label
                         htmlFor="newPassword"
@@ -396,10 +488,6 @@ const UserSettingPage = () => {
                         onChange={(event) =>
                             setNewRepeatedPassword(event.target.value)
                         }
-                        onClick={() => {
-                            // dispatch(deleteErrorMessage())
-                            // setIsPasswordFieldEmpty(false)
-                        }}
                     />
                     <label
                         htmlFor="newRepeatedPassword"
@@ -415,6 +503,13 @@ const UserSettingPage = () => {
                         Xác nhận mật khẩu mới{" "}
                         <span className="text-red-500 px-[2px]">*</span>
                     </label>
+                    {newRepeatedPassword !== newPassword ? (
+                        <div className="text-red-600 mt-2">
+                            Mật khẩu không trùng khớp
+                        </div>
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </div>
         </>

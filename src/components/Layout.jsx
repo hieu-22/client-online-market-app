@@ -23,7 +23,11 @@ import { useDispatch, useSelector } from "react-redux"
 import CustomToastify from "./CustomToastify"
 
 // redux
-import { logout, selectError } from "../features/Auth/authSlice"
+import {
+    logout,
+    selectAuthError,
+    selectError,
+} from "../features/Auth/authSlice"
 import {
     selectPostError,
     fetchPostsBySearchKeysThunk,
@@ -36,7 +40,11 @@ import { selectSearchedPosts } from "../features/Post/postSlice"
 import Loader from "./Loader"
 import { ToastContainer, toast } from "react-toastify"
 
-import { selectAuthStatus } from "../features/Auth/authSlice"
+import {
+    selectAuthStatus,
+    updateUserIsOnline,
+} from "../features/Auth/authSlice"
+import { socket } from "../socket"
 const Layout = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -53,13 +61,14 @@ const Layout = () => {
     const [notificationWindowStatus, setNotificationWindowStatus] =
         useState("onActivities") // onActivities or onNews
     const [searchHintsShowed, setSearchHintsShowed] = useState(false)
+    const [isToastActive, setIsToastActive] = useState(false)
 
     // REDUX STATES
     const user = useSelector((state) => state.auth.user)
     const authStatus = useSelector(selectAuthStatus)
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
     const searchedPosts = useSelector(selectSearchedPosts)
-    const authError = useSelector(selectError)
+    const authError = useSelector(selectAuthError)
     const locationError = useSelector(selectLocationError)
     const chatError = useSelector(selectChatError)
     const userError = useSelector(selectUserError)
@@ -76,6 +85,15 @@ const Layout = () => {
         }, 200)
     }, [location.pathname])
 
+    useEffect(() => {
+        socket.on("updateIsOnline", () => {
+            if (user?.isOnline) return
+            dispatch(updateUserIsOnline())
+        })
+        return () => {
+            socket.off("updateIsOnline")
+        }
+    }, [])
     useEffect(() => {
         const currentUrl = window.location.href
         if (currentUrl.startsWith("http://localhost:3000/chat")) {
@@ -108,6 +126,17 @@ const Layout = () => {
     }, [searchkeys])
 
     /**HANDLERS */
+    const handleShowToast = (message) => {
+        if (!isToastActive) {
+            toast.warn(message, {
+                autoClose: 1000,
+            })
+            setIsToastActive(true)
+            setTimeout(() => {
+                setIsToastActive(false)
+            }, 3000)
+        }
+    }
     const handleReload = () => {
         window.location.reload()
     }
@@ -137,13 +166,17 @@ const Layout = () => {
     }
 
     const handleAddNewPost = () => {
-        if (!user) {
+        if (!isLoggedIn) {
+            if (window.location.href === "http://localhost:3000/login") {
+                return handleShowToast("Vui lòng đăng nhập!")
+            }
             return navigate("/login")
         }
         navigate("/posts/new-post")
     }
 
     const handleLogout = async () => {
+        socket.disconnect()
         dispatch(logout())
         setLoading(true)
         setTimeout(() => {
@@ -209,6 +242,17 @@ const Layout = () => {
                                     onClick={(event) => {
                                         handleCloseAllWindows()
                                         const currentUrl = location.pathname
+                                        if (!isLoggedIn) {
+                                            if (
+                                                window.location.href ===
+                                                "http://localhost:3000/login"
+                                            ) {
+                                                return handleShowToast(
+                                                    "Vui lòng đăng nhập"
+                                                )
+                                            }
+                                            return navigate("/login")
+                                        }
                                         if (
                                             currentUrl.startsWith(
                                                 "http://localhost:3000/user/myProfile"
@@ -287,6 +331,15 @@ const Layout = () => {
                 <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
                     onClick={() => {
+                        if (!isLoggedIn) {
+                            if (
+                                window.location.href ===
+                                "http://localhost:3000/login"
+                            ) {
+                                return handleShowToast("Vui lòng đăng nhập")
+                            }
+                            return navigate("/login")
+                        }
                         navigate("/posts/my-saved-posts")
                     }}
                 >
@@ -298,10 +351,16 @@ const Layout = () => {
                 <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
                     onClick={() => {
-                        if (!user) {
+                        if (!isLoggedIn) {
+                            if (
+                                window.location.href ===
+                                "http://localhost:3000/login"
+                            ) {
+                                return handleShowToast("Vui lòng đăng nhập")
+                            }
                             return navigate("/login")
                         }
-                        alert("Chức năng đang cập nhật!")
+                        toast.info("Chức năng đang cập nhật!")
                     }}
                 >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-blue-400">
@@ -312,19 +371,31 @@ const Layout = () => {
                 <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
                     onClick={() => {
-                        if (!user) {
+                        if (!isLoggedIn) {
+                            if (
+                                window.location.href ===
+                                "http://localhost:3000/login"
+                            ) {
+                                return handleShowToast("Vui lòng đăng nhập")
+                            }
                             return navigate("/login")
                         }
-                        alert("Chức năng đang cập nhật!")
+                        toast.info("Chức năng đang cập nhật!")
                     }}
                 >
                     <div
                         className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-yellow-500"
                         onClick={() => {
-                            if (!user) {
+                            if (!isLoggedIn) {
+                                if (
+                                    window.location.href ===
+                                    "http://localhost:3000/login"
+                                ) {
+                                    return handleShowToast("Vui lòng đăng nhập")
+                                }
                                 return navigate("/login")
                             }
-                            alert("Chức năng đang cập nhật!")
+                            toast.info("Chức năng đang cập nhật!")
                         }}
                     >
                         <BsStarFill className="text-white" />
@@ -340,7 +411,13 @@ const Layout = () => {
                 <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
                     onClick={() => {
-                        if (!user) {
+                        if (!isLoggedIn) {
+                            if (
+                                window.location.href ===
+                                "http://localhost:3000/login"
+                            ) {
+                                return handleShowToast("Vui lòng đăng nhập")
+                            }
                             return navigate("/login")
                         }
                         navigate("user/setting/profile")
@@ -471,6 +548,12 @@ const Layout = () => {
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer "
                         onClick={() => {
                             if (!isLoggedIn) {
+                                if (
+                                    window.location.href ===
+                                    "http://localhost:3000/login"
+                                ) {
+                                    return handleShowToast("Vui lòng đăng nhập")
+                                }
                                 return navigate("/login")
                             }
                             navigate("/dashboard/posts")
@@ -487,6 +570,13 @@ const Layout = () => {
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer"
                         onClick={() => {
                             if (!isLoggedIn) {
+                                if (
+                                    window.location.href ===
+                                    "http://localhost:3000/login"
+                                ) {
+                                    return handleShowToast("Vui lòng đăng nhập")
+                                }
+
                                 return navigate("/login")
                             }
                             navigate("/chat")

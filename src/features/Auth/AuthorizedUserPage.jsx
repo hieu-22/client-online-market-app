@@ -23,6 +23,7 @@ import {
     selectAuthStatus,
     updateAvatarThunk,
     resetStatus,
+    selectAuthError,
 } from "./authSlice"
 import { getPostByUserIdThunk } from "./authSlice"
 import { useDispatch, useSelector } from "react-redux"
@@ -39,7 +40,7 @@ const AuthorizedUserPage = () => {
     const userPosts = user?.posts || []
 
     const [showImageUploader, setShowImageUploader] = useState(false)
-    const error = useSelector(selectError)
+    const error = useSelector(selectAuthError)
     const status = useSelector(selectAuthStatus)
 
     // useEffect(() => {
@@ -64,6 +65,7 @@ const AuthorizedUserPage = () => {
     useEffect(() => {
         dispatch(resetStatus())
     }, [window.performance.navigation.type])
+
     useEffect(() => {
         if (status === "Đang cập nhật ảnh ...") {
             toast.dismiss()
@@ -117,43 +119,8 @@ const AuthorizedUserPage = () => {
             updateAvatarThunk({ formData, userId })
         ).unwrap()
         handleCloseImageUploader()
-        // console.log("===> saved avatar: ", formData.get("avatar"))
         setAvatarImage([])
-
-        // const updatePromise = new Promise((resolve, reject) => {
-        //     const timeoutId = setTimeout(() => {
-        //         clearTimeout(timeoutId)
-        //         reject("failed to update avatar")
-        //     }, 5000)
-
-        //     new Promise(async () => {
-        //         const result = await dispatch(
-        //             updateAvatarThunk({ formData, userId })
-        //         ).unwrap()
-        //         resolve(result)
-        //     })
-        //         .then((result) => {
-        //             clearTimeout(timeoutId)
-        //             resolve(result)
-        //             handleCloseImageUploader()
-        //             // console.log("===> saved avatar: ", formData.get("avatar"))
-        //             setAvatarImage([])
-        //         })
-        //         .catch((error) => {
-        //             clearTimeout(timeoutId)
-        //             reject(error)
-        //         })
-        // })
-        // // console.log("===> Update Avatar Result: ", result)
-        // toast.promise(updatePromise, {
-        //     pending: "Đăng cập nhật ảnh đại diện",
-        //     success: "Cập nhật thành công",
-        //     error: {
-        //         render() {
-        //             return `Cập nhật thất bại`
-        //         },
-        //     },
-        // })
+        dispatch(resetStatus())
     }
 
     /**COMPONENTS */

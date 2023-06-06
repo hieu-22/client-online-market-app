@@ -13,6 +13,8 @@ import {
     getSavedPostsByUserId,
     deleteSavedPost,
     deletePostById,
+    updateUserInfo,
+    updatePassword,
 } from "./authApi"
 
 const initialState = {
@@ -191,6 +193,41 @@ export const updateAvatarThunk = createAsyncThunk(
         }
     }
 )
+
+export const updateUserInfoThunk = createAsyncThunk(
+    "auth/updateUserInfoThunk",
+    async ({ updatedInfo, userId }, { rejectWithValue }) => {
+        try {
+            const data = await updateUserInfo(updatedInfo, userId)
+            return data
+        } catch (error) {
+            // console.log(">>> Error at updatePhoneNumberThunk: ", error)
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
+
+export const updatePasswordThunk = createAsyncThunk(
+    "auth/updatePasswordThunk",
+    async ({ password, newPassword, userId }, { rejectWithValue }) => {
+        try {
+            const data = await updatePassword({ password, newPassword }, userId)
+            return data
+        } catch (error) {
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
 /**DELETE */
 export const deleteSavedPostThunk = createAsyncThunk(
     "auth/deleteSavedPostThunk",
@@ -260,6 +297,12 @@ const authSlice = createSlice({
         },
         resetStatus: (state, action) => {
             state.status = "idle"
+        },
+        updateUserIsOnline: (state, action) => {
+            state.user.isOnline = true
+        },
+        resetError: (state, action) => {
+            state.error = null
         },
     },
     extraReducers: (builder) => {
@@ -410,7 +453,36 @@ const authSlice = createSlice({
             })
             .addCase(deletePostByIdThunk.rejected, (state, action) => {
                 state.status = "Ẩn bài đăng thất bại"
-                console.log(">>>rejected payload: ", action.payload)
+                // console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+            // updateUserInfoThunk
+            .addCase(updateUserInfoThunk.pending, (state) => {
+                state.status = "Đang cập nhật thông tin ..."
+                state.error = null
+            })
+            .addCase(updateUserInfoThunk.fulfilled, (state, action) => {
+                state.status = "Cập nhật thông tin thành công"
+                state.error = null
+                state.user = action.payload.user
+            })
+            .addCase(updateUserInfoThunk.rejected, (state, action) => {
+                state.status = "Cập nhật thông tin thất bại"
+                // console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+            // updatePasswordThunk
+            .addCase(updatePasswordThunk.pending, (state) => {
+                state.status = "Đang cập nhật mật khẩu ..."
+                state.error = null
+            })
+            .addCase(updatePasswordThunk.fulfilled, (state, action) => {
+                state.status = "Cập nhật mật khẩu thành công"
+                state.error = null
+            })
+            .addCase(updatePasswordThunk.rejected, (state, action) => {
+                state.status = "Cập nhật mật khẩu thất bại"
+                // console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
             })
     },
@@ -425,8 +497,14 @@ export const authPersistConfig = {
 
 export const selectAuthStatus = (state) => state.auth.status
 export const selectUser = (state) => state.auth.user
-export const selectError = (state) => state.auth.error
-export const { logout, deleteErrorMessage, resetStatus } = authSlice.actions
+export const selectAuthError = (state) => state.auth.error
+export const {
+    logout,
+    deleteErrorMessage,
+    resetStatus,
+    updateUserIsOnline,
+    resetError,
+} = authSlice.actions
 
 // export authReducer
 export default persistReducer(authPersistConfig, authSlice.reducer)
