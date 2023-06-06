@@ -8,10 +8,12 @@ instance.interceptors.request.use(
     (config) => {
         // Add authentication token to the request headers
         const auth = JSON.parse(localStorage.getItem("persist:auth"))
-        const token = auth.token.replaceAll('"', "")
-        // console.log("===> token: ", token)
+        if (auth) {
+            const token = auth.token.replaceAll('"', "")
+            // console.log("===> token: ", token)
 
-        config.headers.token = `Bearer ${token}`
+            config.headers.token = `Bearer ${token}`
+        }
 
         return config
     },
