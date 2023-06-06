@@ -17,14 +17,32 @@ import { MdPostAdd } from "react-icons/md"
 import { BiHide } from "react-icons/bi"
 import { AiOutlineEdit } from "react-icons/ai"
 import { AiOutlineShareAlt } from "react-icons/ai"
+import { toast } from "react-toastify"
 
 const PostDashboard = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const [postType, setPostType] = useState(1)
+    const [expiredPosts, setExpiredPosts] = useState([])
+    const [nonexpiredPosts, setNonexpiredPosts] = useState([])
     const user = useSelector(selectUser)
     const userPosts = user?.posts
+
+    useEffect(() => {
+        if (!userPosts) return
+        const filterdPosts = userPosts.filter(
+            (post) => new Date(post.expiryDate) <= new Date()
+        )
+        setExpiredPosts(filterdPosts)
+    }, [userPosts])
+    useEffect(() => {
+        if (!userPosts) return
+        const filterdPosts = userPosts.filter(
+            (post) => new Date(post.expiryDate) > new Date()
+        )
+        setNonexpiredPosts(filterdPosts)
+    }, [userPosts])
 
     /**EFFECTS */
     useEffect(() => {
@@ -79,9 +97,20 @@ const PostDashboard = () => {
             <div className="pl-4">
                 <div className="text-lg my-1 font-semibold">
                     {user?.userName ? user.userName : ""}
+                    <span
+                        className={
+                            `ml-3 inline-block mx-1  w-2 h-2 rounded-[50%] ` +
+                            (user?.isOnline ? "bg-green-600" : "bg-gray-600")
+                        }
+                    ></span>
                 </div>
                 <div>
-                    <button className="block rounded-md border border-primary text-primary py-1 px-2 hover:bg-slate-100 cursor-pointer">
+                    <button
+                        className="block rounded-md border border-primary text-primary py-1 px-2 hover:bg-slate-100 cursor-pointer"
+                        onClick={() => {
+                            navigate("/user/myProfile")
+                        }}
+                    >
                         Trang cá nhân{" "}
                     </button>
                 </div>
@@ -97,7 +126,7 @@ const PostDashboard = () => {
                 }`}
                 onClick={() => handleSetPostType(1)}
             >
-                TIN ĐANG ĐĂNG (<span>{userPosts?.length || 0}</span>)
+                TIN ĐANG ĐĂNG (<span>{nonexpiredPosts?.length || 0}</span>)
             </div>
             <div
                 className={`py-2 px-3 text-sm text-gray-400 font-semibold cursor-pointer hover:bg-slate-100 border-b-[3px] border-transparent hover:!border-gray-400 ${
@@ -105,18 +134,137 @@ const PostDashboard = () => {
                 }`}
                 onClick={() => handleSetPostType(2)}
             >
-                TIN HẾT HẠN (<span>{userPosts?.length || 0}</span>)
+                TIN HẾT HẠN (<span>{expiredPosts?.length || 0}</span>)
             </div>
         </div>
     )
 
-    const UserPostsField = (
+    // TIN ĐANG ĐĂNG
+    const nonExpiredPostsField = (
         <div className="w-full">
             <div>
-                {userPosts?.length > 0 ? (
+                {nonexpiredPosts?.length > 0 ? (
                     // show posts
                     <>
-                        {userPosts.map((post, index) => {
+                        {nonexpiredPosts.map((post, index) => {
+                            return (
+                                <div className="mx-20 hover:bg-slate-50 relative">
+                                    <div
+                                        key={index}
+                                        className="p-4 w-full h-[116px] border border-gray-300 border-t-0 border-b-0 cursor-pointer"
+                                        onClick={() => {
+                                            navigate(`/posts/${post.post_url}`)
+                                        }}
+                                    >
+                                        <div className="flex gap-x-4 h-full">
+                                            <div className="w-[15%] h-full rounded-sm">
+                                                <img
+                                                    src={
+                                                        post.images[0].imageUrl
+                                                    }
+                                                    alt="post image"
+                                                    className="w-full h-full object-cover rounded-sm"
+                                                />
+                                            </div>
+                                            <div className="w-[70%] truncate inline-flex flex-col justify-between">
+                                                <div>
+                                                    <div className="font-semibold text-gray-800 text-base">
+                                                        {post.title}
+                                                    </div>
+                                                    <div className="text-red-500 text-sm">
+                                                        {numeral(post.price)
+                                                            .format("0,0 ₫")
+                                                            .replaceAll(
+                                                                ",",
+                                                                "."
+                                                            )}
+                                                        &nbsp;đ
+                                                    </div>
+                                                    <div className="text-sm w-full truncate text-gray-600">
+                                                        Hiển thị đến:{" "}
+                                                        <span className="text-gray-400 font-normal">
+                                                            13:47 21/07/23
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="inline-flex items-center gap-x-2 text-sm text-gray-500 ">
+                                                    <div>{post.timeAgo}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex">
+                                        <div
+                                            className="text-blue-400 flex w-[50%] py-2 border border-gray-300 justify-center cursor-pointer "
+                                            onClick={(event) => {
+                                                event.stopPropagation()
+                                                handleDeletePostById(post.id)
+                                            }}
+                                        >
+                                            <div className="mr-2">
+                                                <BiHide className="w-6 h-6"></BiHide>
+                                            </div>
+                                            <div className="font-semibold  hover:underline">
+                                                Đã bán/Ẩn tin
+                                            </div>
+                                        </div>
+                                        <div className="text-blue-400 flex  w-[50%] py-2 border border-gray-300 justify-center cursor-pointer ">
+                                            <div className="mr-2">
+                                                <AiOutlineEdit className="w-6 h-6" />
+                                            </div>
+                                            <div className="font-semibold  hover:underline">
+                                                Sửa tin
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="absolute top-3 right-3 cursor-pointer"
+                                        onClick={(event) => {
+                                            event.stopPropagation()
+                                            const postUrl = post.post_url
+
+                                            navigator.clipboard
+                                                .readText()
+                                                .then((clipboardText) => {
+                                                    if (
+                                                        clipboardText ===
+                                                        `http://localhost:3000/posts/${postUrl}`
+                                                    )
+                                                        return
+                                                    navigator.clipboard.writeText(
+                                                        `http://localhost:3000/posts/${postUrl}`
+                                                    )
+                                                    toast(
+                                                        "Đã copy link bài đăng"
+                                                    )
+                                                })
+                                        }}
+                                    >
+                                        <AiOutlineShareAlt className="w-7 h-7 text-gray-700"></AiOutlineShareAlt>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </>
+                ) : (
+                    // no post
+
+                    <div className="flex justify-center my-2">
+                        <div className="w-[50%] py-2 my-2 rounded-sm text-sm text-center bg-background text-gray-500 ">
+                            Bạn chưa có tin đăng trong mục này.
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+    const expiredPostsField = (
+        <div className="w-full">
+            <div>
+                {expiredPosts?.length > 0 ? (
+                    // show posts
+                    <>
+                        {expiredPosts.map((post, index) => {
                             return (
                                 <div className="mx-20 hover:bg-slate-50 relative">
                                     <div
@@ -224,7 +372,13 @@ const PostDashboard = () => {
                     <Breadcrumb
                         title1={"Quản lí tin"}
                         link1={"/dashboard/posts"}
-                        title2={"Tin đang đăng"}
+                        title2={
+                            postType === 1
+                                ? "Tin đang đăng"
+                                : postType === 2
+                                ? "Tin hết hạn"
+                                : ""
+                        }
                     ></Breadcrumb>
                 </div>
                 <div className="laptop:w-laptop m-auto bg-white px-6">
@@ -235,7 +389,13 @@ const PostDashboard = () => {
 
                     <div className="py-2">{UserField}</div>
                     <div>{PostControlField}</div>
-                    <div className="pb-4">{UserPostsField}</div>
+                    <div className="pb-4">
+                        {postType === 1
+                            ? nonExpiredPostsField
+                            : postType === 2
+                            ? expiredPostsField
+                            : ""}
+                    </div>
                 </div>
             </div>
         </>

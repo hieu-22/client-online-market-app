@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { selectAddress, addPostThunk } from "./locationSlice"
 import { useNavigate } from "react-router-dom"
 import { selectUser } from "../Auth/authSlice"
+import { toast } from "react-toastify"
 
 const AddPostPage = () => {
     const dispatch = useDispatch()
@@ -106,9 +107,17 @@ const AddPostPage = () => {
         formData.append("description", postDescription)
         formData.append("address", postAddress)
         formData.append("user_id", user.id)
-        const result = await dispatch(addPostThunk(formData)).unwrap()
-        console.log(">>> At handleAddPost, result: ", result)
-        navigate(`/posts/${result.post.post_url}`)
+        const result = new Promise((resolve, reject) => {
+            const data = dispatch(addPostThunk(formData)).unwrap()
+            resolve(data)
+        }).then((data) => {
+            navigate(`/posts/${data.post.post_url}`)
+        })
+        toast.promise(result, {
+            pending: "Đang đăng tin...",
+            success: "Tin đã đăng thành công!",
+            error: "lỗi đăng tin",
+        })
     }
 
     const ImagesUploader = (

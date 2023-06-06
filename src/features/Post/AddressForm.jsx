@@ -488,7 +488,7 @@ const AddressForm = ({ showAddressForm }) => {
                 setShowDistrictsList(false)
             }}
             onKeyDown={(event) => {
-                console.log("==> Event at", event.target)
+                // console.log("==> Event at", event.target)
                 if (event.key === "Enter") {
                     handleCompleteAddress()
                 }
