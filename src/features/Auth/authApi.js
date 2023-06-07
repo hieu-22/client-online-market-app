@@ -6,6 +6,7 @@ import {
     differenceInMonths,
     differenceInYears,
 } from "date-fns"
+import { addTimeAgo } from "../../utils/DateUtils"
 const uniqueParam = new Date().getTime()
 
 export const login = async (credentials) => {
@@ -124,7 +125,7 @@ export const savePost = async ({ userId, postId }) => {
 export const getSavedPostsByUserId = async (userId) => {
     const responses = await axios.get(`/user/get-saved-posts?userId=${userId}`)
     // console.log(">>> At getSavedPostsByUserId, server reponses: ", responses)
-    return responses.data
+    return responses.data.savedPosts
 }
 
 export const deleteSavedPost = async ({ userId, postId }) => {

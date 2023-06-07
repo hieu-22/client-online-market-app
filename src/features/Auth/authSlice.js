@@ -394,10 +394,7 @@ const authSlice = createSlice({
             .addCase(savePostThunk.fulfilled, (state, action) => {
                 state.status = "succeeded"
                 state.error = null
-                state.user.savedPosts = [
-                    ...state.user.savedPosts,
-                    action.payload.savedPost,
-                ]
+                state.user.savedPosts.unshift(action.payload.savedPost)
             })
             .addCase(savePostThunk.rejected, (state, action) => {
                 state.status = "failed"
@@ -414,7 +411,7 @@ const authSlice = createSlice({
                 state.status = "succeeded"
                 state.error = null
                 if (state.user) {
-                    state.user.savedPosts = action.payload.savedPosts
+                    state.user.savedPosts = action.payload
                 }
             })
             .addCase(getSavedPostsByUserIdThunk.rejected, (state, action) => {
