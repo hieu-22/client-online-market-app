@@ -110,9 +110,12 @@ const ChatPage = () => {
                             <div
                                 key={index}
                                 className={` py-3 px-2 cursor-pointer border border-slate-200 border-t-0 hover:bg-slate-100 ${
-                                    !chat.messages[0]?.is_read_by_another
-                                        ? chat.messages[0]?.user_id !== user.id
-                                            ? "bg-slate-100"
+                                    chat.messages.length > 0
+                                        ? !chat.messages[0]?.is_read_by_another
+                                            ? chat.messages[0]?.user_id !==
+                                              user.id
+                                                ? "bg-slate-100"
+                                                : ""
                                             : ""
                                         : ""
                                 }`}
