@@ -120,6 +120,7 @@ const chatSlice = createSlice({
         setCurrentChat(state, action) {
             action.payload.messages.reverse()
             state.currentChat = action.payload
+            state.error = null
         },
         addChats(state, action) {
             state.chats = action.payload
@@ -206,23 +207,23 @@ const chatSlice = createSlice({
 
             state.chats[chatIndex].messages[0].is_read_by_another = true
         },
+        addChatError(state, action) {
+            state.error = action.payload
+        },
     },
     extraReducers: (builder) => {
         builder
             //getEmojisThunk
             .addCase(getEmojisThunk.pending, (state) => {
                 state.status = "loading"
-                state.error = null
             })
             .addCase(getEmojisThunk.fulfilled, (state, action) => {
                 state.status = "succeeded"
-                state.error = null
                 state.emojis = action.payload
             })
             .addCase(getEmojisThunk.rejected, (state, action) => {
                 state.status = "failed"
                 // console.log(">>>rejected payload: ", action.payload)
-                state.error = action.payload
             })
     },
 })
@@ -231,6 +232,7 @@ export const selectAllChats = (state) => state.chat.chats
 export const selectCurrentChat = (state) => state.chat.currentChat
 export const selectEmojis = (state) => state.chat.emojis
 export const selectChatError = (state) => state.chat.error
+export const selectChatStatus = (state) => state.chat.status
 
 export const {
     resetChatStatus,
@@ -246,6 +248,7 @@ export const {
     moveUpdatedChatToTop,
     addMoreMessagesToCurrentChat,
     updateMessageIsRead,
+    addChatError,
 } = chatSlice.actions
 
 export default chatSlice.reducer

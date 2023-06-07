@@ -637,7 +637,12 @@ const UpdatePostPage = () => {
                 <div className="w-4/6">
                     <div className="">{ProductInput}</div>
                     <div className="flex items-center justify-between gap-x-6 mt-9">
-                        <button className=" block w-[50%] py-2 border border-primary text-primary rounded-md hover:bg-hover-primary  ">
+                        <button
+                            className=" block w-[50%] py-2 border border-primary text-primary rounded-md hover:bg-hover-primary  "
+                            onClick={() => {
+                                navigate(`/`)
+                            }}
+                        >
                             HỦY
                         </button>
                         <button

@@ -187,17 +187,14 @@ const postSlice = createSlice({
             })
             .addCase(fetchPostsBySearchKeysThunk.pending, (state) => {
                 state.status = "loading"
-                state.error = null
             })
             .addCase(fetchPostsBySearchKeysThunk.fulfilled, (state, action) => {
                 state.status = "succeeded"
-                state.error = null
                 state.searchedPosts = action.payload.matchedPosts
             })
             .addCase(fetchPostsBySearchKeysThunk.rejected, (state, action) => {
                 state.status = "failed"
                 // console.log(">>>rejected payload: ", action.payload)
-                state.error = action.payload
             })
             // updatePostThunk
             .addCase(updatePostThunk.pending, (state) => {

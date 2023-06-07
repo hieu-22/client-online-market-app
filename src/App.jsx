@@ -16,12 +16,16 @@ import PostDashboard from "./features/Post/PostDashboard"
 import UpdatePostPage from "./features/Post/UpdatePostPage"
 import SavedPostsPage from "./features/Post/SavedPostsPage"
 import SingleChatPage from "./features/Chat/SingleChatPage"
+import NotFoundPage from "./features/Error/NotFoundPage"
+
 import { socket } from "./socket"
 import { useSelector } from "react-redux"
 import { selectUser } from "./features/Auth/authSlice"
+import { selectOtherUser } from "./features/User/userSlice"
 
 const App = () => {
     const user = useSelector(selectUser)
+    const otherUser = useSelector(selectOtherUser)
 
     useEffect(() => {
         if (user) {
@@ -73,6 +77,7 @@ const App = () => {
                         path="/update-post/:postUrl"
                         element={<UpdatePostPage />}
                     />
+                    <Route path="*" element={<NotFoundPage />} />
                 </Route>
             </Routes>
         </main>

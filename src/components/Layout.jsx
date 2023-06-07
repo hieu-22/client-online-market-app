@@ -126,11 +126,26 @@ const Layout = () => {
     }, [searchkeys])
 
     /**HANDLERS */
-    const handleShowToast = (message) => {
+    const handleShowToast = (message, status) => {
         if (!isToastActive) {
-            toast.warn(message, {
-                autoClose: 1000,
-            })
+            if (status === "info") {
+                toast.info(message, {
+                    autoClose: 1000,
+                })
+            } else if (status === "warn") {
+                toast.warn(message, {
+                    autoClose: 1000,
+                })
+            } else if (status === "error") {
+                toast.error(message, {
+                    autoClose: 1000,
+                })
+            } else {
+                toast(message, {
+                    autoClose: 1000,
+                })
+            }
+
             setIsToastActive(true)
             setTimeout(() => {
                 setIsToastActive(false)
@@ -360,7 +375,7 @@ const Layout = () => {
                             }
                             return navigate("/login")
                         }
-                        toast.info("Chức năng đang cập nhật!")
+                        handleShowToast("Chức năng đang cập nhật!", "info")
                     }}
                 >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-blue-400">
@@ -380,7 +395,7 @@ const Layout = () => {
                             }
                             return navigate("/login")
                         }
-                        toast.info("Chức năng đang cập nhật!")
+                        handleShowToast("Chức năng đang cập nhật!", "info")
                     }}
                 >
                     <div
@@ -395,7 +410,7 @@ const Layout = () => {
                                 }
                                 return navigate("/login")
                             }
-                            toast.info("Chức năng đang cập nhật!")
+                            handleShowToast("Chức năng đang cập nhật!", "info")
                         }}
                     >
                         <BsStarFill className="text-white" />
@@ -434,7 +449,7 @@ const Layout = () => {
                         if (!user) {
                             return navigate("/login")
                         }
-                        alert("Chức năng đang cập nhật!")
+                        handleShowToast("Chức năng đang cập nhật!", "info")
                     }}
                 >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%]  bg-gray-400">

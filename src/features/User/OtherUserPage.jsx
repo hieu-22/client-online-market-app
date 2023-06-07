@@ -5,6 +5,7 @@ import Dropzone from "../../components/Dropzone"
 import Loader from "../../components/Loader"
 import numeral from "numeral"
 import { toTimeAgo } from "../../utils/DateUtils"
+import UserErrorPage from "../Error/UserErrorPage"
 // icons
 import {
     BsStar,
@@ -43,13 +44,8 @@ const OtherUserPage = () => {
             console.log(">>> At handleLookPoster, result: ", result)
         })()
     }, [])
-    useEffect(() => {
-        if (status === "failed" && error?.code) {
-            alert(
-                `Error: ${error.code}\nStatusCode:${error.statusCode}\nStatusText:  ${error.statusText}`
-            )
-        }
-    }, [status, error])
+    // showing api error
+    useEffect(() => {}, [status, error])
     const handleCloseAllWindows = () => {
         if (userMenuShowed) {
             setUserMenuShowed(false)
@@ -101,7 +97,7 @@ const OtherUserPage = () => {
                             </span>
                         ) : (
                             <span className="text-gray-600 text-xs">
-                                {toTimeAgo(user.updatedAt)}
+                                {toTimeAgo(user?.updatedAt)}
                             </span>
                         )}
                     </div>
@@ -268,7 +264,9 @@ const OtherUserPage = () => {
         </div>
     )
 
-    return (
+    return error?.statusCode ? (
+        <UserErrorPage statusCode={error.statusCode} message={error.message} />
+    ) : (
         <div className="bg-customWhite " onClick={handleCloseAllWindows}>
             {status === "loadding" ? <Loader /> : <></>}
             <Breadcrumb title1={`Trang cá nhân của ${user?.userName}`} />

@@ -54,9 +54,9 @@ export const getWardsThunk = createAsyncThunk(
 
 export const addPostThunk = createAsyncThunk(
     "location/addPost",
-    async (post, { rejectWithValue }) => {
+    async (newPost, { rejectWithValue }) => {
         try {
-            const data = await addPost(post)
+            const data = await addPost(newPost)
             return data
         } catch (error) {
             return rejectWithValue({

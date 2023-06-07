@@ -43,6 +43,7 @@ import { toTimeAgo } from "../../utils/DateUtils"
 
 import { addChatThunk } from "../Chat/chatSlice"
 import { toast } from "react-toastify"
+import PostErrorPage from "../Error/PostErrorPage"
 
 const SinglePostPage = () => {
     const navigate = useNavigate()
@@ -581,29 +582,38 @@ const SinglePostPage = () => {
 
     return (
         <div className="bg-customWhite">
-            <div className="laptop:w-laptop bg-white m-auto px-6">
-                <Breadcrumb
-                    title1={"Bài đăng"}
-                    link1={"/"}
-                    title2={post?.title ? post.title : "...loading"}
-                ></Breadcrumb>
-            </div>
-            <div className="laptop:w-laptop m-auto bg-white flex">
-                <div className="w-[600px] pl-6 pb-3">{PostField}</div>
-                <div className="flex-1 px-6 pb-3">{AuthorFiled}</div>
-            </div>
-
-            {/* Other Windows  */}
-            {showDeletPostByIdConfirmation ? (
-                <ConfirmationWindow
-                    message={"Bạn có chắc muốn xóa bài viết"}
-                    confirmText={"Xóa"}
-                    onConfirm={handleConfirmDeletePost}
-                    cancelText={"Hủy"}
-                    onCancel={handleCancelDeletePost}
+            {postError?.statusCode ? (
+                <PostErrorPage
+                    statusCode={postError.statusCode}
+                    message={postError.message}
                 />
             ) : (
-                <></>
+                <>
+                    <div className="laptop:w-laptop bg-white m-auto px-6">
+                        <Breadcrumb
+                            title1={"Bài đăng"}
+                            link1={"/"}
+                            title2={post?.title ? post.title : "...loading"}
+                        ></Breadcrumb>
+                    </div>
+                    <div className="laptop:w-laptop m-auto bg-white flex">
+                        <div className="w-[600px] pl-6 pb-3">{PostField}</div>
+                        <div className="flex-1 px-6 pb-3">{AuthorFiled}</div>
+                    </div>
+
+                    {/* Other Windows  */}
+                    {showDeletPostByIdConfirmation ? (
+                        <ConfirmationWindow
+                            message={"Bạn có chắc muốn xóa bài viết"}
+                            confirmText={"Xóa"}
+                            onConfirm={handleConfirmDeletePost}
+                            cancelText={"Hủy"}
+                            onCancel={handleCancelDeletePost}
+                        />
+                    ) : (
+                        <></>
+                    )}
+                </>
             )}
         </div>
     )

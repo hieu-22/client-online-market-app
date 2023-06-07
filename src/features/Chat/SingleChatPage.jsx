@@ -25,6 +25,8 @@ import {
     removeMessage,
     addMoreMessagesToCurrentChat,
     updateMessageIsRead,
+    addChatError,
+    selectChatError,
 } from "./chatSlice"
 import { selectUser } from "../Auth/authSlice"
 import {
@@ -35,12 +37,16 @@ import {
     addMessageToChatsById,
     addChatToChats,
     moveUpdatedChatToTop,
+    selectChatStatus,
 } from "./chatSlice"
 //
 import numeral from "numeral"
 import { socket } from "../../socket"
 import { formatToString } from "../../utils/DateUtils"
 import { toTimeAgo } from "../../utils/DateUtils"
+import { toast } from "react-toastify"
+import ChatErrorPage from "../Error/ChatErrorPage"
+import Loader from "../../components/Loader"
 
 const ChatPage = () => {
     const params = useParams()
@@ -80,6 +86,9 @@ const ChatPage = () => {
     const currentOtherUser = getOtherUserFromChatMembers(currentChat)
     const location = useLocation()
     const emojis = useSelector(selectEmojis)
+
+    const chatError = useSelector(selectChatError)
+    const chatStatus = useSelector(selectChatStatus)
     // EFFECTS
     // socket io listeners
     useEffect(() => {
@@ -99,7 +108,7 @@ const ChatPage = () => {
                     { conversationId: chatId, userId: user.id },
                     (error, data) => {
                         if (error) {
-                            return alert(error)
+                            return toast(error)
                         }
                         const chat = data.chat
                         dispatch(addChatToChats(chat))
@@ -140,7 +149,8 @@ const ChatPage = () => {
             },
             (error, data) => {
                 if (error) {
-                    return alert(error.errorMessage)
+                    toast.error("Get posts error!")
+                    return dispatch(addChatError(error))
                 }
                 console.log(data)
                 const chats = data
@@ -164,7 +174,7 @@ const ChatPage = () => {
             { conversationId: chatId, userId },
             (error, data) => {
                 if (error) {
-                    return alert(error.errorMessage)
+                    return dispatch(addChatError(error))
                 }
 
                 const chat = data.chat
@@ -186,12 +196,15 @@ const ChatPage = () => {
 
     useEffect(() => {
         const scrollContainer = scrollContainerRef.current
-        scrollContainer.scrollTop = scrollContainer.scrollHeight
+        if (scrollContainer) {
+            scrollContainer.scrollTop = scrollContainer.scrollHeight
+        }
     }, [])
 
     useEffect(() => {
         setMessageAvalable(true)
         const scrollContainer = scrollContainerRef.current
+        if (!scrollContainer) return
         scrollContainer.scrollTop = scrollContainer.scrollHeight
     }, [chatId])
 
@@ -250,7 +263,7 @@ const ChatPage = () => {
             },
             (error) => {
                 if (error) {
-                    return alert(error.message)
+                    return toast(error.message)
                 }
             }
         )
@@ -268,10 +281,10 @@ const ChatPage = () => {
                 },
                 (error, data) => {
                     if (error) {
-                        return alert(error.message)
+                        return toast(error.message)
                     }
                     const message = data.message
-                    alert(message)
+                    toast(message)
                     if (currentChat.id === +conversation_id) {
                         dispatch(removeChatById(conversation_id))
                         dispatch(setCurrentChat(null))
@@ -292,7 +305,7 @@ const ChatPage = () => {
             { userId, messageId, conversationId },
             (error, response) => {
                 if (error) {
-                    return alert(error.message)
+                    return toast(error.message)
                 }
                 dispatch(removeMessage(messageId))
             }
@@ -308,7 +321,7 @@ const ChatPage = () => {
             { userId, messageId, conversationId },
             (error, response) => {
                 if (error) {
-                    return alert(error.message)
+                    return toast(error.message)
                 }
                 dispatch(removeMessage(messageId))
             }
@@ -326,22 +339,25 @@ const ChatPage = () => {
                 if (error) {
                     return console.log("Internal Server Error", error)
                 }
-                alert(response.message)
+                toast(response.message)
             }
         )
     }
 
     useEffect(() => {
         const container = scrollContainerRef.current
+        if (!container) return
         container.scrollTop = container.scrollHeight
     }, [chatId])
     useEffect(() => {
         const container = scrollContainerRef.current
+        if (!container) return
         container.scrollTop = container.scrollHeight
     }, [currentChat])
 
     useEffect(() => {
         const container = scrollContainerRef.current
+        if (!container) return
         container.scrollTo({
             top: container.scrollHeight - previousPos,
             behavior: "instant",
@@ -365,7 +381,7 @@ const ChatPage = () => {
                 { userId, messageIds: ids },
                 (error, reponse) => {
                     if (error) {
-                        return alert(error)
+                        return toast(error)
                     }
                     // set message.is_read_by_another: true in the state if database update successfully
                     dispatch(updateMessageIsRead({ chatId }))
@@ -375,6 +391,7 @@ const ChatPage = () => {
     }, [currentChat])
     const handleScrollPosition = () => {
         const scrollContainer = scrollContainerRef.current
+        if (!scrollContainer) return
 
         if (scrollContainer.scrollTop === 0) {
             const pos = scrollContainer.scrollHeight
@@ -385,7 +402,7 @@ const ChatPage = () => {
                 { chatId, offset },
                 async (error, data) => {
                     if (error) {
-                        alert(error.message)
+                        toast(error.message)
                     }
 
                     const messages = data.messages
@@ -1081,17 +1098,27 @@ const ChatPage = () => {
         </div>
     )
 
+    if (chatStatus === "loading") {
+        return <Loader></Loader>
+    }
     return (
         <div
             className="bg-customWhite border-collapse h-full w-full "
             onClick={handleCloseAllWindow}
         >
-            <div className="laptop:w-laptop mx-auto w-full h-full bg-white border border-slate-200 flex">
-                <div className="w-[45%] h-full border-r border-r-gray-100">
-                    {ChatListField}
+            {chatError?.statusCode ? (
+                <ChatErrorPage
+                    statusCode={chatError.statusCode}
+                    message={chatError.message}
+                />
+            ) : (
+                <div className="laptop:w-laptop mx-auto w-full h-full bg-white border border-slate-200 flex">
+                    <div className="w-[45%] h-full border-r border-r-gray-100">
+                        {ChatListField}
+                    </div>
+                    <div className="w-[55%] h-full">{ChatBoxField}</div>
                 </div>
-                <div className="w-[55%] h-full">{ChatBoxField}</div>
-            </div>
+            )}
         </div>
     )
 }
