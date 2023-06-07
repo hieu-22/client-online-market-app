@@ -367,6 +367,7 @@ const ChatPage = () => {
     // tell server that the user has just read the messages
     useEffect(() => {
         if (currentChat) {
+            if (currentChat.messages.length === 0) return
             const userId = user?.id
             const chatId = currentChat?.id
             const unreadMessageIds = currentChat.messages.map((message) => {
@@ -432,19 +433,24 @@ const ChatPage = () => {
                         return (
                             <div
                                 key={index}
-                                className={` py-3 px-2 cursor-pointer border border-slate-200 border-t-0 hover:bg-slate-100 ${
-                                    +chatId === +chat.id ? "bg-slate-200" : ""
+                                className={` py-3 px-2 cursor-pointer border border-slate-200 bg-white border-t-0 hover:bg-slate-100 ${
+                                    +chatId === +chat.id ? "!bg-slate-200" : ""
                                 } ${
-                                    !chat.messages[0]?.is_read_by_another
-                                        ? chat.messages[0]?.user_id !== user.id
-                                            ? "bg-slate-100"
+                                    chat.messages.length > 0
+                                        ? !chat.messages[0]?.is_read_by_another
+                                            ? chat.messages[0]?.user_id !==
+                                              user.id
+                                                ? "!bg-slate-100"
+                                                : ""
                                             : ""
                                         : ""
-                                } ${!chat.messages[0] ? "bg-white" : ""}`}
+                                } `}
                             >
-                                <Link
+                                <div
                                     className="flex justify-between"
-                                    to={`/chat/${chat.id}`}
+                                    onClick={() => {
+                                        navigate(`/chat/${chat.id}`)
+                                    }}
                                 >
                                     {onDeleteChatMode ? (
                                         <div
@@ -576,7 +582,7 @@ const ChatPage = () => {
                                             alt=""
                                         />
                                     </div>
-                                </Link>
+                                </div>
                             </div>
                         )
                     })
