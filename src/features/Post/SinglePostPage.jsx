@@ -33,7 +33,6 @@ import {
 
 import {
     selectPost,
-    selectPostImagesUrls,
     selectPostError,
     selectPostStatus,
     getPostByUrlThunk,
@@ -52,8 +51,10 @@ const SinglePostPage = () => {
 
     const user = useSelector(selectUser)
     const post = useSelector(selectPost)
+    const postImages = post?.images
     const author = post?.author
-    const postImagesUrls = useSelector(selectPostImagesUrls)
+
+    // const [author, setAuthor] = useState(post?.author)
     const postStatus = useSelector(selectPostError)
     const postError = useSelector(selectPostError)
     const authStatus = useSelector(selectAuthStatus)
@@ -66,6 +67,7 @@ const SinglePostPage = () => {
         useState(null)
 
     /**EFFECTS */
+
     useEffect(() => {
         if (authStatus === "Đang ẩn bài đăng ...") {
             toast.info(authStatus, {
@@ -241,12 +243,12 @@ const SinglePostPage = () => {
 
     const ProductImageSlider = (
         <Slider {...sliderSettings}>
-            {postImagesUrls
-                ? postImagesUrls.map((url) => {
+            {postImages
+                ? postImages.map((image) => {
                       return (
                           <div className="w-full h-[460px]">
                               <img
-                                  src={url}
+                                  src={image.imageUrl}
                                   alt=""
                                   className="object-cover w-full h-full "
                               />
@@ -497,7 +499,7 @@ const SinglePostPage = () => {
                         <div
                             className="my-2 flex items-end justify-center border border-gray-300  rounded-md py-3 px-3 w-full text-sm cursor-pointer hover:bg-slate-100 text-gray-700 "
                             onClick={() => {
-                                navigate(`/update-post/:${post?.post_url}`)
+                                navigate(`/update-post/${post?.post_url}`)
                             }}
                         >
                             <div className="flex">

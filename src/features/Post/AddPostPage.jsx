@@ -342,6 +342,7 @@ const AddPostPage = () => {
                         setShowProductConditionOption(true)
                         setProductConditionEmpty(false)
                     }}
+                    autocomplete="off"
                 />
                 <label
                     htmlFor="postProductCondition"

@@ -6,10 +6,13 @@ import {
     differenceInMonths,
     differenceInYears,
 } from "date-fns"
+import { addTimeAgo } from "../../utils/DateUtils"
 
 export const getPostByUrl = async (postUrl) => {
     const responses = await axios.get(`/posts/${postUrl}`)
-    return responses.data
+    const post = responses.data.post
+    const updatedPosts = await addTimeAgo([post], "createdAt")
+    return updatedPosts[0]
 }
 
 export const getFirstPosts = async (limit) => {
@@ -165,4 +168,9 @@ export const fetchPostsBySearchKeys = async (searchKeys) => {
     })
     const updatedReponse = { ...responses.data, matchedPosts: updatedPosts }
     return updatedReponse
+}
+
+export const updatePost = async (newPost, postId) => {
+    const response = await axios.patch(`/posts/${postId}/update`, newPost)
+    return response.data
 }

@@ -4,14 +4,8 @@ import {
     getFirstPosts,
     getNextPosts,
     fetchPostsBySearchKeys,
+    updatePost,
 } from "./postApi"
-import {
-    differenceInHours,
-    differenceInMinutes,
-    differenceInDays,
-    differenceInMonths,
-    differenceInYears,
-} from "date-fns"
 
 const initialState = {
     post: null,
@@ -118,6 +112,24 @@ export const fetchPostsBySearchKeysThunk = createAsyncThunk(
     }
 )
 
+export const updatePostThunk = createAsyncThunk(
+    "post/updatePostThunk",
+    async ({ newPost, postId }, { rejectWithValue }) => {
+        try {
+            const data = await updatePost(newPost, postId)
+            return data
+        } catch (error) {
+            console.log(">>> Error at updatePostThunk: ", error)
+            return rejectWithValue({
+                code: error.code,
+                message: error.response.data.message,
+                statusCode: error.response.status,
+                statusText: error.response.statusText,
+            })
+        }
+    }
+)
+
 const postSlice = createSlice({
     name: "post",
     initialState,
@@ -135,39 +147,6 @@ const postSlice = createSlice({
             .addCase(getPostByUrlThunk.fulfilled, (state, action) => {
                 state.status = "succeeded"
                 state.error = null
-                // add timeAgo
-                action.payload.post.timeAgo = (() => {
-                    const post = action.payload.post
-                    const now = new Date()
-                    const postCreatedTime = new Date(post?.createdAt)
-
-                    const timeAgoInMinites = differenceInMinutes(
-                        now,
-                        postCreatedTime
-                    )
-                    if (timeAgoInMinites < 61) return `${timeAgoInMinites} phút`
-
-                    const timeAgoInHours = differenceInHours(
-                        now,
-                        postCreatedTime
-                    )
-                    if (timeAgoInHours < 25) return `${timeAgoInHours} giờ`
-
-                    const timeAgoInDays = differenceInDays(now, postCreatedTime)
-                    if (timeAgoInDays < 31) return `${timeAgoInDays} ngày`
-
-                    const timeAgoInMonths = differenceInMonths(
-                        now,
-                        postCreatedTime
-                    )
-                    if (timeAgoInDays < 13) return `${timeAgoInMonths} tháng`
-
-                    const timeAgoInYears = differenceInYears(
-                        now,
-                        postCreatedTime
-                    )
-                    return `${timeAgoInYears} năm`
-                })()
                 state.post = action.payload
             })
             .addCase(getPostByUrlThunk.rejected, (state, action) => {
@@ -220,12 +199,25 @@ const postSlice = createSlice({
                 // console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
             })
+            // updatePostThunk
+            .addCase(updatePostThunk.pending, (state) => {
+                state.status = "Đang cập nhật tin ..."
+                state.error = null
+            })
+            .addCase(updatePostThunk.fulfilled, (state, action) => {
+                state.status = "Cập nhật tin thành công"
+                state.error = null
+            })
+            .addCase(updatePostThunk.rejected, (state, action) => {
+                state.status = "Cập nhật tin thất bại"
+                // console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
     },
 })
 
-export const selectPost = (state) => state.post.post?.post
+export const selectPost = (state) => state.post?.post
 export const selectFetchedPosts = (state) => state.post?.fetchedPosts
-export const selectPostImagesUrls = (state) => state.post.post?.imageUrls
 export const selectPostStatus = (state) => state.post.status
 export const selectPostError = (state) => state.post.error
 export const selectSearchedPosts = (state) => state.post?.searchedPosts

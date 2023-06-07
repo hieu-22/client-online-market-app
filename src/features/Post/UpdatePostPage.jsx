@@ -9,7 +9,15 @@ import { useDispatch, useSelector } from "react-redux"
 import { selectAddress, addPostThunk } from "./locationSlice"
 import { useNavigate, useParams } from "react-router-dom"
 import { selectUser } from "../Auth/authSlice"
-import { selectPost, getPostByUrlThunk, resetPostStatus } from "./postSlice"
+import {
+    selectPost,
+    getPostByUrlThunk,
+    resetPostStatus,
+    selectPostStatus,
+} from "./postSlice"
+import { updatePostThunk } from "./postSlice"
+import axios from "axios"
+import { toast } from "react-toastify"
 
 const UpdatePostPage = () => {
     const dispatch = useDispatch()
@@ -18,7 +26,12 @@ const UpdatePostPage = () => {
 
     const user = useSelector(selectUser)
     const post = useSelector(selectPost)
+    const postStatus = useSelector(selectPostStatus)
+    const fetchedImages = post?.images
 
+    const cloudinaryName = process.env.REACT_APP_CLOUDINARY_NAME
+    const unsingedUploadPreset =
+        process.env.REACT_APP_CLOUDINARY_UNSIGNED_UPLOAD_PRESET
     const [postTitle, setPostTitle] = useState("")
     const [postTitleEmpty, setPostTitleEmpty] = useState(false)
 
@@ -49,7 +62,7 @@ const UpdatePostPage = () => {
             reader.onload = () => {
                 setImages((prevImages) => [
                     ...prevImages,
-                    { file: file, imageURL: reader.result },
+                    { file: file, imageUrl: reader.result },
                 ])
             }
         })
@@ -60,13 +73,43 @@ const UpdatePostPage = () => {
     })
     /**EFFECTS */
     useEffect(() => {
+        if (postStatus === "Đang cập nhật tin ...") {
+            toast.info(postStatus)
+        }
+        if (postStatus === "Cập nhật tin thành công") {
+            toast.dismiss()
+            toast.success(postStatus)
+        }
+        if (postStatus === "Cập nhật tin thất bại") {
+            toast.dismiss()
+            toast.error(postStatus)
+        }
+    }, [postStatus])
+    useEffect(() => {
         ;(async () => {
             const { postUrl } = params
             const res = await dispatch(getPostByUrlThunk({ postUrl })).unwrap()
-            console.log("=> getPostByUrlThunk result: ", res)
+            // console.log("=> getPostByUrlThunk result: ", res)
             dispatch(resetPostStatus())
         })()
     }, [])
+    useEffect(() => {
+        const address = `${stateAddress.detailAddress}, ${stateAddress.ward}, ${stateAddress.district}, ${stateAddress.province}`
+
+        setPostAddress(address)
+    }, [stateAddress])
+    // set fetch post images in images state
+    useEffect(() => {
+        if (fetchedImages?.length > 0) {
+            const newFetchedImages = fetchedImages.map((image) => {
+                return {
+                    id: image.id,
+                    imageUrl: image.imageUrl,
+                }
+            })
+            setImages([...newFetchedImages])
+        }
+    }, [fetchedImages])
 
     useEffect(() => {
         if (!post) {
@@ -79,6 +122,49 @@ const UpdatePostPage = () => {
         setPostAddress(post.address)
     }, [post])
     /**HANDLERS */
+    const uploadImageToClodinaryApi = async (images) => {
+        try {
+            toast.info("Đang cập nhật ảnh ...", {
+                autoClose: 5000,
+            })
+            const imageUrls = await Promise.all(
+                images.map(async (image, index) => {
+                    const file = image.file
+                    // Append the file to the FormData object
+                    // image without id is new one
+                    if (file) {
+                        const imageFormData = new FormData()
+                        imageFormData.append("file", file)
+                        try {
+                            // upload image api here
+                            const uploadedImage = await axios.post(
+                                `https://api.cloudinary.com/v1_1/${cloudinaryName}/upload?upload_preset=${unsingedUploadPreset}`,
+                                imageFormData
+                            )
+                            // customize uploaded Image, put uploadImage Url to the index
+                            return {
+                                imageUrl: uploadedImage.data.url,
+                            }
+                        } catch (error) {
+                            console.log(error)
+                            throw new Error("Error when uploading image")
+                        }
+                    }
+                    return image
+                })
+            )
+            toast.dismiss()
+            return imageUrls.filter(Boolean)
+        } catch (error) {
+            console.log(error)
+            toast.dismiss()
+            toast.error("Lỗi cập nhật ảnh")
+            return {
+                error: true,
+            }
+        }
+    }
+
     const handleUpdatePost = async () => {
         if (!postTitle) {
             setPostTitleEmpty(true)
@@ -92,7 +178,7 @@ const UpdatePostPage = () => {
         if (!postDescription) {
             setPostDescriptionEmpty(true)
         }
-        const postAddress = `${stateAddress.detailAddress}, ${stateAddress.ward}, ${stateAddress.district}, ${stateAddress.province}`
+
         if (!postAddress) {
             setAddressEmpty(true)
         }
@@ -113,23 +199,27 @@ const UpdatePostPage = () => {
             return
         }
 
-        const formData = new FormData()
-
-        images.forEach((image) => {
-            const file = image.file
-            // Append the file to the FormData object
-            formData.append("images", file, file.name)
-        })
-
-        formData.append("title", postTitle)
-        formData.append("price", postPrice)
-        formData.append("product_condition", postProductCondition)
-        formData.append("description", postDescription)
-        formData.append("address", postAddress)
-        formData.append("user_id", user.id)
-        const result = await dispatch(addPostThunk(formData)).unwrap()
-        console.log(">>> At handleAddPost, result: ", result)
-        navigate(`/posts/${result.post.post_url}`)
+        const uploadImages = await uploadImageToClodinaryApi(images) // return Array[{id: any, imageUrl: string}, ...]
+        if (uploadImages.error === true) return
+        const newPost = {
+            title: postTitle,
+            price: postPrice,
+            product_condition: postProductCondition,
+            description: postDescription,
+            address: postAddress,
+            images: JSON.stringify(uploadImages),
+        }
+        const postId = post.id
+        // upload
+        const result = await dispatch(
+            updatePostThunk({ newPost, postId })
+        ).unwrap()
+        // console.log(">>> At updatePostThunk, result: ", result)
+        if (result) {
+            setTimeout(() => {
+                navigate(`/posts/${post.post_url}`)
+            }, 1000)
+        }
     }
 
     const ImagesUploader = (
@@ -180,7 +270,7 @@ const UpdatePostPage = () => {
                                 <div className="h-full flex items-center border-[1px] border-gray-300 rounded-[4px]">
                                     <img
                                         className="object-contain w-full h-[86px]"
-                                        src={image.imageURL}
+                                        src={image.imageUrl}
                                         alt=""
                                     />
                                 </div>
@@ -489,11 +579,7 @@ const UpdatePostPage = () => {
                         (addressEmpty ? " outline-red-500" : "")
                     }
                     id="postLocation"
-                    value={
-                        stateAddress?.detailAddress
-                            ? `${stateAddress.detailAddress}, ${stateAddress.ward}, ${stateAddress.district}, ${stateAddress.province}`
-                            : postAddress
-                    }
+                    value={postAddress}
                     onClick={(event) => {
                         event.stopPropagation()
                         setShowAddressForm(true)
@@ -518,7 +604,7 @@ const UpdatePostPage = () => {
             <div className="mt-1">
                 {addressEmpty ? (
                     <div className="text-red-600 text-xs">
-                        Bạn chưa nhập địa chỉ
+                        Vui lòng điền đủ thông tin địa chỉ
                     </div>
                 ) : (
                     <></>
@@ -555,7 +641,8 @@ const UpdatePostPage = () => {
                             HỦY
                         </button>
                         <button
-                            className=" block w-[50%] py-2 bg-primary text-white rounded-md hover:bg-light-primary"
+                            className=" block w-[50%] py-2 bg-primary text-white rounded-md hover:bg-light-primary disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            disabled={images.length === 0 ? true : false}
                             onClick={handleUpdatePost}
                         >
                             CẬP NHẬP

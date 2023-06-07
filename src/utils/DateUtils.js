@@ -8,10 +8,11 @@ import {
     differenceInSeconds,
 } from "date-fns"
 
-export const addTimeAgo = async (array, itemProp) => {
+export const addTimeAgo = async (array, timeStampProp) => {
+    // return a new array of posts with timeAgo in each post
     const updatedArray = await array.map((item) => {
         const now = new Date()
-        const from = new Date(item[itemProp])
+        const from = new Date(item[timeStampProp])
 
         const timeAgoInMinutes = differenceInMinutes(now, from)
         if (timeAgoInMinutes < 61) {
