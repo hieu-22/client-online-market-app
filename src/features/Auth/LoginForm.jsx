@@ -112,7 +112,10 @@ const LoginForm = () => {
                 value={userAccount}
                 onChange={(event) => setUserAccount(event.target.value)}
                 onClick={() => {
-                    dispatch(deleteErrorMessage())
+                    if (error?.message) {
+                        dispatch(deleteErrorMessage())
+                    }
+
                     setIsAccountFieldEmpty(false)
                     setIsEmail(true)
                 }}
@@ -161,7 +164,9 @@ const LoginForm = () => {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 onClick={() => {
-                    dispatch(deleteErrorMessage())
+                    if (error?.message) {
+                        dispatch(deleteErrorMessage())
+                    }
                     setIsPasswordFieldEmpty(false)
                 }}
             />
