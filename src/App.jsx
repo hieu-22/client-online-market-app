@@ -21,11 +21,9 @@ import NotFoundPage from "./features/Error/NotFoundPage"
 import { socket } from "./socket"
 import { useSelector } from "react-redux"
 import { selectUser } from "./features/Auth/authSlice"
-import { selectOtherUser } from "./features/User/userSlice"
 
 const App = () => {
     const user = useSelector(selectUser)
-    const otherUser = useSelector(selectOtherUser)
 
     useEffect(() => {
         if (user) {
@@ -37,6 +35,7 @@ const App = () => {
         }
         socket.disconnect()
     }, [user])
+
     return (
         <main>
             <Routes>
