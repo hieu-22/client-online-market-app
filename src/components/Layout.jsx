@@ -21,6 +21,7 @@ import { RxTriangleDown, RxExit } from "react-icons/rx"
 import { FaUserCircle } from "react-icons/fa"
 import { useDispatch, useSelector } from "react-redux"
 import CustomToastify from "./CustomToastify"
+import ErrorPage from "../features/Error/ErrorPage"
 
 // redux
 import {
@@ -69,7 +70,6 @@ const Layout = () => {
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
     const searchedPosts = useSelector(selectSearchedPosts)
     const authError = useSelector(selectAuthError)
-    const locationError = useSelector(selectLocationError)
     const chatError = useSelector(selectChatError)
     const userError = useSelector(selectUserError)
     const postError = useSelector(selectPostError)
@@ -902,6 +902,40 @@ const Layout = () => {
             </div>
         </footer>
     )
+
+    // RETURN ERROR PAGE IF MATCH CONDITIONS
+    if (authError?.statusCode === 503 || authError?.statusCode === 400) {
+        return (
+            <ErrorPage
+                statusCode={authError.statusCode}
+                message={authError.statusText}
+            />
+        )
+    }
+    if (postError?.statusCode === 503 || postError?.statusCode === 400) {
+        return (
+            <ErrorPage
+                statusCode={postError.statusCode}
+                message={postError.statusText}
+            />
+        )
+    }
+    if (chatError?.statusCode === 503 || chatError?.statusCode === 400) {
+        return (
+            <ErrorPage
+                statusCode={chatError.statusCode}
+                message={chatError.statusText}
+            />
+        )
+    }
+    if (userError?.statusCode === 503 || userError?.statusCode === 400) {
+        return (
+            <ErrorPage
+                statusCode={userError.statusCode}
+                message={userError.statusText}
+            />
+        )
+    }
 
     return (
         <>
