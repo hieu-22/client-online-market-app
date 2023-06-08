@@ -1,5 +1,6 @@
 import React from "react"
 import { TbError404 } from "react-icons/tb"
+import { Link } from "react-router-dom"
 
 const NotFoundPage = () => {
     return (
@@ -7,10 +8,13 @@ const NotFoundPage = () => {
             <div className="">
                 <TbError404 className="w-[160px] h-[160px] text-gray-600" />
             </div>
-            <h1 className="text-lg">Oops! Something went wrong.</h1>
-            <p className="text-lg">
-                We apologize for the inconvenience. Please try again later.
-            </p>
+            <h1 className="text-lg">Oops! Không tìm thấy trang phù hợp</h1>
+            <Link
+                to={"/"}
+                className="text-base text-primary hover:text-slate-300 hover:underline"
+            >
+                Trở về trang chủ
+            </Link>
         </div>
     )
 }
