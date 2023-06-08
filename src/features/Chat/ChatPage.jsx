@@ -3,6 +3,7 @@ import ChatBannerSlider from "./ChatBannerSlider"
 // icons
 import { FaUserCircle } from "react-icons/fa"
 import { RiFileAddLine, RiDeleteBin6Line } from "react-icons/ri"
+import { IoWarning } from "react-icons/io5"
 
 //
 import { Link, useNavigate } from "react-router-dom"
@@ -211,7 +212,14 @@ const ChatPage = () => {
                         )
                     })
                 ) : (
-                    <></>
+                    <div className="p-2 px-3 rounded-sm flex items-center bg-hover-primary">
+                        <div>
+                            <IoWarning
+                                className={"text-white text-xl"}
+                            ></IoWarning>
+                        </div>
+                        <p className="pl-2">Bạn chưa có cuộc hội thoại nào!</p>
+                    </div>
                 )}
             </div>
             <div className="py-2 pl-3 text-lg bg-gray-50 text-gray-700 font-medium  border-y border-gray-200">
@@ -233,17 +241,18 @@ const ChatPage = () => {
                         </div>
                     </div>
                 ) : (
-                    <div
-                        className="flex items-center justify-center px-3 py-1 text-sm text-primary rounded-[20px] border border-primary hover:bg-hover-primary cursor-pointer w-[180px]"
+                    <button
+                        className="flex items-center justify-center px-3 py-1 text-sm text-primary rounded-[20px] border border-primary hover:bg-hover-primary cursor-pointer w-[180px] disabled:cursor-default disabled:hover:bg-inherit"
                         onClick={() => {
                             setOnDeleteChatMode(true)
                         }}
+                        disabled={chats.length === 0 ? true : false}
                     >
                         <span className="pr-1">
                             <RiDeleteBin6Line className="w-5 h-5" />
                         </span>
                         Xóa cuộc trò chuyện
-                    </div>
+                    </button>
                 )}
             </div>
         </div>
