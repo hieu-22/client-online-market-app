@@ -1,10 +1,11 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { GrClose } from "react-icons/gr"
 import Logo from "../../utils/images/Logo.png"
-import { useDispatch } from "react-redux"
-import { registerThunk } from "./authSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { registerThunk, selectAuthError, selectAuthStatus } from "./authSlice"
 import Breadcrumb from "../../components/Breadcrumb"
+import { toast } from "react-toastify"
 
 const LoginForm = () => {
     const [userAccount, setUserAccount] = useState("")
@@ -22,6 +23,41 @@ const LoginForm = () => {
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const authStatus = useSelector(selectAuthStatus)
+    const authError = useSelector(selectAuthError)
+
+    // useEffect
+    useEffect(() => {
+        if (authStatus === "Đang đăng ký tài khoản ...") {
+            toast.dismiss()
+            toast.info(authStatus, {
+                hideProgressBar: true,
+            })
+        }
+        if (authStatus === "Đăng ký tài khoản thành công!") {
+            toast.dismiss()
+            toast.success(authStatus, {
+                hideProgressBar: true,
+            })
+        }
+        if (authStatus === "Đăng ký tài khoản thất bại!") {
+            toast.dismiss()
+            toast.error(authError.message, {
+                hideProgressBar: true,
+            })
+        }
+    }, [authStatus])
+
+    const debounce = (func, delay) => {
+        let timerId
+
+        return function () {
+            clearTimeout(timerId)
+
+            timerId = setTimeout(func, delay)
+        }
+    }
 
     const handleRegister = async () => {
         if (userAccount === "") {
@@ -53,11 +89,12 @@ const LoginForm = () => {
                     password,
                 })
             ).unwrap()
-            navigate("/")
+            navigate("/add-phone-number")
         } catch (error) {
             console.log(error)
         }
     }
+    const debounceRegisterHandler = debounce(handleRegister, 500)
 
     // UI
     const AccountField = (
@@ -204,7 +241,7 @@ const LoginForm = () => {
             </div>
             <div
                 className={`mt-10 bg-primary  text-white text-lg font-semibold py-2 flex rounded-md opacity-100 hover:opacity-90 cursor-pointer`}
-                onClick={handleRegister}
+                onClick={debounceRegisterHandler}
             >
                 <p className="m-auto">Đăng ký</p>
             </div>
@@ -229,7 +266,7 @@ const LoginForm = () => {
                 className="relative -top-20 bg-white m-auto my-12 w-[450px] border-[1px] rounded-md border-gray-200 py-4  px-8 shadow-lg shadow-gray-400"
                 onKeyDown={(event) => {
                     if (event.key === "Enter") {
-                        handleRegister()
+                        return debounceRegisterHandler
                     }
                 }}
             >

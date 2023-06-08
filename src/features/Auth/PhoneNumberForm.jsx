@@ -1,9 +1,15 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useState } from "react"
 import Breadcrumb from "../../components/Breadcrumb"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { updatePhoneNumberThunk, selectUser } from "../Auth/authSlice"
+import {
+    updatePhoneNumberThunk,
+    selectUser,
+    selectAuthError,
+    selectAuthStatus,
+} from "../Auth/authSlice"
+import { toast } from "react-toastify"
 
 const PhoneNumberForm = () => {
     const dispatch = useDispatch()
@@ -18,6 +24,30 @@ const PhoneNumberForm = () => {
 
     const phoneNumberPattern = /^(\+84|0)\d{9,10}$/
 
+    const authStatus = useSelector(selectAuthStatus)
+    const authError = useSelector(selectAuthError)
+    // useEffect
+    useEffect(() => {
+        if (authStatus === "Đang cập nhật ...") {
+            toast.dismiss()
+            toast.info(authStatus, {
+                hideProgressBar: true,
+            })
+        }
+        if (authStatus === "Cập nhật thành công!") {
+            toast.dismiss()
+            toast.success(authStatus, {
+                hideProgressBar: true,
+            })
+        }
+        if (authStatus === "Cập nhật thất bại!") {
+            toast.dismiss()
+            toast.error(authError.message, {
+                hideProgressBar: true,
+            })
+        }
+    }, [authStatus])
+    // handlers
     const handleFormatCheck = () => {
         if (userPhoneNumber === "") {
             setUserPhoneNumberEmpty(true)
@@ -32,6 +62,15 @@ const PhoneNumberForm = () => {
         return true
     }
 
+    const debounce = (func, delay) => {
+        let timerId
+
+        return function () {
+            clearTimeout(timerId)
+
+            timerId = setTimeout(func, delay)
+        }
+    }
     const handleAddPhoneNumber = async () => {
         const check = handleFormatCheck()
         if (!check) {
@@ -49,6 +88,7 @@ const PhoneNumberForm = () => {
             navigate("/")
         }
     }
+    const debounceAddPhoneNumberHandler = debounce(handleAddPhoneNumber, 500)
 
     // const Header = (
     //     <h2 className=" font-bold py-6  flex justify-between items-center">
@@ -120,7 +160,7 @@ const PhoneNumberForm = () => {
         <div className="">
             <div
                 className=" bg-primary text-white text-lg font-semibold py-2 flex rounded-md opacity-100 hover:opacity-90 cursor-pointer"
-                onClick={handleAddPhoneNumber}
+                onClick={debounceAddPhoneNumberHandler}
             >
                 <p className="m-auto">Tiếp tục</p>
             </div>
@@ -138,7 +178,7 @@ const PhoneNumberForm = () => {
                 className="relative -top-20 bg-white m-auto my-12 w-[420px] h-[480px] border-[1px] rounded-md border-gray-200 py-4 pt-6  px-8 shadow-lg shadow-gray-400 "
                 onKeyDown={(event) => {
                     if (event.key === "Enter") {
-                        handleAddPhoneNumber()
+                        return debounceAddPhoneNumberHandler
                     }
                 }}
             >

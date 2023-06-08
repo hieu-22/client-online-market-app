@@ -518,32 +518,31 @@ const authSlice = createSlice({
 
             // registerThunk
             .addCase(registerThunk.pending, (state) => {
-                state.status = "loading"
+                state.status = "Đang đăng ký tài khoản ..."
                 state.error = null
             })
             .addCase(registerThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
+                state.status = "Đăng ký tài khoản thành công!"
                 state.error = null
                 state.user = action.payload.user
                 state.token = action.payload.token
                 state.isLoggedIn = true
             })
             .addCase(registerThunk.rejected, (state, action) => {
-                state.status = "failed"
+                state.status = "Đăng ký tài khoản thất bại!"
                 state.error = action.payload
             })
 
             // updatePhoneNumberThunk
             .addCase(updatePhoneNumberThunk.pending, (state) => {
-                state.status = "loadding"
+                state.status = "Đang cập nhật ..."
             })
             .addCase(updatePhoneNumberThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
-                state.error = null
+                state.status = "Cập nhật thành công!"
                 state.user = action.payload.user
             })
             .addCase(updatePhoneNumberThunk.rejected, (state, action) => {
-                state.status = "failed"
+                state.status = "Cập nhật thất bại!"
                 state.error = action.payload
             })
 

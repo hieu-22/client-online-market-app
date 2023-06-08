@@ -75,7 +75,12 @@ const Layout = () => {
     const postError = useSelector(selectPostError)
 
     // EFFECTS
-    // ERROR NOTIFICATION FOR EACH STATE
+    // + navigate to add phoneNumber page if user don't have phoneNumber
+    useEffect(() => {
+        if (!user.phoneNumber) {
+            navigate("/add-phone-number")
+        }
+    }, [user])
     useEffect(() => {
         setIsAccountWindowShowed(false)
         setIsNotificationWindowShowed(false)

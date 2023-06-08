@@ -44,7 +44,7 @@ const App = () => {
                     <Route path="login" element={<LoginForm />} />
                     <Route path="register" element={<RegisterForm />} />
                     <Route
-                        path="login/add-phone-number"
+                        path="add-phone-number"
                         element={<PhoneNumberForm />}
                     />
                     <Route path="user/:userId" element={<OtherUserPage />} />
