@@ -45,6 +45,11 @@ const LoginForm = () => {
         if (authStatus === "Đăng nhập thất bại") {
             toast.dismiss()
             // toast.error(authStatus)
+            if (error.statusCode === 404) {
+                toast.warn("Sai tài khoản!", {
+                    autoClose: 2000,
+                })
+            }
         }
     }, [authStatus])
 

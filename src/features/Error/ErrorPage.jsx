@@ -4,7 +4,7 @@ const ErrorPage = ({ statusCode, message }) => {
     return (
         <div className="bg-customWhite">
             <div className="laptop:w-laptop m-auto h-screen flex items-center justify-center gap-x-16 translate-y-[-10%]">
-                <div className="text-[160px] text-gray-500 font-mono">
+                <div className="text-[160px] text-gray-500 font-mono select-none">
                     {statusCode}
                 </div>
                 <div className="h-[100px] flex flex-col justify-end">

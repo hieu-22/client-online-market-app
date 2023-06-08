@@ -513,7 +513,7 @@ const authSlice = createSlice({
             .addCase(loginThunk.rejected, (state, action) => {
                 state.status = "Đăng nhập thất bại"
                 console.log(">>>rejected payload: ", action.payload)
-                state.error = action.payload.data
+                state.error = action.payload
             })
 
             // registerThunk
@@ -680,6 +680,8 @@ const authSlice = createSlice({
 export const authPersistConfig = {
     key: "auth",
     storage,
+    whitelist: ["isLoggedIn", "token", "user"],
+    blacklist: ["status", "error", "message"],
     stateReconciler: autoMergeLevel2,
 }
 
