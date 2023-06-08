@@ -16,6 +16,7 @@ const ProductCard = ({
     title,
     price,
     author,
+    description,
     timeAgo,
     address,
     postUrl,
@@ -71,11 +72,16 @@ const ProductCard = ({
     const productDetails = (
         <div className="productDetails px-3 py-2">
             <div className="overflow-hidden">
-                <Link
-                    to={`/posts/${postUrl}`}
-                    className="text-base font-medium text-gray-700 hover:text-primary"
-                >
-                    <h2 className="ellipsis line-clamp-2">{title}</h2>
+                <Link to={`/posts/${postUrl}`} className="">
+                    <div className="ellipsis line-clamp-2">
+                        <span className="hover:text-primary text-base font-medium text-gray-700">
+                            {title}
+                        </span>
+                        <br />
+                        <span className="text-sm font-light text-gray-500 ">
+                            {description}
+                        </span>
+                    </div>
                 </Link>
             </div>
             <div className="flex justify-between items-center mt-2">

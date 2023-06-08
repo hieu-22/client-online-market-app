@@ -121,6 +121,7 @@ const NewPosts = () => {
                                     address={post.address}
                                     postUrl={post.post_url}
                                     imageUrl={post.images[0].imageUrl}
+                                    description={post.description}
                                 />
                             )
                         })}{" "}
