@@ -26,6 +26,7 @@ import {
 } from "./userSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
+import { toast } from "react-toastify"
 
 const OtherUserPage = () => {
     const dispatch = useDispatch()
@@ -129,7 +130,35 @@ const OtherUserPage = () => {
                                         <div>
                                             <BsShare></BsShare>
                                         </div>
-                                        <div className="font-normal">
+                                        <div
+                                            className="font-normal flex-1 text-left"
+                                            onClick={(event) => {
+                                                event.stopPropagation()
+                                                const url = window.location.href
+                                                navigator.clipboard
+                                                    .readText()
+                                                    .then((clipboardText) => {
+                                                        if (
+                                                            clipboardText ===
+                                                            url
+                                                        ) {
+                                                            return setUserMenuShowed(
+                                                                false
+                                                            )
+                                                        } else {
+                                                            navigator.clipboard.writeText(
+                                                                url
+                                                            )
+                                                            toast(
+                                                                "Copy link successfully!"
+                                                            )
+                                                            setUserMenuShowed(
+                                                                false
+                                                            )
+                                                        }
+                                                    })
+                                            }}
+                                        >
                                             Sao chép liên kết
                                         </div>
                                     </div>

@@ -196,7 +196,7 @@ const AuthorizedUserPage = () => {
                                             <BsShare></BsShare>
                                         </div>
                                         <div
-                                            className="font-normal"
+                                            className="font-normal flex-1 text-left"
                                             onClick={(event) => {
                                                 event.stopPropagation()
                                                 const url = window.location.href
