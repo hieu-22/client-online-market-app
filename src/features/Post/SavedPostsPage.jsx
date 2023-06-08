@@ -10,6 +10,7 @@ import {
     resetStatus,
     savePostThunk,
 } from "../Auth/authSlice"
+import { Link } from "react-router-dom"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
 
 const SavedPostsPage = () => {
@@ -126,21 +127,20 @@ const SavedPostsPage = () => {
                 </>
             ) : (
                 // no post
-                <div className="w-[50%] m-auto pb-10">
-                    <div className="my-5 flex justify-center">
+                <div className="w-[40%] m-auto pb-10">
+                    {/* <div className="my-5 flex justify-center">
                         <MdPostAdd className="w-20 h-20 text-gray-500"></MdPostAdd>
-                    </div>
-                    <div className="my-5 p-5 bg-background text-gray-500">
-                        Bạn chưa có tin đăng cá nhân nào đang bán, thử đăng bán
-                        ngay
-                    </div>
-                    <div
-                        className="my-5 border-[1px] border-primary hover:bg-primary hover:text-white cursor-pointer py-2 text-center rounded-md"
-                        onClick={() => {
-                            navigate("../posts/new-post")
-                        }}
-                    >
-                        Đăng tin
+                    </div> */}
+                    <div className="mt-[50px] py-5 px-5 text-lg bg-background text-gray-500 rounded-sm">
+                        Bạn chưa lưu bất kì tin nào.{" "}
+                        <Link
+                            className={
+                                "text-primary hover:text-slate-400 hover:underline text-base"
+                            }
+                            to="/"
+                        >
+                            Xem tin...
+                        </Link>
                     </div>
                 </div>
             )}
