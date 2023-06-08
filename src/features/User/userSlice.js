@@ -14,13 +14,35 @@ export const getUserByIdThunk = createAsyncThunk(
             // console.log(">>> At getUserByIdThunk, data: ", data)
             return data
         } catch (error) {
-            // console.log(">>> Error at getUserByIdThunk: ", error)
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )

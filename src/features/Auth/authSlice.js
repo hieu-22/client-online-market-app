@@ -38,24 +38,31 @@ export const loginThunk = createAsyncThunk(
             if (error.response) {
                 // The request was made and the server responded with a status code
                 // that falls out of the range of 2xx
-                console.log(">>> Error at loginThunk, response: ", {
-                    data: error.response.data,
-                    status: error.response.status,
-                    header: error.response.headers,
-                })
                 return rejectWithValue({
-                    data: error.response.data,
-                    status: error.response.status,
-                    header: error.response.headers,
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
                 })
             } else if (error.request) {
                 // The request was made but no response was received
                 // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
                 // http.ClientRequest in node.js
-                console.log(">>> Error at loginThunk, request:", error.request)
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
             } else {
                 // Something happened in setting up the request that triggered an Error
                 console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
             }
         }
     }
@@ -68,13 +75,35 @@ export const registerThunk = createAsyncThunk(
             const data = await register(credentials)
             return data
         } catch (error) {
-            // console.log(">>> Error at registerThunk: ", error)
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )
@@ -87,13 +116,35 @@ export const savePostThunk = createAsyncThunk(
             // console.log(">>> At savePostThunk, data: ", data)
             return data
         } catch (error) {
-            console.log(">>> Error at savePostThunk: ", error)
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )
@@ -107,13 +158,35 @@ export const getPostByUserIdThunk = createAsyncThunk(
             // console.log(">>> At getPostByUserIdThunk, data: ", data)
             return data
         } catch (error) {
-            console.log(">>> Error at getPostByUserIdThunk: ", error)
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )
@@ -129,27 +202,31 @@ export const getSavedPostsByUserIdThunk = createAsyncThunk(
             if (error.response) {
                 // The request was made and the server responded with a status code
                 // that falls out of the range of 2xx
-                console.log(
-                    ">>> Error at getSavedPostsByUserIdThunk, response: ",
-                    {
-                        data: error.response.data,
-                        status: error.response.status,
-                        header: error.response.headers,
-                    }
-                )
                 return rejectWithValue({
-                    data: error.response.data,
-                    status: error.response.status,
-                    header: error.response.headers,
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
                 })
             } else if (error.request) {
-                console.log(">>> Error at loginThunk, request:", error.request)
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
                 return rejectWithValue({
-                    message: "ClientSide error",
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
                 })
             } else {
                 // Something happened in setting up the request that triggered an Error
                 console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
             }
         }
     }
@@ -163,14 +240,35 @@ export const updatePhoneNumberThunk = createAsyncThunk(
             const data = await updatePhoneNumber(phoneNumber, userId)
             return data
         } catch (error) {
-            // console.log(">>> Error at updatePhoneNumberThunk: ", error)
-
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )
@@ -183,13 +281,35 @@ export const updateAvatarThunk = createAsyncThunk(
             // console.log("==> data: ", data)
             return data
         } catch (error) {
-            // console.log(">>> Error at updateAvatarThunk: ", error)
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )
@@ -201,13 +321,35 @@ export const updateUserInfoThunk = createAsyncThunk(
             const data = await updateUserInfo(updatedInfo, userId)
             return data
         } catch (error) {
-            // console.log(">>> Error at updatePhoneNumberThunk: ", error)
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )
@@ -219,12 +361,35 @@ export const updatePasswordThunk = createAsyncThunk(
             const data = await updatePassword({ password, newPassword }, userId)
             return data
         } catch (error) {
-            return rejectWithValue({
-                code: error.code,
-                message: error.response.data.message,
-                statusCode: error.response.status,
-                statusText: error.response.statusText,
-            })
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
         }
     }
 )
@@ -237,20 +402,33 @@ export const deleteSavedPostThunk = createAsyncThunk(
             return data
         } catch (error) {
             if (error.response) {
-                console.log("axios error.response: ", error.response)
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
                 return rejectWithValue({
-                    data: error.response.data,
-                    status: error.response.status,
-                    header: error.response.headers,
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
                 })
             } else if (error.request) {
-                console.log("=> axios error.request: ", error.request)
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
                 return rejectWithValue({
-                    message: "ClientSide error",
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
                 })
             } else {
                 // Something happened in setting up the request that triggered an Error
                 console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
             }
         }
     }
@@ -263,20 +441,33 @@ export const deletePostByIdThunk = createAsyncThunk(
             return data
         } catch (error) {
             if (error.response) {
-                console.log("axios error.response: ", error.response)
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
                 return rejectWithValue({
-                    data: error.response.data,
-                    status: error.response.status,
-                    header: error.response.headers,
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
                 })
             } else if (error.request) {
-                console.log("axios error.request: ", error.request)
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
                 return rejectWithValue({
-                    message: "ClientSide error",
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
                 })
             } else {
                 // Something happened in setting up the request that triggered an Error
                 console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
             }
         }
     }

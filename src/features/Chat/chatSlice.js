@@ -24,24 +24,33 @@ export const addChatThunk = createAsyncThunk(
             return data
         } catch (error) {
             if (error.response) {
-                console.log(
-                    ">>> Error at getPostByUrlThunk, response: ",
-                    error.response
-                )
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
                 return rejectWithValue({
-                    data: error.response.data,
-                    status: error.response.status,
-                    headers: error.response.headers,
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
                 })
             } else if (error.request) {
-                console.log(
-                    ">>> Error at getPostByUrlThunk, request: ",
-                    error.request
-                )
-                rejectWithValue(error.request)
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
             } else {
+                // Something happened in setting up the request that triggered an Error
                 console.log("Error", error.message)
-                rejectWithValue(error.request)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
             }
         }
     }
@@ -55,24 +64,33 @@ export const getEmojisThunk = createAsyncThunk(
             return data
         } catch (error) {
             if (error.response) {
-                console.log(
-                    ">>> Error at getEmojisThunk, response: ",
-                    error.response
-                )
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
                 return rejectWithValue({
-                    data: error.response.data,
-                    status: error.response.status,
-                    headers: error.response.headers,
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
                 })
             } else if (error.request) {
-                console.log(
-                    ">>> Error at getEmojisThunk, request: ",
-                    error.request
-                )
-                rejectWithValue(error.request)
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
             } else {
+                // Something happened in setting up the request that triggered an Error
                 console.log("Error", error.message)
-                rejectWithValue(error.request)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
             }
         }
     }
@@ -85,24 +103,33 @@ export const getConversationsByUserIdThunk = createAsyncThunk(
             return data
         } catch (error) {
             if (error.response) {
-                console.log(
-                    ">>> Error at getPostByUrlThunk, response: ",
-                    error.response
-                )
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
                 return rejectWithValue({
-                    data: error.response.data,
-                    status: error.response.status,
-                    headers: error.response.headers,
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
                 })
             } else if (error.request) {
-                console.log(
-                    ">>> Error at getPostByUrlThunk, request: ",
-                    error.request
-                )
-                rejectWithValue(error.request)
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
             } else {
+                // Something happened in setting up the request that triggered an Error
                 console.log("Error", error.message)
-                rejectWithValue(error.request)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
             }
         }
     }
