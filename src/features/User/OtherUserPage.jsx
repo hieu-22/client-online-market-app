@@ -16,7 +16,7 @@ import {
 import { HiOutlineLocationMarker } from "react-icons/hi"
 import { AiOutlineMail } from "react-icons/ai"
 import { TbMoodEmpty } from "react-icons/tb"
-import { RiMessage2Line } from "react-icons/ri"
+import { BsTelephoneForward } from "react-icons/bs"
 import { FaUserCircle } from "react-icons/fa"
 import {
     selectOtherUser,
@@ -41,7 +41,7 @@ const OtherUserPage = () => {
         ;(async () => {
             const { userId } = params
             const result = await dispatch(getUserByIdThunk({ userId })).unwrap()
-            console.log(">>> At handleLookPoster, result: ", result)
+            // console.log(">>> At handleLookPoster, result: ", result)
         })()
     }, [])
     // showing api error
@@ -165,10 +165,12 @@ const OtherUserPage = () => {
                 </div>
                 <div className="flex items-center gap-x-2 py-1">
                     <div>
-                        <RiMessage2Line className="text-gray-400 w-5 h-5" />
+                        <BsTelephoneForward className="text-gray-400 w-5 h-5" />
                     </div>
-                    <div className="text-gray-400 text-sm">Phản hồi chat:</div>
-                    <div className="text-sm text-text">72% (Trong 3 giờ)</div>
+                    <div className="text-gray-400 text-sm">Số điện thoại:</div>
+                    <div className="text-sm text-text">
+                        {user?.phoneNumber ? user.phoneNumber : "Chưa cung cấp"}
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-x-2 py-1">

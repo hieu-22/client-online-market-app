@@ -75,7 +75,7 @@ export const getPostByUserId = async ({ userId }) => {
         if (timeAgoInMinutes < 61) {
             return {
                 ...post,
-                timeAgo: `${timeAgoInMinutes.toString()} phút`,
+                timeAgo: `${timeAgoInMinutes.toString()} phút trước`,
             }
         }
 
@@ -152,7 +152,7 @@ export const deletePostById = async ({ postId, userId }) => {
         if (timeAgoInMinutes < 61) {
             return {
                 ...post,
-                timeAgo: `${timeAgoInMinutes.toString()} phút`,
+                timeAgo: `${timeAgoInMinutes.toString()} phút trước`,
             }
         }
 

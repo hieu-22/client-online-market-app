@@ -12,7 +12,7 @@ import {
     BsShare,
     BsFillCameraFill,
 } from "react-icons/bs"
-import { HiOutlineLocationMarker } from "react-icons/hi"
+import { BsTelephoneForward } from "react-icons/bs"
 import { AiOutlineMail } from "react-icons/ai"
 import { MdPostAdd } from "react-icons/md"
 import { FaUserCircle } from "react-icons/fa"
@@ -259,11 +259,11 @@ const AuthorizedUserPage = () => {
                 </div>
                 <div className="flex items-center gap-x-2 py-1">
                     <div>
-                        <HiOutlineLocationMarker className="text-gray-400 w-5 h-5" />
+                        <BsTelephoneForward className="text-gray-400 w-5 h-5" />
                     </div>
-                    <div className="text-gray-400 text-sm">Địa chỉ:</div>
+                    <div className="text-gray-400 text-sm">Số điện thoại:</div>
                     <div className="text-sm text-text">
-                        {user.address ? user.address : "Chưa có địa chỉ"}
+                        {user?.phoneNumber ? user.phoneNumber : "Chưa cung cấp"}
                     </div>
                 </div>
                 {/* <div className="flex items-center gap-x-2 py-1">
