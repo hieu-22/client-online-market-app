@@ -28,6 +28,9 @@ const PhoneNumberForm = () => {
     const authError = useSelector(selectAuthError)
     // useEffect
     useEffect(() => {
+        if (user.phoneNumber) navigate("/")
+    }, [user])
+    useEffect(() => {
         if (authStatus === "Đang cập nhật ...") {
             toast.dismiss()
             toast.info(authStatus, {
