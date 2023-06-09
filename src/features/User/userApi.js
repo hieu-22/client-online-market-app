@@ -57,5 +57,34 @@ export const getUserById = async (userId) => {
 
 export const getOtherUsers = async (userId) => {
     const response = await axios.get(`user/get-other-users?userId=${userId}`)
-    return response.data.users
+
+    const followedUsers = response.data.users.followedUsers
+    const newFollowedUsers = followedUsers.map((item) => {
+        const newItem = item
+        newItem.isFollowed = true
+        return newItem
+    })
+
+    const nonFollowedUsers = response.data.users.nonFollowedUsers
+    const newNonFollowedUsers = nonFollowedUsers.map((item) => {
+        const newItem = item
+        newItem.isFollowed = false
+        return newItem
+    })
+
+    const customizedData = { followedUsers, nonFollowedUsers }
+    return customizedData
+}
+
+export const followUser = async ({ followerId, followedUserId }) => {
+    const response = await axios.post(
+        `user/${followerId}/add-relationship?otherUserId=${followedUserId}`
+    )
+    return response.data
+}
+export const unfollowUser = async ({ followerId, followedUserId }) => {
+    const response = await axios.delete(
+        `user/${followerId}/remove-relationship?otherUserId=${followedUserId}`
+    )
+    return response.data
 }
