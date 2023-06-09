@@ -182,6 +182,13 @@ const userSlice = createSlice({
             state.nonFollowedUsers[index].isFollowed =
                 !state.nonFollowedUsers[index].isFollowed
         },
+        addVisitingUserToFollowers(state, action) {
+            const addedUser = action.payload
+            state.otherUser.followers.unshift(addedUser)
+        },
+        removeVisitingUserToFollowers(state, action) {
+            state.otherUser.followers.shift()
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -250,6 +257,11 @@ export const selectOtherUser = (state) => state.user.otherUser
 export const selectUserError = (state) => state.user.error
 export const selectUserStatus = (state) => state.user.status
 export const selectNonFollowedUsers = (state) => state.user.nonFollowedUsers
-export const { resetUserStatus, toggleIsUserFollowed } = userSlice.actions
+export const {
+    resetUserStatus,
+    toggleIsUserFollowed,
+    addVisitingUserToFollowers,
+    removeVisitingUserToFollowers,
+} = userSlice.actions
 
 export default userSlice.reducer

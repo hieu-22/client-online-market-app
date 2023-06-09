@@ -216,7 +216,7 @@ const AuthorizedUserPage = () => {
                                         className="font-normal flex-1 text-left"
                                         onClick={(event) => {
                                             event.stopPropagation()
-                                            const url = window.location.href
+                                            const url = `${window.location.hostname}/user/${user.id}`
                                             navigator.clipboard
                                                 .readText()
                                                 .then((clipboardText) => {

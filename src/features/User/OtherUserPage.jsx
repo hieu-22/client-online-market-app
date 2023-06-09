@@ -21,30 +21,56 @@ import { FaUserCircle } from "react-icons/fa"
 import { BsChatFill } from "react-icons/bs"
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { IoOptions } from "react-icons/io5"
+import { MdOutlineDone } from "react-icons/md"
+import { ImCancelCircle } from "react-icons/im"
 //
 import {
     selectOtherUser,
     selectUserError,
     selectUserStatus,
     getUserByIdThunk,
+    followUserThunk,
+    unfollowUserThunk,
+    addVisitingUserToFollowers,
+    removeVisitingUserToFollowers,
 } from "./userSlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "react-toastify"
+import { selectUser } from "../Auth/authSlice"
 
 const OtherUserPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const params = useParams()
     const [userMenuShowed, setUserMenuShowed] = useState(false)
+    const [isFollowedByCurrentUser, setIsFollowedByCurrentUser] = useState(null)
+    const [isTheSameUser, setIsTheSameUser] = useState(null)
 
     const user = useSelector(selectOtherUser)
+    const visitingUser = useSelector(selectUser)
     const followers = user?.followers
     const followingUsers = user?.followingUsers
 
     // console.log(">>> At user: ", user)
     const error = useSelector(selectUserError)
     const status = useSelector(selectUserStatus)
+
+    // useEffect
+    // - the same user with the page can't click to do some specific actions
+    useEffect(() => {
+        if (!visitingUser) {
+            setIsTheSameUser(false)
+            return
+        }
+        const visitingUserId = visitingUser?.id
+        const userId = user?.id
+        if (+visitingUserId === +userId) {
+            setIsTheSameUser(true)
+        } else {
+            setIsTheSameUser(false)
+        }
+    }, [user])
     useEffect(() => {
         ;(async () => {
             const { userId } = params
@@ -60,14 +86,74 @@ const OtherUserPage = () => {
         }
     }
 
+    // - to check if is user followed by the visiting user
+    useEffect(() => {
+        // if visiting user id is included in followers, then true
+        const followers = user?.followers
+        const visitingUserId = visitingUser?.id
+        if (!visitingUserId) {
+            setIsFollowedByCurrentUser(false)
+            return
+        }
+        if (followers?.some((user) => user.id === visitingUserId)) {
+            setIsFollowedByCurrentUser(true)
+        } else {
+            setIsFollowedByCurrentUser(false)
+        }
+    }, [user])
+
     const handleSwitchUserMenu = (e) => {
         e.stopPropagation()
         setUserMenuShowed(!userMenuShowed)
     }
 
+    const handleFollowUser = async () => {
+        if (!visitingUser) {
+            return navigate("/login")
+        }
+        const followerId = visitingUser.id
+        const followedUserId = user.id
+        await dispatch(followUserThunk({ followerId, followedUserId })).unwrap()
+        const {
+            id,
+            email,
+            userName,
+            avatar,
+            phoneNumber,
+            isOnline,
+            introduction,
+            createdAt,
+            updatedAt,
+        } = visitingUser
+        const addedUser = {
+            id,
+            email,
+            userName,
+            avatar,
+            phoneNumber,
+            isOnline,
+            introduction,
+            createdAt,
+            updatedAt,
+        }
+        dispatch(addVisitingUserToFollowers(addedUser))
+    }
+
+    const handleUnfollowUser = async () => {
+        if (!visitingUser) {
+            return navigate("/login")
+        }
+        const followerId = visitingUser.id
+        const followedUserId = user.id
+        await dispatch(
+            unfollowUserThunk({ followerId, followedUserId })
+        ).unwrap()
+        dispatch(removeVisitingUserToFollowers())
+    }
+
     /**COMPONENTS */
     const userInformatiion = (
-        <div className="laptop:w-laptop m-auto my-5 bg-white grid grid-cols-2 ] py-5 rounded-md shadow-md">
+        <div className="laptop:w-laptop m-auto mb-5 bg-white grid grid-cols-2 ] py-5 rounded-md shadow-md">
             {/* left side*/}
             <div className="flex ">
                 <div className="w-3/12 flex justify-center">
@@ -122,15 +208,50 @@ const OtherUserPage = () => {
                         </div>
                     </div>
                     <div className="flex gap-x-4 mt-[10px]">
-                        <div className="select-none cursor-pointer text-white border-[1px] bg-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 ">
-                            <span className="text-lg">+</span> Theo dõi
-                        </div>
-                        <div className="flex items-center gap-x-1 select-none cursor-pointer text-white border-[1px] border-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 ">
+                        {isFollowedByCurrentUser ? (
+                            <button
+                                className="group select-none cursor-pointer text-primary border border-primary bg-white hover:bg-white hover:border-red-600 pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 "
+                                onClick={() => {
+                                    handleUnfollowUser()
+                                }}
+                            >
+                                <span className="inline-flex group-hover:hidden items-end transition-all">
+                                    <span>
+                                        <MdOutlineDone />
+                                    </span>{" "}
+                                    <span className="translate-y-[2px]">
+                                        Đang theo dõi
+                                    </span>
+                                </span>
+                                <span className="hidden group-hover:inline-flex items-end transition-all text-red-600">
+                                    <span>
+                                        <ImCancelCircle />
+                                    </span>{" "}
+                                    <span className="translate-y-[2px]">
+                                        Hủy theo dõi
+                                    </span>
+                                </span>
+                            </button>
+                        ) : (
+                            <button
+                                className="select-none cursor-pointer text-white border bg-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 disabled:cursor-not-allowed"
+                                onClick={() => {
+                                    handleFollowUser()
+                                }}
+                                disabled={isTheSameUser}
+                            >
+                                <span className="text-lg">+</span> Theo dõi
+                            </button>
+                        )}
+                        <button
+                            className="flex items-center gap-x-1 select-none cursor-pointer text-white border-[1px] border-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 disabled:cursor-not-allowed"
+                            disabled={isTheSameUser}
+                        >
                             <div>
                                 <BsChatFill className="text-primary"></BsChatFill>
                             </div>
                             <div className="text-primary">chat</div>
-                        </div>
+                        </button>
                     </div>
                     <button
                         onClick={handleSwitchUserMenu}
@@ -238,7 +359,7 @@ const OtherUserPage = () => {
     )
 
     const userPosts = (
-        <div className="laptop:w-laptop m-auto my-5 bg-white py-5 px-4 rounded-md shadow-md">
+        <div className="laptop:w-laptop m-auto bg-white py-5 px-4 rounded-md shadow-boxMd">
             <div className="py-2  border-b-[1px] border-gray-300">
                 <span>Tin đang đăng</span>
                 <span className="px-2">-</span>
@@ -316,7 +437,7 @@ const OtherUserPage = () => {
     return error?.statusCode ? (
         <UserErrorPage statusCode={error.statusCode} message={error.message} />
     ) : (
-        <div className="bg-customWhite " onClick={handleCloseAllWindows}>
+        <div className="bg-customWhite pb-5" onClick={handleCloseAllWindows}>
             {status === "loadding" ? <Loader /> : <></>}
             <Breadcrumb title1={`Trang cá nhân của ${user?.userName}`} />
             {userInformatiion}
