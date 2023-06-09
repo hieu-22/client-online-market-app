@@ -39,6 +39,9 @@ const OtherUserPage = () => {
     const [userMenuShowed, setUserMenuShowed] = useState(false)
 
     const user = useSelector(selectOtherUser)
+    const followers = user?.followers
+    const followingUsers = user?.followingUsers
+
     // console.log(">>> At user: ", user)
     const error = useSelector(selectUserError)
     const status = useSelector(selectUserStatus)
@@ -80,9 +83,6 @@ const OtherUserPage = () => {
                         ) : (
                             <FaUserCircle className="w-full h-full text-gray-400 rounded-[50%]"></FaUserCircle>
                         )}
-                        <div className="absolute bottom-0 right-0 rounded-[50%] w-6 h-6 bg-gray-300 flex items-center justify-center shadow-boxMd hover:bg-gray-200 cursor-pointer">
-                            <BsFillCameraFill className="" />
-                        </div>
                     </div>
                 </div>
                 <div className="w-[70%] relative border-r border-gray-200">
@@ -108,13 +108,17 @@ const OtherUserPage = () => {
                     </div>
                     <div className="flex justify-left gap-x-2 text-sm mt-[1px] pr-[120px]">
                         <div>
-                            <span className="font-semibold">0</span> Người theo
-                            dõi
+                            <span className="font-semibold">
+                                {followers?.length || 0}
+                            </span>{" "}
+                            Người theo dõi
                         </div>
                         <div className="w-[1px] h-4 translate-y-[2px] bg-gray-600"></div>
                         <div>
-                            <span className="font-semibold">0</span> Đang theo
-                            dõi
+                            <span className="font-semibold">
+                                {followingUsers?.length || 0}
+                            </span>{" "}
+                            Đang theo dõi
                         </div>
                     </div>
                     <div className="flex gap-x-4 mt-[10px]">

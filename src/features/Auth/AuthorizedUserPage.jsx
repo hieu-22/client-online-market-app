@@ -38,6 +38,8 @@ const AuthorizedUserPage = () => {
     const [userMenuShowed, setUserMenuShowed] = useState(false)
     const [avatarImage, setAvatarImage] = useState([])
     const user = useSelector(selectUser)
+    const followers = user?.followers
+    const followingUsers = user?.followingUsers
     const userPosts = user?.posts || []
 
     const [showImageUploader, setShowImageUploader] = useState(false)
@@ -165,13 +167,17 @@ const AuthorizedUserPage = () => {
                     </div>
                     <div className="flex justify-left gap-x-2 text-sm mt-[1px] pr-[120px]">
                         <div>
-                            <span className="font-semibold">0</span> Người theo
-                            dõi
+                            <span className="font-semibold">
+                                {followers?.length || 0}
+                            </span>{" "}
+                            Người theo dõi
                         </div>
                         <div className="w-[1px] h-4 translate-y-[2px] bg-gray-600"></div>
                         <div>
-                            <span className="font-semibold">0</span> Đang theo
-                            dõi
+                            <span className="font-semibold">
+                                {followingUsers?.length || 0}
+                            </span>{" "}
+                            Đang theo dõi
                         </div>
                     </div>
                     <div className=" flex gap-x-4 mt-3">

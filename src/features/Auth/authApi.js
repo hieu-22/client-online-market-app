@@ -34,7 +34,7 @@ export const updatePhoneNumber = async (phoneNumber, userId) => {
 
 export const updateUserInfo = async (updatedInfo, userId) => {
     const response = await axios.patch(
-        `user/${userId}/update-user-information`,
+        `user/${userId}/update-user-information?cacheBust=${uniqueParam}`,
         updatedInfo
     )
     return response.data

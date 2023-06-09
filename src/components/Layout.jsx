@@ -66,6 +66,8 @@ const Layout = () => {
 
     // REDUX STATES
     const user = useSelector((state) => state.auth.user)
+    const followingUsers = user?.followingUsers
+    const followers = user?.followers
     const authStatus = useSelector(selectAuthStatus)
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
     const searchedPosts = useSelector(selectSearchedPosts)
@@ -290,13 +292,17 @@ const Layout = () => {
 
                                 <div className=" inline-flex items-center text-2xs">
                                     <div className="font-medium hover:opacity-70">
-                                        <span className="font-bold">0</span>{" "}
-                                        Người theo dõi
+                                        Người theo dõi{" "}
+                                        <span className="font-bold ml-1">
+                                            {followers?.length || 0}
+                                        </span>
                                     </div>
                                     <span className="px-2">|</span>
                                     <div className="font-medium hover:opacity-70">
-                                        <span className="font-bold">0</span>{" "}
-                                        Đang theo dõi
+                                        Đang theo dõi{" "}
+                                        <span className="font-bold ml-1">
+                                            {followingUsers?.length || 0}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
