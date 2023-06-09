@@ -77,8 +77,10 @@ const Layout = () => {
     // EFFECTS
     // + navigate to add phoneNumber page if user don't have phoneNumber
     useEffect(() => {
-        if (!user.phoneNumber) {
-            navigate("/add-phone-number")
+        if (user) {
+            if (!user.phoneNumber) {
+                navigate("/add-phone-number")
+            }
         }
     }, [user])
     useEffect(() => {

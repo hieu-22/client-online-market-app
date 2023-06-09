@@ -578,7 +578,7 @@ const ChatPage = () => {
                                     <div className="rounded-md w-[20%]">
                                         <img
                                             className="w-full h-full object-cover rounded-md "
-                                            src={chat.post?.images[0].imageUrl}
+                                            src={chat.post?.images[0]?.imageUrl}
                                             alt=""
                                         />
                                     </div>
@@ -969,7 +969,7 @@ const ChatPage = () => {
                 <div className="w-[12%] h-full rounded-md">
                     {currentChat?.post ? (
                         <img
-                            src={currentChat?.post.images[0].imageUrl}
+                            src={currentChat?.post.images[0]?.imageUrl}
                             alt="post image"
                             className="w-full h-full object-cover rounded-md"
                         />

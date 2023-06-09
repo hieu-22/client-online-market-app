@@ -63,7 +63,9 @@ const SavedPostsPage = () => {
                             >
                                 <div className="w-[15%] h-full">
                                     <img
-                                        src={savedpost.post?.images[0].imageUrl}
+                                        src={
+                                            savedpost.post?.images[0]?.imageUrl
+                                        }
                                         alt="post image"
                                         className="w-full h-full object-cover"
                                     />

@@ -54,3 +54,8 @@ export const getUserById = async (userId) => {
     const updatedUser = { ...user, posts: updatedPosts }
     return updatedUser
 }
+
+export const getOtherUsers = async (userId) => {
+    const response = await axios.get(`user/get-other-users?userId=${userId}`)
+    return response.data.users
+}

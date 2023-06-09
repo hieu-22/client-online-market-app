@@ -19,6 +19,7 @@ import { BiHide } from "react-icons/bi"
 import { AiOutlineEdit } from "react-icons/ai"
 import { AiOutlineShareAlt } from "react-icons/ai"
 import { toast } from "react-toastify"
+import { formatToString } from "../../utils/DateUtils"
 
 const PostDashboard = () => {
     const navigate = useNavigate()
@@ -199,7 +200,7 @@ const PostDashboard = () => {
                     <>
                         {nonexpiredPosts.map((post, index) => {
                             return (
-                                <div className="mx-20 hover:bg-slate-50 relative">
+                                <div className="mx-20 hover:bg-slate-50 relative ">
                                     <div
                                         key={index}
                                         className="p-4 w-full h-[116px] border border-gray-300 border-t-0 border-b-0 cursor-pointer"
@@ -237,7 +238,10 @@ const PostDashboard = () => {
                                                     <div className="text-sm w-full truncate text-gray-600">
                                                         Hiển thị đến:{" "}
                                                         <span className="text-gray-400 font-normal">
-                                                            13:47 21/07/23
+                                                            {formatToString(
+                                                                post.expiryDate,
+                                                                "hh:mm dd/mm/yyyy"
+                                                            )}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -331,19 +335,19 @@ const PostDashboard = () => {
                     <>
                         {expiredPosts.map((post, index) => {
                             return (
-                                <div className="mx-20 hover:bg-slate-50 relative">
+                                <div className="mx-20 bg-gray-200 mb-2  relative">
                                     <div
                                         key={index}
-                                        className="p-4 w-full h-[116px] border border-gray-300 border-t-0 border-b-0 cursor-pointer"
+                                        className="p-4 w-full h-[116px] border border-gray-300 border-t-0 border-b-0"
                                         onClick={() => {
-                                            navigate(`/posts/${post.post_url}`)
+                                            // navigate(`/posts/${post.post_url}`)
                                         }}
                                     >
                                         <div className="flex gap-x-4 h-full">
                                             <div className="w-[15%] h-full rounded-sm">
                                                 <img
                                                     src={
-                                                        post.images[0].imageUrl
+                                                        post.images[0]?.imageUrl
                                                     }
                                                     alt="post image"
                                                     className="w-full h-full object-cover rounded-sm"
@@ -363,11 +367,19 @@ const PostDashboard = () => {
                                                             )}
                                                         &nbsp;đ
                                                     </div>
-                                                    <div className="text-sm w-full truncate text-gray-600">
-                                                        Hiển thị đến:{" "}
+                                                    <div className="text-sm w-full truncate text-red-500">
+                                                        {/* Hiển thị đến:{" "}
                                                         <span className="text-gray-400 font-normal">
-                                                            13:47 21/07/23
-                                                        </span>
+                                                            {formatToString(
+                                                                post.expiryDate,
+                                                                "hh:mm dd/mm/yyyy"
+                                                            )}
+                                                        </span> */}
+                                                        Tin đã hết hạn từ{" "}
+                                                        {formatToString(
+                                                            post.expiryDate,
+                                                            "hh:mm dd/mm/yyyy"
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="inline-flex items-center gap-x-2 text-sm text-gray-500 ">
@@ -376,7 +388,7 @@ const PostDashboard = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex">
+                                    {/* <div className="flex">
                                         <div
                                             className="text-blue-400 flex w-[50%] py-2 border border-gray-300 justify-center cursor-pointer "
                                             onClick={(event) => {
@@ -402,7 +414,7 @@ const PostDashboard = () => {
                                                 Sửa tin
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div
                                         className="absolute top-3 right-3 cursor-pointer"
                                         onClick={(event) => {

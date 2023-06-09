@@ -311,14 +311,14 @@ const AuthorizedUserPage = () => {
                                 >
                                     <div className="w-[15%] h-full">
                                         <img
-                                            src={post.images[0].imageUrl}
+                                            src={post.images[0]?.imageUrl}
                                             alt="post image"
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div className="w-[70%] inline-flex flex-col justify-between">
                                         <div>
-                                            <div className="font-semibold text-gray-800 text-lg">
+                                            <div className="font-semibold text-gray-800 text-lg ellipsis line-clamp-1">
                                                 {post.title}
                                             </div>
                                             <div className="text-red-500 text-base">

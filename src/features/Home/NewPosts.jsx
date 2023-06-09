@@ -35,7 +35,7 @@ const NewPosts = () => {
     useEffect(() => {
         ;(async () => {
             const res = await dispatch(
-                getFirstPostsThunk({ limit: 10 })
+                getFirstPostsThunk({ limit: 12 })
             ).unwrap()
             setNoMorePost(false)
         })()
@@ -45,7 +45,7 @@ const NewPosts = () => {
         const lastPostCreatedAt =
             fetchedPosts[fetchedPosts.length - 1].createdAt
         const res = await dispatch(
-            getNextPostsThunk({ limit: 10, lastPostCreatedAt })
+            getNextPostsThunk({ limit: 12, lastPostCreatedAt })
         ).unwrap()
         // console.log(">>> At handleGetNextPosts: ", res)
         if (res.posts.length === 0) {
@@ -113,15 +113,15 @@ const NewPosts = () => {
                             return (
                                 <ProductCard
                                     key={index}
-                                    postId={post.id}
-                                    title={post.title}
-                                    price={post.price}
-                                    author={post.author}
-                                    timeAgo={post.timeAgo}
-                                    address={post.address}
-                                    postUrl={post.post_url}
-                                    imageUrl={post.images[0].imageUrl}
-                                    description={post.description}
+                                    postId={post?.id}
+                                    title={post?.title}
+                                    price={post?.price}
+                                    author={post?.author}
+                                    timeAgo={post?.timeAgo}
+                                    address={post?.address}
+                                    postUrl={post?.post_url}
+                                    imageUrl={post?.images[0]?.imageUrl}
+                                    description={post?.description}
                                 />
                             )
                         })}{" "}

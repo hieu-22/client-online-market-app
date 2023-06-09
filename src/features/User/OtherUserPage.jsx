@@ -18,6 +18,10 @@ import { AiOutlineMail } from "react-icons/ai"
 import { TbMoodEmpty } from "react-icons/tb"
 import { BsTelephoneForward } from "react-icons/bs"
 import { FaUserCircle } from "react-icons/fa"
+import { BsChatFill } from "react-icons/bs"
+import { BsThreeDotsVertical } from "react-icons/bs"
+import { IoOptions } from "react-icons/io5"
+//
 import {
     selectOtherUser,
     selectUserError,
@@ -81,8 +85,8 @@ const OtherUserPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex-1">
-                    <div className="text-lg my-2 font-semibold">
+                <div className="w-[70%] relative border-r border-gray-200">
+                    <div className="text-lg font-semibold">
                         {user?.userName ? user.userName : ""}
                         <span
                             className={
@@ -102,72 +106,82 @@ const OtherUserPage = () => {
                             </span>
                         )}
                     </div>
-                    <div className="flex justify-between text-sm my-2 pr-[120px]">
+                    <div className="flex justify-left gap-x-2 text-sm mt-[1px] pr-[120px]">
                         <div>
                             <span className="font-semibold">0</span> Người theo
                             dõi
                         </div>
+                        <div className="w-[1px] h-4 translate-y-[2px] bg-gray-600"></div>
                         <div>
                             <span className="font-semibold">0</span> Đang theo
                             dõi
                         </div>
                     </div>
-                    <div className="  flex gap-x-4 ">
+                    <div className="flex gap-x-4 mt-[10px]">
                         <div className="select-none cursor-pointer text-white border-[1px] bg-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 ">
                             <span className="text-lg">+</span> Theo dõi
                         </div>
-                        <div
-                            onClick={handleSwitchUserMenu}
-                            className="relative select-none cursor-pointer h-9 w-9 rounded-[50%] border-[1px] border-gray-300 text-2xl font-extrabold text-center"
-                        >
-                            ...
-                            {userMenuShowed ? (
-                                <div
-                                    className="absolute z-10  top-10 right-0 border-[1px]  shadow-md py-2 bg-white text-sm w-[200px] "
-                                    onClick={(event) => event.stopPropagation()}
-                                >
-                                    <div className="flex items-center px-2 py-2 gap-x-2 hover:bg-background">
-                                        <div>
-                                            <BsShare></BsShare>
-                                        </div>
-                                        <div
-                                            className="font-normal flex-1 text-left"
-                                            onClick={(event) => {
-                                                event.stopPropagation()
-                                                const url = window.location.href
-                                                navigator.clipboard
-                                                    .readText()
-                                                    .then((clipboardText) => {
-                                                        if (
-                                                            clipboardText ===
-                                                            url
-                                                        ) {
-                                                            return setUserMenuShowed(
-                                                                false
-                                                            )
-                                                        } else {
-                                                            navigator.clipboard.writeText(
-                                                                url
-                                                            )
-                                                            toast(
-                                                                "Copy link successfully!"
-                                                            )
-                                                            setUserMenuShowed(
-                                                                false
-                                                            )
-                                                        }
-                                                    })
-                                            }}
-                                        >
-                                            Sao chép liên kết
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <></>
-                            )}
+                        <div className="flex items-center gap-x-1 select-none cursor-pointer text-white border-[1px] border-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 ">
+                            <div>
+                                <BsChatFill className="text-primary"></BsChatFill>
+                            </div>
+                            <div className="text-primary">chat</div>
                         </div>
                     </div>
+                    <button
+                        onClick={handleSwitchUserMenu}
+                        className="group w-8 h-8 absolute top-0 right-4 select-none cursor-pointer rounded-[20px] border-gray-500 font-extrabold text-center"
+                    >
+                        <div
+                            className={`w-8 h-8 text-slate-600 ${
+                                !userMenuShowed
+                                    ? "group-hover:text-slate-400"
+                                    : ""
+                            }`}
+                        >
+                            <IoOptions className="text-[32px]"></IoOptions>
+                        </div>
+                        {userMenuShowed ? (
+                            <div
+                                className="absolute z-10  top-10 right-0 border-[1px]  shadow-md py-2 bg-white text-sm w-[200px] "
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                <div className="flex items-center px-2 py-2 gap-x-2 hover:bg-background">
+                                    <div className="">
+                                        <BsShare></BsShare>
+                                    </div>
+                                    <div
+                                        className="font-normal flex-1 text-left"
+                                        onClick={(event) => {
+                                            event.stopPropagation()
+                                            const url = window.location.href
+                                            navigator.clipboard
+                                                .readText()
+                                                .then((clipboardText) => {
+                                                    if (clipboardText === url) {
+                                                        return setUserMenuShowed(
+                                                            false
+                                                        )
+                                                    } else {
+                                                        navigator.clipboard.writeText(
+                                                            url
+                                                        )
+                                                        toast(
+                                                            "Copy link successfully!"
+                                                        )
+                                                        setUserMenuShowed(false)
+                                                    }
+                                                })
+                                        }}
+                                    >
+                                        Sao chép liên kết
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <></>
+                        )}
+                    </button>
                 </div>
             </div>
             {/* right side*/}
@@ -242,14 +256,14 @@ const OtherUserPage = () => {
                             >
                                 <div className="w-[15%] h-full">
                                     <img
-                                        src={post.images[0].imageUrl}
+                                        src={post.images[0]?.imageUrl}
                                         alt="post image"
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
                                 <div className="w-[70%] inline-flex flex-col justify-between">
                                     <div>
-                                        <div className="font-semibold text-gray-800 text-lg">
+                                        <div className="font-semibold text-gray-800 text-lg ellipsis line-clamp-1">
                                             {post.title}
                                         </div>
                                         <div className="text-red-500 text-base">
