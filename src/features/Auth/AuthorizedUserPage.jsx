@@ -16,6 +16,7 @@ import { BsTelephoneForward } from "react-icons/bs"
 import { AiOutlineMail } from "react-icons/ai"
 import { MdPostAdd } from "react-icons/md"
 import { FaUserCircle } from "react-icons/fa"
+import { IoOptions } from "react-icons/io5"
 
 import {
     selectUser,
@@ -150,8 +151,8 @@ const AuthorizedUserPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex-1">
-                    <div className="text-lg my-2 font-semibold">
+                <div className="w-[70%] relative border-r border-gray-200">
+                    <div className="text-lg font-semibold">
                         {user?.userName ? user.userName : ""}
                         <span
                             className={
@@ -162,17 +163,18 @@ const AuthorizedUserPage = () => {
                             }
                         ></span>
                     </div>
-                    <div className="flex justify-between text-sm my-2 pr-[120px]">
+                    <div className="flex justify-left gap-x-2 text-sm mt-[1px] pr-[120px]">
                         <div>
                             <span className="font-semibold">0</span> Người theo
                             dõi
                         </div>
+                        <div className="w-[1px] h-4 translate-y-[2px] bg-gray-600"></div>
                         <div>
                             <span className="font-semibold">0</span> Đang theo
                             dõi
                         </div>
                     </div>
-                    <div className="  flex gap-x-4 ">
+                    <div className=" flex gap-x-4 mt-3">
                         <button
                             className="select-none cursor-pointer block text-gray-500 border-[1px] border-gray-300 py-1 px-3 rounded-3xl hover:opacity-70 "
                             onClick={() => {
@@ -181,58 +183,61 @@ const AuthorizedUserPage = () => {
                         >
                             Chỉnh sửa trang cá nhân
                         </button>
+                    </div>
+                    <button
+                        onClick={handleSwitchUserMenu}
+                        className="group w-8 h-8 absolute top-0 right-4 select-none cursor-pointer rounded-[20px] border-gray-500 font-extrabold text-center"
+                    >
                         <div
-                            onClick={handleSwitchUserMenu}
-                            className="relative select-none cursor-pointer h-9 w-9 rounded-[50%] border-[1px] border-gray-300 text-2xl font-extrabold text-center"
+                            className={`w-8 h-8 text-slate-600 ${
+                                !userMenuShowed
+                                    ? "group-hover:text-slate-400"
+                                    : ""
+                            }`}
                         >
-                            ...
-                            {userMenuShowed ? (
-                                <div
-                                    className="absolute z-10  top-10 right-0 border-[1px]  shadow-md py-2 bg-white text-sm w-[200px] "
-                                    onClick={(event) => event.stopPropagation()}
-                                >
-                                    <div className="flex items-center px-2 py-2 gap-x-2 hover:bg-background">
-                                        <div>
-                                            <BsShare></BsShare>
-                                        </div>
-                                        <div
-                                            className="font-normal flex-1 text-left"
-                                            onClick={(event) => {
-                                                event.stopPropagation()
-                                                const url = window.location.href
-                                                navigator.clipboard
-                                                    .readText()
-                                                    .then((clipboardText) => {
-                                                        if (
-                                                            clipboardText ===
+                            <IoOptions className="text-[32px]"></IoOptions>
+                        </div>
+                        {userMenuShowed ? (
+                            <div
+                                className="absolute z-10  top-10 right-0 border-[1px]  shadow-md py-2 bg-white text-sm w-[200px] "
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                <div className="flex items-center px-2 py-2 gap-x-2 hover:bg-background">
+                                    <div className="">
+                                        <BsShare></BsShare>
+                                    </div>
+                                    <div
+                                        className="font-normal flex-1 text-left"
+                                        onClick={(event) => {
+                                            event.stopPropagation()
+                                            const url = window.location.href
+                                            navigator.clipboard
+                                                .readText()
+                                                .then((clipboardText) => {
+                                                    if (clipboardText === url) {
+                                                        return setUserMenuShowed(
+                                                            false
+                                                        )
+                                                    } else {
+                                                        navigator.clipboard.writeText(
                                                             url
-                                                        ) {
-                                                            return setUserMenuShowed(
-                                                                false
-                                                            )
-                                                        } else {
-                                                            navigator.clipboard.writeText(
-                                                                url
-                                                            )
-                                                            toast(
-                                                                "Copy link successfully!"
-                                                            )
-                                                            setUserMenuShowed(
-                                                                false
-                                                            )
-                                                        }
-                                                    })
-                                            }}
-                                        >
-                                            Sao chép liên kết
-                                        </div>
+                                                        )
+                                                        toast(
+                                                            "Copy link successfully!"
+                                                        )
+                                                        setUserMenuShowed(false)
+                                                    }
+                                                })
+                                        }}
+                                    >
+                                        Sao chép liên kết
                                     </div>
                                 </div>
-                            ) : (
-                                <></>
-                            )}
-                        </div>
-                    </div>
+                            </div>
+                        ) : (
+                            <></>
+                        )}
+                    </button>
                 </div>
             </div>
             {/* right side*/}
