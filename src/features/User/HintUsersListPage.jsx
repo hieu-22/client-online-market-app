@@ -16,11 +16,12 @@ import { IoOptions } from "react-icons/io5"
 import { BsChatFill } from "react-icons/bs"
 import { MdOutlineDone } from "react-icons/md"
 import { ImCancelCircle } from "react-icons/im"
+import { FaUserCheck, FaUserPlus } from "react-icons/fa"
 //
-import { Link, useNavigate } from "react-router-dom"
+import { Link, NavLink, useNavigate } from "react-router-dom"
 import Breadcrumb from "../../components/Breadcrumb"
 
-const UsersListPage = () => {
+const HintUsersListPage = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -42,7 +43,7 @@ const UsersListPage = () => {
         const followerId = user.id
         const followedUserId = userId
         await dispatch(followUserThunk({ followerId, followedUserId })).unwrap()
-        dispatch(toggleIsUserFollowed(index))
+        dispatch(toggleIsUserFollowed({ index }))
     }
 
     const handleUnfollowUser = async (userId, index) => {
@@ -51,7 +52,7 @@ const UsersListPage = () => {
         await dispatch(
             unfollowUserThunk({ followerId, followedUserId })
         ).unwrap()
-        dispatch(toggleIsUserFollowed(index))
+        dispatch(toggleIsUserFollowed({ index }))
     }
 
     const toggleUserMenu = (index) => {
@@ -69,6 +70,32 @@ const UsersListPage = () => {
         })
     }
 
+    const handleCloseAllMenu = () => {
+        setUserMenuShowed([])
+    }
+
+    const Header = (
+        <div className="flex gap-x-1 text-gray-600 justify-center ">
+            <NavLink
+                to={"/users/following"}
+                className={`flex items-center py-2 px-2 text-gray-400 hover:bg-white border-b-2 border-transparent hover:border-gray-400`}
+            >
+                <span className="mr-2">
+                    <FaUserCheck className="text-lg"></FaUserCheck>
+                </span>
+                Đang theo dõi
+            </NavLink>
+            <NavLink
+                to={"."}
+                className={`flex items-center text-gray-700 font-medium py-2 px-2 border-b-[3px] border-primary hover:bg-white text-`}
+            >
+                <span className="mr-2">
+                    <FaUserPlus className="text-lg"></FaUserPlus>
+                </span>
+                Người dùng khác
+            </NavLink>
+        </div>
+    )
     const userBlock = ({
         id,
         userName,
@@ -81,9 +108,7 @@ const UsersListPage = () => {
             <div
                 className="relative select-none flex gap-x-5 w-[500px] border rounded-lg bg-white px-5 py-5"
                 onClick={() => {
-                    if (userMenuShowed[index]) {
-                        toggleUserMenu(index)
-                    }
+                    handleCloseAllMenu()
                 }}
             >
                 <div className="flex justify-center">
@@ -225,12 +250,9 @@ const UsersListPage = () => {
 
     return (
         <div className="bg-customWhite">
-            <Breadcrumb
-                title1={"Người dùng"}
-                link1={"/users"}
-                title2={"Gợi ý"}
-            />
+            <Breadcrumb title1={"users > gợi ý"} />
             <div className="laptop:w-laptop m-auto pb-10">
+                <div className="mb-4 mr-2 border-b ">{Header}</div>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-2">
                     {nonFollowingUsers ? (
                         nonFollowingUsers.map((user, index) => {
@@ -256,4 +278,4 @@ const UsersListPage = () => {
     )
 }
 
-export default UsersListPage
+export default HintUsersListPage

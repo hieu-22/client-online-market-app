@@ -590,7 +590,7 @@ const Layout = () => {
                         }}
                     >
                         <div className="">
-                            <AiFillControl className="w-6 h-6 text-slate-700" />
+                            <AiFillControl className="w-6 h-6 text-slate-600" />
                         </div>
                         <div className="text-text">Quản lí tin</div>
                     </div>
@@ -608,11 +608,11 @@ const Layout = () => {
                                 }
                                 return navigate("/login")
                             }
-                            navigate("/users")
+                            navigate("/users/following")
                         }}
                     >
                         <div className="">
-                            <FaUserFriends className="w-6 h-6 text-slate-700 " />
+                            <FaUserFriends className="w-6 h-6 text-slate-600 " />
                         </div>
                         <div className="text-text">Người dùng</div>
                     </div>
@@ -635,7 +635,7 @@ const Layout = () => {
                         }}
                     >
                         <div className="">
-                            <AiFillWechat className="w-7 h-7 text-slate-700" />
+                            <AiFillWechat className="w-7 h-7 text-slate-600" />
                         </div>
                         <div className="text-text">Chat</div>
                     </div>
@@ -646,7 +646,7 @@ const Layout = () => {
                         onClick={(event) => handleShowNotificationWindow(event)}
                     >
                         <div className="">
-                            <AiFillBell className="w-6 h-6 text-slate-700" />
+                            <AiFillBell className="w-6 h-6 text-slate-600" />
                         </div>
                         <div className="text-text">Thông báo</div>
                     </div>

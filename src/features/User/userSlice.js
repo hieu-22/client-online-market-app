@@ -178,9 +178,14 @@ const userSlice = createSlice({
             state.status = "idle"
         },
         toggleIsUserFollowed: (state, action) => {
-            const index = action.payload
-            state.nonFollowedUsers[index].isFollowed =
-                !state.nonFollowedUsers[index].isFollowed
+            const { index, wereFollowed } = action.payload
+            if (wereFollowed) {
+                state.followedUsers[index].isFollowed =
+                    !state.followedUsers[index].isFollowed
+            } else {
+                state.nonFollowedUsers[index].isFollowed =
+                    !state.nonFollowedUsers[index].isFollowed
+            }
         },
         addVisitingUserToFollowers(state, action) {
             const addedUser = action.payload
@@ -258,6 +263,7 @@ export const selectOtherUser = (state) => state.user.otherUser
 export const selectUserError = (state) => state.user.error
 export const selectUserStatus = (state) => state.user.status
 export const selectNonFollowedUsers = (state) => state.user.nonFollowedUsers
+export const selectFollowedUsers = (state) => state.user.followedUsers
 export const {
     resetUserStatus,
     toggleIsUserFollowed,

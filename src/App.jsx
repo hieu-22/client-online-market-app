@@ -17,7 +17,8 @@ import UpdatePostPage from "./features/Post/UpdatePostPage"
 import SavedPostsPage from "./features/Post/SavedPostsPage"
 import SingleChatPage from "./features/Chat/SingleChatPage"
 import NotFoundPage from "./features/Error/NotFoundPage"
-import UsersListPage from "./features/User/UsersListPage"
+import HintUsersListPage from "./features/User/HintUsersListPage"
+import FollowedUsersListPage from "./features/User/FollowedUsersListPage"
 
 import { socket } from "./socket"
 import { useSelector } from "react-redux"
@@ -49,7 +50,14 @@ const App = () => {
                         element={<PhoneNumberForm />}
                     />
                     <Route path="user/:userId" element={<OtherUserPage />} />
-                    <Route path="users" element={<UsersListPage />} />
+                    <Route
+                        path="users/suggests"
+                        element={<HintUsersListPage />}
+                    />
+                    <Route
+                        path="users/following"
+                        element={<FollowedUsersListPage />}
+                    />
                     <Route
                         path="user/setting/profile"
                         element={<UserSettingPage />}
