@@ -32,6 +32,13 @@ export const addChat = async ({ userId, postId }) => {
     return response.data
 }
 
+export const addChatByUserId = async ({ userId, otherUserId }) => {
+    const response = await axios.post(
+        `conversations/createByUserId?userId=${userId}&otherUserId=${otherUserId}`
+    )
+    return response.data
+}
+
 export const getConversationsByUserId = async ({ userId }) => {
     const response = await axios.get(`/conversation/get-all?userId=${userId}`)
     const customeConversations = await response.data.conversations.map(

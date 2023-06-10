@@ -4,6 +4,7 @@ import {
     getConversationsByUserId,
     getEmojis,
     deleteChat,
+    addChatByUserId,
 } from "./chatApi"
 
 const initialState = {
@@ -21,6 +22,46 @@ export const addChatThunk = createAsyncThunk(
     async ({ userId, postId }, { rejectWithValue }) => {
         try {
             const data = await addChat({ userId, postId })
+            return data
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.response.data.message,
+                    statusCode: error.response.status,
+                    statusText: error.response.statusText,
+                })
+            } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                return rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 503,
+                    statusText: "Service Unavailable",
+                })
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log("Error", error.message)
+                rejectWithValue({
+                    code: error.code,
+                    message: error.message,
+                    statusCode: 400,
+                    statusText: "Bad Request",
+                })
+            }
+        }
+    }
+)
+
+export const addChatByUserIdThunk = createAsyncThunk(
+    "chat/addChatByUserIdThunk",
+    async ({ userId, otherUserId }, { rejectWithValue }) => {
+        try {
+            const data = await addChatByUserId({ userId, otherUserId })
             return data
         } catch (error) {
             if (error.response) {
@@ -251,6 +292,30 @@ const chatSlice = createSlice({
             .addCase(getEmojisThunk.rejected, (state, action) => {
                 state.status = "failed"
                 // console.log(">>>rejected payload: ", action.payload)
+            })
+            // addChatThunk
+            .addCase(addChatThunk.pending, (state) => {
+                state.status = "loading"
+            })
+            .addCase(addChatThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+            })
+            .addCase(addChatThunk.rejected, (state, action) => {
+                state.status = "failed"
+                // console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
+            })
+            // addChatByUserIdThunk
+            .addCase(addChatByUserIdThunk.pending, (state) => {
+                state.status = "loading"
+            })
+            .addCase(addChatByUserIdThunk.fulfilled, (state, action) => {
+                state.status = "succeeded"
+            })
+            .addCase(addChatByUserIdThunk.rejected, (state, action) => {
+                state.status = "failed"
+                // console.log(">>>rejected payload: ", action.payload)
+                state.error = action.payload
             })
     },
 })

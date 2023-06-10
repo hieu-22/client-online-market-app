@@ -143,7 +143,7 @@ const ChatPage = () => {
                                         <></>
                                     )}
                                     <div className="flex w-[80%] ">
-                                        <div className=" h-full w-[64px] p-3">
+                                        <div className=" h-full w-[64px] px-1">
                                             {OtherUser?.avatar ? (
                                                 <>
                                                     <img
@@ -167,6 +167,17 @@ const ChatPage = () => {
                                                             : "bg-gray-600")
                                                     }
                                                 ></span>
+                                                {OtherUser?.isOnline ? (
+                                                    <span className="text-green-600 text-xs">
+                                                        Đang hoạt động
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-600 text-xs">
+                                                        {toTimeAgo(
+                                                            OtherUser.updatedAt
+                                                        )}
+                                                    </span>
+                                                )}
                                             </div>
                                             <div className="w-full truncate text-gray-400 font-medium text-sm ">
                                                 {chat?.title}
@@ -188,25 +199,31 @@ const ChatPage = () => {
                                                     : ""}{" "}
                                                 &nbsp;
                                                 <span>
-                                                    -{" "}
                                                     {chat.messages[0]
-                                                        ? toTimeAgo(
+                                                        ? `- ${toTimeAgo(
                                                               chat.messages[0]
                                                                   .createdAt
-                                                          )
+                                                          )}`
                                                         : ""}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="rounded-md w-[20%]">
-                                        <img
-                                            className="w-full h-full object-cover rounded-md "
-                                            src={chat.post?.images[0]?.imageUrl}
-                                            alt=""
-                                        />
-                                    </div>
+                                    {chat?.post ? (
+                                        <div className="rounded-md w-[20%]">
+                                            <img
+                                                className="w-full h-full object-cover rounded-md "
+                                                src={
+                                                    chat.post?.images[0]
+                                                        ?.imageUrl
+                                                }
+                                                alt=""
+                                            />
+                                        </div>
+                                    ) : (
+                                        <></>
+                                    )}
                                 </Link>
                             </div>
                         )

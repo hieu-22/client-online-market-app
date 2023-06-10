@@ -233,7 +233,9 @@ const SinglePostPage = () => {
             addChatThunk({ userId: user.id, postId: post.id })
         ).unwrap()
         // console.log("=> addChatRes: ", addChatRes)
+
         if (addChatRes.errorCode === 1) {
+            // chat already exist, navigate to chat page
             return navigate(`/chat/${addChatRes.chatId}`)
         }
         const chatId = addChatRes.chat.id

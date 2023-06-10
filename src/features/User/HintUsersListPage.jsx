@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { selectUser } from "../Auth/authSlice"
+import { addChatByUserIdThunk, addChatThunk } from "../Chat/chatSlice"
 import {
     handleGetOtherUsersThunk,
     selectNonFollowedUsers,
@@ -72,6 +73,18 @@ const HintUsersListPage = () => {
 
     const handleCloseAllMenu = () => {
         setUserMenuShowed([])
+    }
+
+    const handleChatWithOtherUser = async (otherUserId) => {
+        const addChatRes = await dispatch(
+            addChatByUserIdThunk({ userId: user.id, otherUserId })
+        ).unwrap()
+        // console.log("=> addChatRes: ", addChatRes)
+        if (addChatRes.errorCode === 1) {
+            return navigate(`/chat/${addChatRes.chatId}`)
+        }
+        const chatId = addChatRes.chat.id
+        navigate(`/chat/${chatId}`)
     }
 
     const Header = (
@@ -185,7 +198,12 @@ const HintUsersListPage = () => {
                                 <span className="text-lg">+</span> Theo dõi
                             </button>
                         )}
-                        <button className="flex items-center gap-x-1 select-none cursor-pointer text-white border-[1px] border-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 ">
+                        <button
+                            className="flex items-center gap-x-1 select-none cursor-pointer text-white border-[1px] border-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 "
+                            onClick={() => {
+                                handleChatWithOtherUser(id)
+                            }}
+                        >
                             <div>
                                 <BsChatFill className="text-primary"></BsChatFill>
                             </div>

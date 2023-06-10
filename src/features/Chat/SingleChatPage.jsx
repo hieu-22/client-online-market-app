@@ -507,13 +507,13 @@ const ChatPage = () => {
                                         <></>
                                     )}
                                     <div className="flex w-[80%] ">
-                                        <div className="h-full w-[64px] p-3">
+                                        <div className="h-full w-[64px] px-1">
                                             {OtherUser?.avatar ? (
                                                 <>
                                                     <img
                                                         src={OtherUser.avatar}
                                                         alt=""
-                                                        className="w-full h-full object-cover rounded-[50%]"
+                                                        className="w-full h-full object-fill rounded-[50%]"
                                                     />
                                                 </>
                                             ) : (
@@ -563,25 +563,31 @@ const ChatPage = () => {
                                                     : ""}{" "}
                                                 &nbsp;
                                                 <span>
-                                                    -{" "}
                                                     {chat.messages[0]
-                                                        ? toTimeAgo(
+                                                        ? `- ${toTimeAgo(
                                                               chat.messages[0]
                                                                   .createdAt
-                                                          )
+                                                          )}`
                                                         : ""}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="rounded-md w-[20%]">
-                                        <img
-                                            className="w-full h-full object-cover rounded-md "
-                                            src={chat.post?.images[0]?.imageUrl}
-                                            alt=""
-                                        />
-                                    </div>
+                                    {chat?.post ? (
+                                        <div className="rounded-md w-[20%]">
+                                            <img
+                                                className="w-full h-full object-cover rounded-md "
+                                                src={
+                                                    chat.post?.images[0]
+                                                        ?.imageUrl
+                                                }
+                                                alt=""
+                                            />
+                                        </div>
+                                    ) : (
+                                        <></>
+                                    )}
                                 </div>
                             </div>
                         )
@@ -755,7 +761,7 @@ const ChatPage = () => {
                         <img
                             src={currentOtherUser.avatar}
                             alt="avatar"
-                            className="w-full h-full object-cover rounded-[50%]"
+                            className="w-full h-full object-fill rounded-[50%]"
                         />
                     ) : (
                         <>
@@ -884,7 +890,7 @@ const ChatPage = () => {
                                 <img
                                     src={currentOtherUser.avatar}
                                     alt="avatar"
-                                    className="w-full h-full object-cover rounded-[50%]"
+                                    className="w-full h-full object-fill rounded-[50%]"
                                 />
                             ) : (
                                 <>
@@ -960,37 +966,47 @@ const ChatPage = () => {
                 </div>
             </div>
             {/* post information  */}
-            <div
-                className="h-[80px] px-2 py-2 w-full flex gap-x-4 border-b border-gray-200 cursor-pointer hover:bg-slate-100"
-                onClick={() => {
-                    navigate(`/posts/${currentChat?.post?.post_url}`)
-                }}
-            >
-                <div className="w-[12%] h-full rounded-md">
-                    {currentChat?.post ? (
-                        <img
-                            src={currentChat?.post.images[0]?.imageUrl}
-                            alt="post image"
-                            className="w-full h-full object-cover rounded-md"
-                        />
-                    ) : (
-                        <></>
-                    )}
-                </div>
-                <div className="w-[70%] inline-flex flex-col justify-between ">
-                    <div>
-                        <div className="font-semibold text-gray-800 text-lg truncate">
-                            {currentChat?.title}
-                        </div>
-                        <div className="text-red-500 text-base">
-                            {numeral(currentChat?.post.price)
-                                .format("0,0 ₫")
-                                .replaceAll(",", ".")}
-                            &nbsp;đ
+            {currentChat?.post ? (
+                <div
+                    className="h-[80px] px-2 py-2 w-full flex gap-x-4 border-b border-gray-200 cursor-pointer hover:bg-slate-100"
+                    onClick={() => {
+                        navigate(`/posts/${currentChat?.post?.post_url}`)
+                    }}
+                >
+                    <div className="w-[12%] h-full rounded-md">
+                        {currentChat?.post ? (
+                            <img
+                                src={currentChat?.post.images[0]?.imageUrl}
+                                alt="post image"
+                                className="w-full h-full object-cover rounded-md"
+                            />
+                        ) : (
+                            <></>
+                        )}
+                    </div>
+                    <div className="w-[70%] inline-flex flex-col justify-between ">
+                        <div>
+                            <div className="font-semibold text-gray-800 text-lg truncate">
+                                {currentChat?.title}
+                            </div>
+                            <div className="text-red-500 text-base">
+                                {currentChat?.post ? (
+                                    <>
+                                        {numeral(currentChat?.post.price)
+                                            .format("0,0 ₫")
+                                            .replaceAll(",", ".")}
+                                    </>
+                                ) : (
+                                    <></>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            ) : (
+                <></>
+            )}
+
             {/* chat messages  */}
             <div
                 className="flex-1 overflow-y-scroll scroll-smooth pb-4"
