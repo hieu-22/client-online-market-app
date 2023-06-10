@@ -38,6 +38,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 import { toast } from "react-toastify"
 import { selectUser } from "../Auth/authSlice"
+import { addChatByUserIdThunk } from "../Chat/chatSlice"
 
 const OtherUserPage = () => {
     const dispatch = useDispatch()
@@ -168,6 +169,20 @@ const OtherUserPage = () => {
     }
     const debounceHandleUnfollowUser = debounce(handleUnfollowUser, 500)
 
+    const handleChatWithOtherUser = async () => {
+        const userId = visitingUser.id
+        const otherUserId = user.id
+        const addChatRes = await dispatch(
+            addChatByUserIdThunk({ userId, otherUserId })
+        ).unwrap()
+        // console.log("=> addChatRes: ", addChatRes)
+        if (addChatRes.errorCode === 1) {
+            return navigate(`/chat/${addChatRes.chatId}`)
+        }
+        const chatId = addChatRes.chat.id
+        navigate(`/chat/${chatId}`)
+    }
+
     /**COMPONENTS */
     const userInformatiion = (
         <div className="laptop:w-laptop m-auto mb-5 bg-white grid grid-cols-2 ] py-5 rounded-md shadow-md">
@@ -259,6 +274,7 @@ const OtherUserPage = () => {
                         <button
                             className="flex items-center gap-x-1 select-none cursor-pointer text-white border-[1px] border-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 disabled:cursor-not-allowed"
                             disabled={isTheSameUser}
+                            onClick={handleChatWithOtherUser}
                         >
                             <div>
                                 <BsChatFill className="text-primary"></BsChatFill>

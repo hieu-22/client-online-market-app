@@ -4,6 +4,7 @@ import ChatBannerSlider from "./ChatBannerSlider"
 import { FaUserCircle } from "react-icons/fa"
 import { RiFileAddLine, RiDeleteBin6Line } from "react-icons/ri"
 import { IoWarning } from "react-icons/io5"
+import { BiMessageAdd } from "react-icons/bi"
 
 //
 import { Link, useNavigate } from "react-router-dom"
@@ -23,11 +24,14 @@ import { selectUser } from "../Auth/authSlice"
 import { io } from "socket.io-client"
 import { socket } from "../../socket"
 import { toTimeAgo } from "../../utils/DateUtils"
+import { toast } from "react-toastify"
 
 const ChatPage = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [onDeleteChatMode, setOnDeleteChatMode] = useState(false)
     const [autoFetchingCount, setAutoFetchingCount] = useState(0)
+    const [aimedDeletedChats, setAimedDeletedChats] = useState([])
 
     // STATES
     const user = useSelector(selectUser)
@@ -94,9 +98,30 @@ const ChatPage = () => {
         }
     }, [autoFetchingCount])
 
+    // - to delete chat
+    const handleDeleteChat = async () => {
+        aimedDeletedChats.forEach((conversation_id) => {
+            socket.emit(
+                "deleteChat",
+                {
+                    conversation_id,
+                    user_id: user.id,
+                },
+                (error, data) => {
+                    if (error) {
+                        return toast(error.message)
+                    }
+                    const message = data.message
+                    toast(message)
+                    dispatch(removeChatById(conversation_id))
+                }
+            )
+        })
+    }
+
     // components
     const ChatListField = (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col select-none">
             <div className="py-2 pl-3 text-lg bg-gray-50 text-gray-700 font-medium">
                 Tất cả hội thoại
             </div>
@@ -110,7 +135,7 @@ const ChatPage = () => {
                         return (
                             <div
                                 key={index}
-                                className={` py-3 px-2 cursor-pointer border border-slate-200 border-t-0 hover:bg-slate-100 ${
+                                className={`h-[86px] py-3 px-2 cursor-pointer border border-slate-200 border-t-0 hover:bg-slate-100 ${
                                     chat.messages.length > 0
                                         ? !chat.messages[0]?.is_read_by_another
                                             ? chat.messages[0]?.user_id !==
@@ -122,34 +147,66 @@ const ChatPage = () => {
                                 }`}
                             >
                                 <Link
-                                    className="flex justify-between"
+                                    className="h-full flex justify-between"
                                     to={`/chat/${chat.id}`}
                                 >
                                     {onDeleteChatMode ? (
-                                        <div className="flex align-middle">
+                                        <div className="flex align-middle mr-1">
                                             <input
                                                 type="checkbox"
-                                                // onChange={(event) => {
-                                                //     if(event.target.checked) {
-                                                //         setAimedDeletedPost([...aimedDeletedPost, ])
-                                                //     }
-                                                //     if(!event.target.checked) {
-                                                //         setAimedDeletedPost([...aimedDeletedPost, ])
-                                                //     }
-                                                // }}
+                                                onChange={(event) => {
+                                                    if (event.target.checked) {
+                                                        setAimedDeletedChats([
+                                                            ...aimedDeletedChats,
+                                                            chat.id,
+                                                        ])
+                                                        console.log(
+                                                            "=>add: ",
+                                                            chat.id
+                                                        )
+                                                    }
+                                                    if (!event.target.checked) {
+                                                        const index =
+                                                            aimedDeletedChats.indexOf(
+                                                                chat.id
+                                                            )
+                                                        if (index === -1)
+                                                            return console.error(
+                                                                "post has been unchecked"
+                                                            )
+                                                        let newDeletedChat =
+                                                            aimedDeletedChats
+                                                        newDeletedChat.splice(
+                                                            index,
+                                                            1
+                                                        )
+                                                        newDeletedChat =
+                                                            newDeletedChat.filter(
+                                                                Boolean
+                                                            )
+
+                                                        setAimedDeletedChats(
+                                                            newDeletedChat
+                                                        )
+                                                        console.log(
+                                                            "=>delete: ",
+                                                            chat.id
+                                                        )
+                                                    }
+                                                }}
                                             />
                                         </div>
                                     ) : (
                                         <></>
                                     )}
-                                    <div className="flex w-[80%] ">
-                                        <div className=" h-full w-[64px] px-1">
+                                    <div className="flex h-full w-[80%] ">
+                                        <div className=" h-full w-[64px] mr-2">
                                             {OtherUser?.avatar ? (
                                                 <>
                                                     <img
                                                         src={OtherUser.avatar}
                                                         alt=""
-                                                        className="w-full h-full object-cover rounded-[50%]"
+                                                        className="w-[64px] h-[64px] object-cover rounded-[50%]"
                                                     />
                                                 </>
                                             ) : (
@@ -209,9 +266,8 @@ const ChatPage = () => {
                                             </div>
                                         </div>
                                     </div>
-
                                     {chat?.post ? (
-                                        <div className="rounded-md w-[20%]">
+                                        <div className="rounded-md h-full w-[20%]">
                                             <img
                                                 className="w-full h-full object-cover rounded-md "
                                                 src={
@@ -222,7 +278,7 @@ const ChatPage = () => {
                                             />
                                         </div>
                                     ) : (
-                                        <></>
+                                        <div className="w-[20%]"></div>
                                     )}
                                 </Link>
                             </div>
@@ -239,12 +295,15 @@ const ChatPage = () => {
                     </div>
                 )}
             </div>
-            <div className="py-2 pl-3 text-lg bg-gray-50 text-gray-700 font-medium  border-y border-gray-200">
+            <div className="relative py-2 pl-3 text-lg bg-gray-50 text-gray-700 font-medium  border-y border-gray-200">
                 {onDeleteChatMode ? (
                     <div className="flex justify-around">
                         <div
                             className="flex items-center justify-center px-3 py-1 text-sm text-white rounded-[20px] border bg-primary hover:bg-light-primary cursor-pointer w-[40%]"
-                            onClick={() => {}}
+                            onClick={() => {
+                                setOnDeleteChatMode(false)
+                                handleDeleteChat()
+                            }}
                         >
                             Xóa
                         </div>
@@ -258,18 +317,28 @@ const ChatPage = () => {
                         </div>
                     </div>
                 ) : (
-                    <button
-                        className="flex items-center justify-center px-3 py-1 text-sm text-primary rounded-[20px] border border-primary hover:bg-hover-primary cursor-pointer w-[180px] disabled:cursor-default disabled:hover:bg-inherit"
-                        onClick={() => {
-                            setOnDeleteChatMode(true)
-                        }}
-                        disabled={chats.length === 0 ? true : false}
-                    >
-                        <span className="pr-1">
-                            <RiDeleteBin6Line className="w-5 h-5" />
-                        </span>
-                        Xóa cuộc trò chuyện
-                    </button>
+                    <>
+                        <button
+                            className="flex items-center justify-center px-3 py-1 text-sm text-primary rounded-[20px] border border-primary hover:bg-hover-primary cursor-pointer w-[180px] disabled:cursor-default disabled:hover:bg-inherit"
+                            onClick={() => {
+                                setOnDeleteChatMode(true)
+                            }}
+                            disabled={chats.length === 0 ? true : false}
+                        >
+                            <span className="pr-1">
+                                <RiDeleteBin6Line className="w-5 h-5" />
+                            </span>
+                            Xóa cuộc trò chuyện
+                        </button>
+                        <button
+                            className="absolute right-6 bottom-2"
+                            onClick={() => {
+                                navigate("/users/suggests")
+                            }}
+                        >
+                            <BiMessageAdd className="text-primary w-7 h-7 hover:scale-110 hover:font-medium"></BiMessageAdd>
+                        </button>
+                    </>
                 )}
             </div>
         </div>

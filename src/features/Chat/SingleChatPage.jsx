@@ -9,7 +9,7 @@ import { RiFileAddLine, RiDeleteBin6Line } from "react-icons/ri"
 import { MdEmojiEmotions } from "react-icons/md"
 import { IoSendSharp } from "react-icons/io5"
 import { BiUser } from "react-icons/bi"
-import { BsEmojiSmile, BsEmojiSmileFill } from "react-icons/bs"
+import { BiMessageAdd } from "react-icons/bi"
 //
 import { useLocation, useNavigate, useParams, Link } from "react-router-dom"
 import { useState } from "react"
@@ -66,6 +66,7 @@ const ChatPage = () => {
     const [messageAvalable, setMessageAvalable] = useState(true)
 
     const [autoFetchingCount, setAutoFetchingCount] = useState(0)
+    const [chatHidden, setChatHidden] = useState(null)
     // functions
     const getOtherUserFromChatMembers = (currentChat) => {
         const userId = user?.id
@@ -178,21 +179,15 @@ const ChatPage = () => {
                 }
 
                 const chat = data.chat
-                dispatch(setCurrentChat(chat))
+                if (!chat.is_hidden) {
+                    setChatHidden(false)
+                    dispatch(setCurrentChat(chat))
+                } else {
+                    setChatHidden(true)
+                }
             }
         )
     }, [params])
-    // useEffect(() => {
-    //     ;(async () => {
-    //         const userId = user?.id
-    //         const res = await dispatch(
-    //             getConversationsByUserIdThunk({ userId: userId })
-    //         ).unwrap()
-    //         // console.log("=> getConversationsByUserIdThunk result: ", res)
-    //         dispatch(setCurrentChat({ chatId }))
-    //         dispatch(resetChatStatus())
-    //     })()
-    // }, [chatId])
 
     useEffect(() => {
         const scrollContainer = scrollContainerRef.current
@@ -272,7 +267,7 @@ const ChatPage = () => {
     }
 
     const handleDeleteChat = async () => {
-        aimedDeletedChats.forEach((conversation_id) => {
+        aimedDeletedChats.map((conversation_id) => {
             socket.emit(
                 "deleteChat",
                 {
@@ -281,19 +276,18 @@ const ChatPage = () => {
                 },
                 (error, data) => {
                     if (error) {
-                        return toast(error.message)
-                    }
-                    const message = data.message
-                    toast(message)
-                    if (currentChat.id === +conversation_id) {
+                        toast(error.message)
+                    } else {
+                        const message = data.message
                         dispatch(removeChatById(conversation_id))
-                        dispatch(setCurrentChat(null))
-                        return navigate("/chat")
                     }
-                    dispatch(removeChatById(chatId))
                 }
             )
         })
+
+        if (aimedDeletedChats.some((item) => item === +chatId)) {
+            navigate("/chat")
+        }
     }
 
     const handleHideMessageByOwner = async (messageId) => {
@@ -340,6 +334,26 @@ const ChatPage = () => {
                     return console.log("Internal Server Error", error)
                 }
                 toast(response.message)
+            }
+        )
+    }
+
+    const handleDeleteChatById = async () => {
+        const user_id = user.id
+        const conversation_id = currentChat.id
+        socket.emit(
+            "deleteChat",
+            {
+                conversation_id,
+                user_id,
+            },
+            (error, data) => {
+                if (error) {
+                    return toast(error.message)
+                }
+                const message = data.message
+                dispatch(removeChatById(conversation_id))
+                navigate("/chat")
             }
         )
     }
@@ -419,7 +433,7 @@ const ChatPage = () => {
 
     // components
     const ChatListField = (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col select-none">
             <div className="py-2 pl-3 text-lg bg-gray-50 text-gray-700 font-medium">
                 Tất cả hội thoại
             </div>
@@ -433,7 +447,7 @@ const ChatPage = () => {
                         return (
                             <div
                                 key={index}
-                                className={` py-3 px-2 cursor-pointer border border-slate-200 bg-white border-t-0 hover:bg-slate-100 ${
+                                className={`h-[86px] py-3 px-2 cursor-pointer border border-slate-200 bg-white border-t-0 hover:bg-slate-100 ${
                                     +chatId === +chat.id ? "!bg-slate-200" : ""
                                 } ${
                                     chat.messages.length > 0
@@ -447,14 +461,14 @@ const ChatPage = () => {
                                 } `}
                             >
                                 <div
-                                    className="flex justify-between"
+                                    className="flex justify-between h-full"
                                     onClick={() => {
                                         navigate(`/chat/${chat.id}`)
                                     }}
                                 >
                                     {onDeleteChatMode ? (
                                         <div
-                                            className="flex align-middle"
+                                            className="flex align-middle mr-1"
                                             onClick={(event) => {
                                                 event.stopPropagation()
                                             }}
@@ -506,14 +520,14 @@ const ChatPage = () => {
                                     ) : (
                                         <></>
                                     )}
-                                    <div className="flex w-[80%] ">
-                                        <div className="h-full w-[64px] px-1">
+                                    <div className="flex w-[80%] h-full">
+                                        <div className="h-full w-[64px] flex items-center mr-2">
                                             {OtherUser?.avatar ? (
                                                 <>
                                                     <img
                                                         src={OtherUser.avatar}
                                                         alt=""
-                                                        className="w-full h-full object-fill rounded-[50%]"
+                                                        className="w-[64px] h-[64px] object-cover rounded-[50%]"
                                                     />
                                                 </>
                                             ) : (
@@ -586,7 +600,7 @@ const ChatPage = () => {
                                             />
                                         </div>
                                     ) : (
-                                        <></>
+                                        <div className="w-[20%]"></div>
                                     )}
                                 </div>
                             </div>
@@ -596,7 +610,7 @@ const ChatPage = () => {
                     <></>
                 )}
             </div>
-            <div className="py-2 pl-3 text-lg bg-gray-50 text-gray-700 font-medium  border-y border-gray-200">
+            <div className="relative py-2 pl-3 text-lg bg-gray-50 text-gray-700 font-medium  border-y border-gray-200">
                 {onDeleteChatMode ? (
                     <div className="flex justify-around">
                         <div
@@ -618,17 +632,28 @@ const ChatPage = () => {
                         </div>
                     </div>
                 ) : (
-                    <div
-                        className="flex items-center justify-center px-3 py-1 text-sm text-primary rounded-[20px] border border-primary hover:bg-hover-primary cursor-pointer w-[180px]"
-                        onClick={() => {
-                            setOnDeleteChatMode(true)
-                        }}
-                    >
-                        <span className="pr-1">
-                            <RiDeleteBin6Line className="w-5 h-5" />
-                        </span>
-                        Xóa cuộc trò chuyện
-                    </div>
+                    <>
+                        <button
+                            className="flex items-center justify-center px-3 py-1 text-sm text-primary rounded-[20px] border border-primary hover:bg-hover-primary cursor-pointer w-[180px] disabled:cursor-default disabled:hover:bg-inherit"
+                            onClick={() => {
+                                setOnDeleteChatMode(true)
+                            }}
+                            disabled={chats.length === 0 ? true : false}
+                        >
+                            <span className="pr-1">
+                                <RiDeleteBin6Line className="w-5 h-5" />
+                            </span>
+                            Xóa cuộc trò chuyện
+                        </button>
+                        <button
+                            className="absolute right-6 bottom-2"
+                            onClick={() => {
+                                navigate("/users/suggests")
+                            }}
+                        >
+                            <BiMessageAdd className="text-primary w-7 h-7 hover:scale-110 hover:font-medium"></BiMessageAdd>
+                        </button>
+                    </>
                 )}
             </div>
         </div>
@@ -944,14 +969,24 @@ const ChatPage = () => {
                                 event.stopPropagation()
                             }}
                         >
-                            <div className="cursor-pointer hover:bg-gray-100 flex items-center px-2 py-1">
+                            <div
+                                className="cursor-pointer hover:bg-gray-100 flex items-center px-2 py-1"
+                                onClick={() => {
+                                    navigate(`/user/${currentOtherUser.id}`)
+                                }}
+                            >
                                 <div className="px-2">
                                     <BiUser className="w-4 h-4"></BiUser>
                                 </div>
                                 <div className="font-medium">Xem hồ sơ</div>
                             </div>
 
-                            <div className="cursor-pointer hover:bg-gray-100 flex items-center px-2 py-1">
+                            <div
+                                className="cursor-pointer hover:bg-gray-100 flex items-center px-2 py-1"
+                                onClick={(event) => {
+                                    handleDeleteChatById()
+                                }}
+                            >
                                 <div className="px-2">
                                     <AiOutlineDelete className="w-4 h-4"></AiOutlineDelete>
                                 </div>
@@ -1128,11 +1163,8 @@ const ChatPage = () => {
             className="bg-customWhite border-collapse h-full w-full "
             onClick={handleCloseAllWindow}
         >
-            {chatError?.statusCode ? (
-                <ChatErrorPage
-                    statusCode={chatError.statusCode}
-                    message={chatError.message}
-                />
+            {chatHidden ? (
+                <ChatErrorPage statusCode={403} message={"Forbidden Error"} />
             ) : (
                 <div className="laptop:w-laptop mx-auto w-full h-full bg-white border border-slate-200 flex">
                     <div className="w-[45%] h-full border-r border-r-gray-100">
