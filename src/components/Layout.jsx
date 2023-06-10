@@ -11,8 +11,8 @@ import {
 // react-icons
 import { MdPostAdd } from "react-icons/md"
 import { FiSearch } from "react-icons/fi"
-import { BiUser, BiBell, BiChat, BiCart, BiUserCircle } from "react-icons/bi"
-import { GrUserManager } from "react-icons/gr"
+import { BiUser, BiBell, BiChat, BiUserCircle } from "react-icons/bi"
+import { AiFillControl, AiFillWechat, AiFillBell } from "react-icons/ai"
 import { MdHelpCenter } from "react-icons/md"
 import { AiFillHeart, AiFillSetting } from "react-icons/ai"
 import { BsFillBookmarkFill, BsStarFill } from "react-icons/bs"
@@ -20,6 +20,8 @@ import { RiPencilFill } from "react-icons/ri"
 import { RxTriangleDown, RxExit } from "react-icons/rx"
 import { FaUserCircle } from "react-icons/fa"
 import { useDispatch, useSelector } from "react-redux"
+import { FaUserFriends } from "react-icons/fa"
+//
 import CustomToastify from "./CustomToastify"
 import ErrorPage from "../features/Error/ErrorPage"
 
@@ -588,9 +590,31 @@ const Layout = () => {
                         }}
                     >
                         <div className="">
-                            <GrUserManager className="w-6 h-6" />
+                            <AiFillControl className="w-6 h-6 text-slate-700" />
                         </div>
                         <div className="text-text">Quản lí tin</div>
+                    </div>
+                </li>
+                <li className="">
+                    <div
+                        className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer "
+                        onClick={() => {
+                            if (!isLoggedIn) {
+                                if (
+                                    window.location.href ===
+                                    "http://localhost:3000/login"
+                                ) {
+                                    return handleShowToast("Vui lòng đăng nhập")
+                                }
+                                return navigate("/login")
+                            }
+                            navigate("/users")
+                        }}
+                    >
+                        <div className="">
+                            <FaUserFriends className="w-6 h-6 text-slate-700 " />
+                        </div>
+                        <div className="text-text">Người dùng</div>
                     </div>
                 </li>
                 <li className="">
@@ -611,7 +635,7 @@ const Layout = () => {
                         }}
                     >
                         <div className="">
-                            <BiChat className="w-6 h-6" />
+                            <AiFillWechat className="w-7 h-7 text-slate-700" />
                         </div>
                         <div className="text-text">Chat</div>
                     </div>
@@ -622,7 +646,7 @@ const Layout = () => {
                         onClick={(event) => handleShowNotificationWindow(event)}
                     >
                         <div className="">
-                            <BiBell className="w-6 h-6" />
+                            <AiFillBell className="w-6 h-6 text-slate-700" />
                         </div>
                         <div className="text-text">Thông báo</div>
                     </div>
