@@ -46,6 +46,7 @@ const OtherUserPage = () => {
     const [userMenuShowed, setUserMenuShowed] = useState(false)
     const [isFollowedByCurrentUser, setIsFollowedByCurrentUser] = useState(null)
     const [isTheSameUser, setIsTheSameUser] = useState(null)
+    const [visitingUserIndex, setVistingUserIndex] = useState(undefined)
 
     const user = useSelector(selectOtherUser)
     const visitingUser = useSelector(selectUser)
@@ -95,8 +96,11 @@ const OtherUserPage = () => {
             setIsFollowedByCurrentUser(false)
             return
         }
-        if (followers?.some((user) => user.id === visitingUserId)) {
+
+        const index = followers?.findIndex((user) => user.id === visitingUserId)
+        if (index > -1) {
             setIsFollowedByCurrentUser(true)
+            setVistingUserIndex(index)
         } else {
             setIsFollowedByCurrentUser(false)
         }
@@ -105,6 +109,16 @@ const OtherUserPage = () => {
     const handleSwitchUserMenu = (e) => {
         e.stopPropagation()
         setUserMenuShowed(!userMenuShowed)
+    }
+
+    const debounce = (func, delay) => {
+        let timerId
+
+        return function () {
+            clearTimeout(timerId)
+
+            timerId = setTimeout(func, delay)
+        }
     }
 
     const handleFollowUser = async () => {
@@ -139,6 +153,8 @@ const OtherUserPage = () => {
         dispatch(addVisitingUserToFollowers(addedUser))
     }
 
+    const debounceHandleFollowUser = debounce(handleFollowUser, 500)
+
     const handleUnfollowUser = async () => {
         if (!visitingUser) {
             return navigate("/login")
@@ -148,8 +164,9 @@ const OtherUserPage = () => {
         await dispatch(
             unfollowUserThunk({ followerId, followedUserId })
         ).unwrap()
-        dispatch(removeVisitingUserToFollowers())
+        dispatch(removeVisitingUserToFollowers(visitingUserIndex))
     }
+    const debounceHandleUnfollowUser = debounce(handleUnfollowUser, 500)
 
     /**COMPONENTS */
     const userInformatiion = (
@@ -211,9 +228,7 @@ const OtherUserPage = () => {
                         {isFollowedByCurrentUser ? (
                             <button
                                 className="group select-none cursor-pointer text-primary border border-primary bg-white hover:bg-white hover:border-red-600 pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 "
-                                onClick={() => {
-                                    handleUnfollowUser()
-                                }}
+                                onClick={debounceHandleUnfollowUser}
                             >
                                 <span className="inline-flex group-hover:hidden items-end transition-all">
                                     <span>
@@ -235,9 +250,7 @@ const OtherUserPage = () => {
                         ) : (
                             <button
                                 className="select-none cursor-pointer text-white border bg-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 disabled:cursor-not-allowed"
-                                onClick={() => {
-                                    handleFollowUser()
-                                }}
+                                onClick={debounceHandleFollowUser}
                                 disabled={isTheSameUser}
                             >
                                 <span className="text-lg">+</span> Theo dõi

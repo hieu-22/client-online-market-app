@@ -21,7 +21,7 @@ import { Link, useNavigate } from "react-router-dom"
 import Breadcrumb from "../../components/Breadcrumb"
 
 const UsersListPage = () => {
-    const dispath = useDispatch()
+    const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const user = useSelector(selectUser)
@@ -33,7 +33,7 @@ const UsersListPage = () => {
     useEffect(() => {
         if (user) {
             const userId = user?.id
-            dispath(handleGetOtherUsersThunk(userId))
+            dispatch(handleGetOtherUsersThunk(userId))
         }
     }, [user])
 
@@ -41,17 +41,17 @@ const UsersListPage = () => {
     const handleFollowUser = async (userId, index) => {
         const followerId = user.id
         const followedUserId = userId
-        await dispath(followUserThunk({ followerId, followedUserId })).unwrap()
-        dispath(toggleIsUserFollowed(index))
+        await dispatch(followUserThunk({ followerId, followedUserId })).unwrap()
+        dispatch(toggleIsUserFollowed(index))
     }
 
     const handleUnfollowUser = async (userId, index) => {
         const followerId = user.id
         const followedUserId = userId
-        await dispath(
+        await dispatch(
             unfollowUserThunk({ followerId, followedUserId })
         ).unwrap()
-        dispath(toggleIsUserFollowed(index))
+        dispatch(toggleIsUserFollowed(index))
     }
 
     const toggleUserMenu = (index) => {
@@ -160,25 +160,6 @@ const UsersListPage = () => {
                                 <span className="text-lg">+</span> Theo dõi
                             </button>
                         )}
-
-                        {/* <button className="group select-none cursor-pointer text-primary border border-primary bg-white hover:bg-white hover:border-red-600 pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 ">
-                            <span className="inline-flex group-hover:hidden items-end transition-all">
-                                <span>
-                                    <MdOutlineDone />
-                                </span>{" "}
-                                <span className="translate-y-[2px]">
-                                    Đang theo dõi
-                                </span>
-                            </span>
-                            <span className="hidden group-hover:inline-flex items-end transition-all text-red-600">
-                                <span>
-                                    <ImCancelCircle />
-                                </span>{" "}
-                                <span className="translate-y-[2px]">
-                                    Hủy theo dõi
-                                </span>
-                            </span>
-                        </button> */}
                         <button className="flex items-center gap-x-1 select-none cursor-pointer text-white border-[1px] border-primary pb-1 pt-[2px] px-3 rounded-3xl hover:opacity-70 ">
                             <div>
                                 <BsChatFill className="text-primary"></BsChatFill>

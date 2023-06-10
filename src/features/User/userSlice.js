@@ -187,7 +187,8 @@ const userSlice = createSlice({
             state.otherUser.followers.unshift(addedUser)
         },
         removeVisitingUserToFollowers(state, action) {
-            state.otherUser.followers.shift()
+            const index = action.payload
+            state.otherUser.followers.splice(index, 1)
         },
     },
     extraReducers: (builder) => {
@@ -224,29 +225,29 @@ const userSlice = createSlice({
             })
             //followUserThunk
             .addCase(followUserThunk.pending, (state) => {
-                state.status = "loading"
+                state.status = "Follow user updating ..."
                 state.error = null
             })
             .addCase(followUserThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
+                state.status = "Updating is succeeded"
                 state.error = null
             })
             .addCase(followUserThunk.rejected, (state, action) => {
-                state.status = "failed"
+                state.status = "Updating is failed"
                 console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
             })
             // unfollowUserThunk
             .addCase(unfollowUserThunk.pending, (state) => {
-                state.status = "loading"
+                state.status = "Unfollow user updating ..."
                 state.error = null
             })
             .addCase(unfollowUserThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
+                state.status = "Updating is succeeded"
                 state.error = null
             })
             .addCase(unfollowUserThunk.rejected, (state, action) => {
-                state.status = "failed"
+                state.status = "Updating is failed"
                 console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
             })
