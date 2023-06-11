@@ -189,3 +189,27 @@ export const deletePostById = async ({ postId, userId }) => {
     const updatedReponse = { ...responses.data, posts: updatedPosts }
     return updatedReponse
 }
+
+export const getRelativeUsers = async (userId) => {
+    const response = await axios.get(`user/${userId}/get-relative-users`)
+
+    const followingUsers = response.data.users.followingUsers
+    const newFollowingUsers = followingUsers.map((item) => {
+        const newItem = item
+        newItem.isFollowed = true
+        return newItem
+    })
+
+    const followers = response.data.users.followers
+    const newFollowers = followers.map((item) => {
+        const newItem = item
+        newItem.isFollowed = false
+        return newItem
+    })
+
+    const customizedData = {
+        followers: newFollowers,
+        followingUsers: newFollowingUsers,
+    }
+    return customizedData
+}

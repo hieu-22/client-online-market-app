@@ -9,6 +9,7 @@ import {
     selectUser,
     resetStatus,
     getSavedPostsByUserIdThunk,
+    getRelativeUsersThunk,
 } from "../Auth/authSlice"
 
 const Homepage = () => {
@@ -56,6 +57,13 @@ const Homepage = () => {
             // )
             dispatch(resetStatus())
         })()
+    }, [])
+
+    useEffect(() => {
+        if (user) {
+            const userId = user?.id
+            dispatch(getRelativeUsersThunk(userId))
+        }
     }, [])
 
     return (
