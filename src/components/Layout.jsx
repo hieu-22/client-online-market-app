@@ -87,6 +87,7 @@ const Layout = () => {
             }
         }
     }, [user])
+
     useEffect(() => {
         setIsAccountWindowShowed(false)
         setIsNotificationWindowShowed(false)

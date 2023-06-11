@@ -72,7 +72,10 @@ export const getOtherUsers = async (userId) => {
         return newItem
     })
 
-    const customizedData = { followedUsers, nonFollowedUsers }
+    const customizedData = {
+        followedUsers: newFollowedUsers,
+        nonFollowedUsers: newNonFollowedUsers,
+    }
     return customizedData
 }
 
