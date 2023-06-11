@@ -22,3 +22,40 @@
     -ms-backface-visibility: hidden;
     backface-visibility: hidden;
 }
+
+.slick-prev,
+.slick-next {
+    font-size: 0;
+    line-height: 0;
+    position: absolute;
+    top: 45% !important;
+    display: block;
+    width: 52px !important;
+    height: 52px !important;
+    padding: 0;
+    -webkit-transform: translate(0, 0);
+    -ms-transform: translate(0, 0);
+    transform: translate(0, 0);
+    cursor: pointer;
+    z-index: 1;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+    opacity: 1;
+}
+
+.slick-next {
+    right: -10px !important;
+}
+.slick-prev {
+    left: -10px !important;
+}
+
+.slick-prev:before,
+.slick-next:before {
+    font-size: 50px;
+    line-height: 1;
+    color: rgb(51, 136, 255);
+    opacity: 1 !important;
+}
