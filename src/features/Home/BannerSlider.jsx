@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Slider from "react-slick"
 import { selectFetchedPosts } from "../Post/postSlice"
 import { useSelector } from "react-redux"
@@ -12,6 +12,9 @@ import "./banner.css"
 const BannerSlider = () => {
     const fetchedPosts = useSelector(selectFetchedPosts)
     const newestPosts = fetchedPosts.slice(0, 8)
+    const [isTabletDevice, setIsTabletDevice] = useState(false)
+    const [slidesToShow, setSlidesToShow] = useState(4)
+    const [slidesToScroll, setSlidesToScroll] = useState(2)
 
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -21,8 +24,8 @@ const BannerSlider = () => {
         infinite: true,
         initialSlide: 0,
         speed: 500,
-        slidesToShow: 4,
-        slidesToScroll: 2,
+        slidesToShow: slidesToShow,
+        slidesToScroll: slidesToScroll,
         autoplay: true,
         autoplaySpeed: 2000,
         nextArrow: (
@@ -54,8 +57,53 @@ const BannerSlider = () => {
         },
     }
 
+    // To change how many slide to show based on device width
+    useEffect(() => {
+        const screenWidth = window.innerWidth
+        if (screenWidth < 786 && screenWidth >= 576) {
+            if (!isTabletDevice) {
+                setSlidesToShow(2)
+                setSlidesToScroll(1)
+                setIsTabletDevice(true)
+            }
+        }
+        if (screenWidth >= 786) {
+            if (true) {
+                setIsTabletDevice(false)
+            }
+            setSlidesToShow(4)
+            setSlidesToScroll(2)
+        }
+    }, [])
+    useEffect(() => {
+        const handleResize = () => {
+            const screenWidth = window.innerWidth
+            if (screenWidth < 786 && screenWidth >= 576) {
+                if (!isTabletDevice) {
+                    setSlidesToShow(2)
+                    setSlidesToScroll(1)
+                    setIsTabletDevice(true)
+                }
+            }
+            if (screenWidth >= 786) {
+                if (true) {
+                    setIsTabletDevice(false)
+                }
+                setSlidesToShow(4)
+                setSlidesToScroll(2)
+            }
+        }
+
+        window.addEventListener("resize", handleResize)
+
+        // Clean up the event listener when the component unmounts
+        return () => {
+            window.removeEventListener("resize", handleResize)
+        }
+    }, [window.innerWidth])
+
     return (
-        <div className="laptop:w-laptop m-auto my-5 bg-white">
+        <div className="w-full my-5 bg-white ">
             <div className="border-b border-gray-100">
                 <h3 className="text-text text-lg py-2 font-semibold px-5">
                     Tin nổi bật

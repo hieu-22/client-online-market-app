@@ -5,13 +5,13 @@ module.exports = {
         extend: {
             // breakpoint
             screens: {
-                phone: "360px",
-                tablet: "640px",
+                minScreen: "1px",
+                smallPhone: "480px",
+                phone: "576px",
+                tablet: "768px",
                 // => @media (min-width: 640px) { ... }
-
                 laptop: "1024px",
                 // => @media (min-width: 1024px) { ... }
-
                 desktop: "1280px",
                 // => @media (min-width: 1280px) { ... }
             },

@@ -231,18 +231,16 @@ const Layout = () => {
     )
     const AccountWindow = (
         <div
-            className="bg-white z-[9999] absolute top-10 right-0 w-[300px] py-2 shadow-boxMd"
+            className="bg-white z-[50] absolute top-10 right-0 w-[300px] py-2 shadow-boxMd text-base"
             onClick={(event) => {
                 event.stopPropagation()
             }}
         >
-            <div className="flex items-center justify-start pt-2 pb-3  px-4">
+            <div className="flex items-center justify-start pb-3 px-4">
                 {isLoggedIn ? (
                     <>
                         <div className="cursor-pointer flex items-center gap-x-4">
-                            <div
-                                className={`relative h-10 w-10 rounded-[50%] `}
-                            >
+                            <div className={`relative h-10 w-10 rounded-[50%]`}>
                                 {user?.avatar ? (
                                     <img
                                         className="w-full h-full object-cover rounded-[50%]"
@@ -265,7 +263,7 @@ const Layout = () => {
                             </div>
                             <div className="flex-1  ">
                                 <div
-                                    className="text-base font-medium hover:opacity-70 truncate"
+                                    className="text-lg font-medium hover:opacity-70 truncate"
                                     onClick={(event) => {
                                         handleCloseAllWindows()
                                         const currentUrl = location.pathname
@@ -291,9 +289,26 @@ const Layout = () => {
                                     }}
                                 >
                                     {user?.userName ? user.userName : ""}
+                                    <span
+                                        className={
+                                            `ml-3 inline-block mx-1  w-2 h-2 rounded-[50%] ` +
+                                            (user?.isOnline
+                                                ? "bg-green-600"
+                                                : "bg-gray-600")
+                                        }
+                                    ></span>
+                                    {user?.isOnline ? (
+                                        <span className="text-green-600 text-xs">
+                                            Đang hoạt động
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-600 text-xs">
+                                            Không hoạt động
+                                        </span>
+                                    )}
                                 </div>
 
-                                <div className=" inline-flex items-center text-2xs">
+                                <div className=" inline-flex items-center text-xs">
                                     <div className="font-medium hover:opacity-70">
                                         Người theo dõi{" "}
                                         <span className="font-bold ml-1">
@@ -573,8 +588,8 @@ const Layout = () => {
 
     const Navbar = (
         <nav>
-            <ul className="flex items-center justify-around gap-x-8">
-                <li className="">
+            <ul className="flex items-center justify-around gap-x-6">
+                <li className="hidden laptop:block">
                     <div
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer "
                         onClick={() => {
@@ -596,7 +611,7 @@ const Layout = () => {
                         <div className="text-text">Quản lí tin</div>
                     </div>
                 </li>
-                <li className="">
+                <li className="hidden tablet:block">
                     <div
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer "
                         onClick={() => {
@@ -618,7 +633,7 @@ const Layout = () => {
                         <div className="text-text">Người dùng</div>
                     </div>
                 </li>
-                <li className="">
+                <li className="hidden phone:block">
                     <div
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer"
                         onClick={() => {
@@ -641,7 +656,7 @@ const Layout = () => {
                         <div className="text-text">Chat</div>
                     </div>
                 </li>
-                <li className="relative">
+                <li className="relative hidden smallPhone:block">
                     <div
                         className="flex items-center gap-x-1 hover:opacity-70 cursor-pointer"
                         onClick={(event) => handleShowNotificationWindow(event)}
@@ -653,7 +668,7 @@ const Layout = () => {
                     </div>
                     {isNotificationWindowShowed ? NotificationWindow : <></>}
                 </li>
-                <li className="relative  ">
+                <li className="relative ">
                     <div
                         className="flex items-center gap-x-1  hover:opacity-70 cursor-pointer"
                         onClick={(event) => handleShowAccountWindow(event)}
@@ -698,21 +713,29 @@ const Layout = () => {
     )
 
     const Header = (
-        <header className=" h-full bg-background ">
-            <div className="">
-                <div className="laptop:w-laptop  m-auto flex justify-between items-center py-4 ">
+        <header className="h-full bg-background text-[1.25rem]">
+            <div
+                className={`m-auto px-6
+                            laptop:max-w-[1024px]
+                            desktop:max-w-[1024px] desktop:px-0`}
+            >
+                <div className="flex justify-between items-center py-4 ">
                     {LogoBox}
                     {Navbar}
                 </div>
             </div>
 
             <div
-                className=" flex justify-between items-center mx-auto laptop:w-laptop w-100 "
+                className={`flex justify-between items-center mx-auto
+                minScreen:px-6
+                laptop:max-w-[1024px] 
+                desktop:max-w-[1024px] desktop:!px-0 
+                `}
                 onClick={(event) => {
                     event.stopPropagation()
                 }}
             >
-                <div className="flex items-center  w-full relative">
+                <div className="flex items-center w-full relative">
                     <input
                         className="px-4 w-full rounded border-[1px] border-gray-200 shadow-boxMd py-2  text-sm p-1 focus:outline-4 outline-primary"
                         type="text"
@@ -777,7 +800,11 @@ const Layout = () => {
                         <></>
                     )}
                 </div>
-                <div className="flex items-center justify-end gap-x-1 flex-row min-w-[160px]">
+                <div
+                    className={`hidden items-center justify-end gap-x-1 flex-row min-w-[160px]
+                                tablet:flex
+                `}
+                >
                     <div
                         onClick={handleAddNewPost}
                         className="flex items-center text-sm py-[6px] px-2  text-white bg-primary hover:bg-light-primary rounded cursor-pointer"
@@ -792,7 +819,7 @@ const Layout = () => {
 
     const Footer = (
         <footer>
-            <div className=" laptop:px-6 bg-neutral-700 px-12 py-6 text-gray-300 ">
+            <div className="px-6 bg-neutral-700 py-6 text-gray-300 desktop:px-0">
                 <div className="laptop:w-laptop m-auto">
                     <div className="flex items-center">
                         <Link
@@ -985,10 +1012,10 @@ const Layout = () => {
             >
                 {Loading ? <Loader /> : <></>}
                 <div className="h-[140px]">{Header}</div>
-                <div className="flex-1 h-outlet">
+                <div className="flex-1 h-outlet bg-customWhite">
                     <Outlet />
                 </div>
-                <div>{footerHidden ? <></> : Footer}</div>
+                <div className="tablet:">{footerHidden ? <></> : Footer}</div>
                 <CustomToastify />
             </div>
         </>

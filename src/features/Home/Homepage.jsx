@@ -15,6 +15,7 @@ import {
 const Homepage = () => {
     const dispatch = useDispatch()
     const user = useSelector(selectUser)
+    const [isPhone, setIsPhone] = useState(null)
 
     // Components
     const findNewBar = (
@@ -45,6 +46,33 @@ const Homepage = () => {
             </div>
         </div>
     )
+    // EFFECTS
+    // -HANDLERS ON WIDTH DEVICE
+    // ---
+    useEffect(() => {
+        const screenWidth = window.innerWidth
+        if (screenWidth < 576) {
+            setIsPhone(true)
+        } else {
+            setIsPhone(false)
+        }
+    }, [])
+    useEffect(() => {
+        const handleResize = () => {
+            const screenWidth = window.innerWidth
+            if (screenWidth < 576) {
+                setIsPhone(true)
+            } else {
+                setIsPhone(false)
+            }
+        }
+        window.addEventListener("resize", handleResize)
+        // Clean up the event listener when the component unmounts
+        return () => {
+            window.removeEventListener("resize", handleResize)
+        }
+    }, [window.innerWidth])
+
     useEffect(() => {
         ;(async () => {
             const userId = user?.id
@@ -67,11 +95,21 @@ const Homepage = () => {
     }, [])
 
     return (
-        <div className="py-3 mx-auto bg-customWhite">
-            <div className="mb-8">
-                <BannerSlider />
+        <div
+            className="py-3 mx-auto px-6
+                        desktop:max-w-[1024px]
+                        laptop:max-w-[1024px]  desktop:px-0"
+        >
+            <div>
+                {!isPhone ? (
+                    <div className="mb-8">
+                        <BannerSlider />
+                    </div>
+                ) : (
+                    <></>
+                )}
             </div>
-            <div className="">
+            <div>
                 <NewPosts />
             </div>
         </div>

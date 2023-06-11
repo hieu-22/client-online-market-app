@@ -16,13 +16,14 @@ import { TbMoodEmpty } from "react-icons/tb"
 const NewPosts = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-
+    const [deviceType, setDeviceType] = useState(null)
     const fetchedPosts = useSelector(selectFetchedPosts)
     const postsStatus = useSelector(selectPostStatus)
     const postsError = useSelector(selectPostError)
     const [noMorePost, setNoMorePost] = useState(false)
     const [PostsLoading, setPostsLoading] = useState(null)
 
+    // EFFECTS
     useEffect(() => {
         if (PostsLoading === null) {
             return setPostsLoading(false)
@@ -40,6 +41,33 @@ const NewPosts = () => {
             setNoMorePost(false)
         })()
     }, [])
+
+    // - SET DEVICE TYPE
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [window.innerWidth])
+
+    //HANDLERS
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
 
     const handleGetNextPosts = async () => {
         const lastPostCreatedAt =
@@ -100,7 +128,7 @@ const NewPosts = () => {
     }
 
     return (
-        <div className="laptop:w-laptop m-auto my-5 bg-white">
+        <div className="w-full my-5 bg-white">
             <div className="">
                 <h3 className="text-text text-lg py-2 font-semibold px-5">
                     Tin đăng mới
@@ -108,7 +136,17 @@ const NewPosts = () => {
             </div>
             <div>
                 {fetchedPosts?.length > 0 ? (
-                    <div className=" bg-white grid grid-cols-4 border-t border-gray-200">
+                    <div
+                        className={` bg-white grid  ${
+                            deviceType === "tablet" ||
+                            deviceType === "desktop" ||
+                            deviceType === "laptop"
+                                ? "grid-cols-4"
+                                : deviceType === "mobile"
+                                ? "grid-cols-2"
+                                : "grid-cols-1"
+                        }  border-t border-gray-200`}
+                    >
                         {fetchedPosts.map((post, index) => {
                             return (
                                 <ProductCard
