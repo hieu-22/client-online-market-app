@@ -24,7 +24,7 @@ const BannerSlider = () => {
         slidesToShow: 4,
         slidesToScroll: 2,
         autoplay: true,
-        autoplaySpeed: 3000,
+        autoplaySpeed: 2000,
         nextArrow: (
             <MdOutlineKeyboardArrowRight
                 className="slick-next"
@@ -64,7 +64,7 @@ const BannerSlider = () => {
             <Slider {...settings} className="px-7">
                 {newestPosts.map((post, index) => {
                     return (
-                        <div className="px-1 pb-3 pt-1">
+                        <div className="p-1">
                             <ProductCard
                                 className="hover:shadow-boxMd"
                                 key={index}

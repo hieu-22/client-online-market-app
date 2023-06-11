@@ -28,8 +28,8 @@ const ChatBannerSlider = () => {
     }
 
     const bannerUrls = [
-        "https://chat.chotot.com/emptyRoom.png",
-        "https://chat.chotot.com/emptyRoom2.png",
+        "https://res.cloudinary.com/duhbzyhtj/image/upload/v1686449161/emptyRoom_vvfkj4.png",
+        "https://res.cloudinary.com/duhbzyhtj/image/upload/v1686449161/emptyRoom2_vpwdsd.png",
     ]
     return (
         <div className="w-full">

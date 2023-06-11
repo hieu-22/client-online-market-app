@@ -25,6 +25,7 @@ import { io } from "socket.io-client"
 import { socket } from "../../socket"
 import { toTimeAgo } from "../../utils/DateUtils"
 import { toast } from "react-toastify"
+import { current } from "@reduxjs/toolkit"
 
 const ChatPage = () => {
     const dispatch = useDispatch()
@@ -72,7 +73,7 @@ const ChatPage = () => {
             socket.off("sendUpdatedChatId")
         }
     }, [chats])
-    // to get real-time chats
+    // To get real-time chats
     useEffect(() => {
         const userId = user?.id
         socket.emit(
@@ -98,7 +99,7 @@ const ChatPage = () => {
         }
     }, [autoFetchingCount])
 
-    // - to delete chat
+    // -To delete chat
     const handleDeleteChat = async () => {
         aimedDeletedChats.forEach((conversation_id) => {
             socket.emit(

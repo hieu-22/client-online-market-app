@@ -60,8 +60,12 @@ const Homepage = () => {
 
     return (
         <div className="py-3 mx-auto bg-customWhite">
-            <BannerSlider />
-            <NewPosts />
+            <div className="mb-8">
+                <BannerSlider />
+            </div>
+            <div className="">
+                <NewPosts />
+            </div>
         </div>
     )
 }

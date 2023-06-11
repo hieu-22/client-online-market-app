@@ -129,7 +129,9 @@ const ProductCard = ({
                     &nbsp;·&nbsp;{" "}
                 </span>
                 <div className="truncate w-[100px]">
-                    {address ? address.split(",")[3] : ""}
+                    {address
+                        ? address.split(",")[address.split(",").length - 1]
+                        : ""}
                 </div>
             </div>
         </div>
