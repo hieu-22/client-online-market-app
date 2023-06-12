@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import {
     Outlet,
     useNavigate,
@@ -13,19 +13,26 @@ import { MdPostAdd } from "react-icons/md"
 import { FiSearch } from "react-icons/fi"
 import { BiUser, BiBell, BiChat, BiUserCircle } from "react-icons/bi"
 import { AiFillControl, AiFillWechat, AiFillBell } from "react-icons/ai"
-import { MdHelpCenter } from "react-icons/md"
+import { MdHelpCenter, MdHome } from "react-icons/md"
 import { AiFillHeart, AiFillSetting } from "react-icons/ai"
-import { BsFillBookmarkFill, BsStarFill } from "react-icons/bs"
+import {
+    BsFillBookmarkFill,
+    BsStarFill,
+    BsFillArrowUpCircleFill,
+} from "react-icons/bs"
 import { RiPencilFill } from "react-icons/ri"
 import { RxTriangleDown, RxExit } from "react-icons/rx"
 import { FaUserCircle } from "react-icons/fa"
-import { useDispatch, useSelector } from "react-redux"
-import { FaUserFriends } from "react-icons/fa"
+import { FaUserFriends, FaUsers, FaTools } from "react-icons/fa"
+import { RiMessage2Fill } from "react-icons/ri"
+import { IoHome } from "react-icons/io5"
 //
 import CustomToastify from "./CustomToastify"
 import ErrorPage from "../features/Error/ErrorPage"
 
 // redux
+import { useDispatch, useSelector } from "react-redux"
+
 import {
     logout,
     selectAuthError,
@@ -52,6 +59,7 @@ const Layout = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
+    const timeoutRef = useRef(null)
 
     // COMPONENT'S STATES
     const [isfullScreenAndNoScroll, setIsfullScreenAndNoScroll] = useState(null)
@@ -65,6 +73,7 @@ const Layout = () => {
         useState("onActivities") // onActivities or onNews
     const [searchHintsShowed, setSearchHintsShowed] = useState(false)
     const [isToastActive, setIsToastActive] = useState(false)
+    const [goUpHandlerShowed, setGoUpHandlerShowed] = useState(null)
 
     // REDUX STATES
     const user = useSelector((state) => state.auth.user)
@@ -136,6 +145,39 @@ const Layout = () => {
         // Cleanup function to cancel the timer if the component is unmounted or query changes
         return () => clearTimeout(timerId)
     }, [searchkeys])
+
+    // -- handle show go to handler
+    const prevScrollPosRef = useRef(0)
+    useEffect(() => {
+        const handleScrollDown = () => {
+            const currentScrollPos = window.pageYOffset
+            // console.log(
+            //     currentScrollPos,
+            //     " - ",
+            //     prevScrollPosRef,
+            //     " : ",
+            //     currentScrollPos < prevScrollPosRef
+            // )
+            if (currentScrollPos < prevScrollPosRef.current) {
+                setGoUpHandlerShowed(true)
+                clearTimeout(timeoutRef.current)
+                // to off after `timer`
+                timeoutRef.current = setTimeout(() => {
+                    setGoUpHandlerShowed(false)
+                }, 2000)
+                prevScrollPosRef.current = currentScrollPos
+            } else {
+                setGoUpHandlerShowed(false)
+                prevScrollPosRef.current = currentScrollPos
+            }
+        }
+
+        window.addEventListener("scroll", handleScrollDown)
+        return () => {
+            clearTimeout(timeoutRef.current)
+            window.removeEventListener("scroll", handleScrollDown)
+        }
+    }, [])
 
     /**HANDLERS */
     const handleShowToast = (message, status) => {
@@ -231,7 +273,7 @@ const Layout = () => {
     )
     const AccountWindow = (
         <div
-            className="bg-white z-[50] absolute top-10 right-0 w-[300px] py-2 shadow-boxMd text-base"
+            className="bg-white z-[50] absolute top-10 right-0 w-[300px] py-2 shadow-big text-base rounded-sm select-none"
             onClick={(event) => {
                 event.stopPropagation()
             }}
@@ -351,28 +393,69 @@ const Layout = () => {
                 <div></div>
             </div>
 
-            {/* Quản lí đơn */}
-            {/* <div>
+            {/* Nav */}
+            <div>
                 <div className="px-3 py-1 bg-primary text-base text-white font-semibold">
-                    Quản lí đơn hàng
+                    Lối tắt
                 </div>
-                <div className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer">
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        navigate("/")
+                    }}
+                >
                     <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-blue-400">
-                        <GiShoppingBag className="text-white" />
+                        <IoHome className="text-white translate-y-[-1px]" />
                     </div>
-                    <div className="font-light">Đơn mua</div>
+                    <div className="font-light">Trang chủ</div>
                 </div>
-                <div className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-green-500">
-                        <MdStickyNote2 className="text-white" />
+
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        if (!isLoggedIn) {
+                            if (
+                                window.location.href ===
+                                "http://localhost:3000/login"
+                            ) {
+                                return handleShowToast("Vui lòng đăng nhập")
+                            }
+                            return navigate("/login")
+                        }
+                        navigate("/users/following")
+                    }}
+                >
+                    <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-blue-400">
+                        <FaUsers className="text-white" />
                     </div>
-                    <div className="font-light">Đơn bán</div>
+                    <div className="font-light">Người dùng khác</div>
                 </div>
-            </div> */}
+            </div>
             {/* Tiện ích    */}
             <div>
                 <div className="px-3 py-1 bg-primary text-base text-white font-semibold">
                     Tiện ích
+                </div>
+
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        if (!isLoggedIn) {
+                            if (
+                                window.location.href ===
+                                "http://localhost:3000/login"
+                            ) {
+                                return handleShowToast("Vui lòng đăng nhập")
+                            }
+                            return navigate("/login")
+                        }
+                        navigate("/chat")
+                    }}
+                >
+                    <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-green-500">
+                        <RiMessage2Fill className="text-white" />
+                    </div>
+                    <div className="font-light">Tin nhắn</div>
                 </div>
                 <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
@@ -406,15 +489,15 @@ const Layout = () => {
                             }
                             return navigate("/login")
                         }
-                        handleShowToast("Chức năng đang cập nhật!", "info")
+                        navigate("/dashboard/posts")
                     }}
                 >
-                    <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-blue-400">
-                        <BsFillBookmarkFill className="text-white scale-[0.85]" />
+                    <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-yellow-500">
+                        <FaTools className="text-white scale-[0.85]" />
                     </div>
-                    <div className="font-light">Tìm kiếm đã lưu</div>
+                    <div className="font-light">Quản lí tin</div>
                 </div>
-                <div
+                {/* <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
                     onClick={() => {
                         if (!isLoggedIn) {
@@ -447,7 +530,7 @@ const Layout = () => {
                         <BsStarFill className="text-white" />
                     </div>
                     <div className="font-light">Đánh giá từ tôi</div>
-                </div>
+                </div> */}
             </div>
             {/* Khác */}
             <div>
@@ -474,7 +557,7 @@ const Layout = () => {
                     </div>
                     <div className="font-light">Cài đặt tài khoản</div>
                 </div>
-                <div
+                {/* <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
                     onClick={() => {
                         if (!user) {
@@ -487,7 +570,7 @@ const Layout = () => {
                         <MdHelpCenter className="text-white" />
                     </div>
                     <div className="font-light">Trợ giúp</div>
-                </div>
+                </div> */}
                 {isLoggedIn ? (
                     <div
                         className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
@@ -707,13 +790,20 @@ const Layout = () => {
                         )}
                     </div>
                     {isAccountWindowShowed ? AccountWindow : <></>}
+                    {isAccountWindowShowed ? (
+                        <div className="absolute left-2 z-50 ">
+                            <div className=" !w-0 !h-0 border-transparent border-t-[16px] border-r-[24px] border-b-[16px] border-l-[24px] border-r-white rounded-[2px]"></div>
+                        </div>
+                    ) : (
+                        <></>
+                    )}
                 </li>
             </ul>
         </nav>
     )
 
     const Header = (
-        <header className="h-full bg-background text-[1.25rem]">
+        <header className="h-full bg-background text-[1rem]">
             <div
                 className={`m-auto px-6
                             laptop:max-w-[1024px]
@@ -1017,6 +1107,30 @@ const Layout = () => {
                 </div>
                 <div className="tablet:">{footerHidden ? <></> : Footer}</div>
                 <CustomToastify />
+                {goUpHandlerShowed ? (
+                    <BsFillArrowUpCircleFill
+                        onClick={() => {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: "auto",
+                            })
+                        }}
+                        onMouseEnter={() => {
+                            clearTimeout(timeoutRef.current)
+                        }}
+                        onMouseLeave={() => {
+                            clearTimeout(timeoutRef.current)
+                            timeoutRef.current = setTimeout(() => {
+                                setGoUpHandlerShowed(false)
+                            }, 2000)
+                        }}
+                        className="fixed z-[9999] text-[42px] text-blue-500 opacity-80 hover:opacity-[1] right-5 bottom-20 cursor-pointer 
+                                desktop:right-10
+                            "
+                    />
+                ) : (
+                    <></>
+                )}
             </div>
         </>
     )

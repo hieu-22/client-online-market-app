@@ -100,7 +100,7 @@ const BannerSlider = () => {
         return () => {
             window.removeEventListener("resize", handleResize)
         }
-    }, [window.innerWidth])
+    }, [])
 
     return (
         <div className="w-full my-5 bg-white ">

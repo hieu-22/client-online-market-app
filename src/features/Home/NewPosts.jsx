@@ -137,7 +137,7 @@ const NewPosts = () => {
             <div>
                 {fetchedPosts?.length > 0 ? (
                     <div
-                        className={` bg-white grid  ${
+                        className={`bg-white grid  ${
                             deviceType === "tablet" ||
                             deviceType === "desktop" ||
                             deviceType === "laptop"
@@ -145,22 +145,30 @@ const NewPosts = () => {
                                 : deviceType === "mobile"
                                 ? "grid-cols-2"
                                 : "grid-cols-1"
-                        }  border-t border-gray-200`}
+                        }  border-t border-gray-200 `}
                     >
                         {fetchedPosts.map((post, index) => {
                             return (
-                                <ProductCard
-                                    key={index}
-                                    postId={post?.id}
-                                    title={post?.title}
-                                    price={post?.price}
-                                    author={post?.author}
-                                    timeAgo={post?.timeAgo}
-                                    address={post?.address}
-                                    postUrl={post?.post_url}
-                                    imageUrl={post?.images[0]?.imageUrl}
-                                    description={post?.description}
-                                />
+                                <div
+                                    className={`${
+                                        deviceType === "smallMobile"
+                                            ? "my-2"
+                                            : ""
+                                    }`}
+                                >
+                                    <ProductCard
+                                        key={index}
+                                        postId={post?.id}
+                                        title={post?.title}
+                                        price={post?.price}
+                                        author={post?.author}
+                                        timeAgo={post?.timeAgo}
+                                        address={post?.address}
+                                        postUrl={post?.post_url}
+                                        imageUrl={post?.images[0]?.imageUrl}
+                                        description={post?.description}
+                                    />
+                                </div>
                             )
                         })}{" "}
                     </div>
