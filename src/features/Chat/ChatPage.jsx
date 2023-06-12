@@ -120,6 +120,32 @@ const ChatPage = () => {
         })
     }
 
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
     // components
     const ChatListField = (
         <div className="h-full flex flex-col select-none">
@@ -214,7 +240,7 @@ const ChatPage = () => {
                                                 <FaUserCircle className="w-full h-full text-gray-400 rounded-[50%]"></FaUserCircle>
                                             )}
                                         </div>
-                                        <div className="pl-2 w-[240px]">
+                                        <div className={`pl-2 w-[65%] `}>
                                             <div className="w-full truncate text-base text-gray-700 pb-1">
                                                 {OtherUser.userName}{" "}
                                                 <span
@@ -268,7 +294,7 @@ const ChatPage = () => {
                                         </div>
                                     </div>
                                     {chat?.post ? (
-                                        <div className="rounded-md h-full w-[20%]">
+                                        <div className="rounded-md h-full w-[86px]">
                                             <img
                                                 className="w-full h-full object-cover rounded-md "
                                                 src={
@@ -354,10 +380,25 @@ const ChatPage = () => {
     return (
         <div className="bg-customWhite border-collapse h-full w-full ">
             <div className="laptop:w-laptop mx-auto w-full h-full bg-white border border-slate-200 flex">
-                <div className="w-[45%] h-full border-r border-r-gray-100">
+                <div
+                    className={`${
+                        deviceType === "laptop" || deviceType === "desktop"
+                            ? "w-[45%]"
+                            : "w-full"
+                    }  
+                             h-full border-r border-r-gray-100 `}
+                >
                     {ChatListField}
                 </div>
-                <div className="w-[55%] h-full">{BannerField}</div>
+                <div
+                    className={`${
+                        deviceType === "laptop" || deviceType === "desktop"
+                            ? "block"
+                            : "hidden"
+                    } w-[55%] h-full`}
+                >
+                    {BannerField}
+                </div>
             </div>
         </div>
     )

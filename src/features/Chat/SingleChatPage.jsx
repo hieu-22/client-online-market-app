@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from "react"
 import ChatBannerSlider from "./ChatBannerSlider"
+import "./chat.css"
 // icons
 import { FaUserCircle, FaShare } from "react-icons/fa"
 import { GoKebabVertical, GoKebabHorizontal } from "react-icons/go"
-import { MdDeleteOutline } from "react-icons/md"
+import { MdDeleteOutline, MdOutlineArrowBackIosNew } from "react-icons/md"
 import { AiFillPlusCircle, AiOutlineDelete } from "react-icons/ai"
 import { RiFileAddLine, RiDeleteBin6Line } from "react-icons/ri"
 import { MdEmojiEmotions } from "react-icons/md"
@@ -47,6 +48,7 @@ import { toTimeAgo } from "../../utils/DateUtils"
 import { toast } from "react-toastify"
 import ChatErrorPage from "../Error/ChatErrorPage"
 import Loader from "../../components/Loader"
+import "./chat.css"
 
 const ChatPage = () => {
     const params = useParams()
@@ -428,6 +430,32 @@ const ChatPage = () => {
                     setPreviousPos(pos)
                 }
             )
+        }
+    }
+
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
         }
     }
 
@@ -907,8 +935,22 @@ const ChatPage = () => {
     const ChatBoxField = (
         <div className="h-full flex flex-col justify-between">
             {/* user field  */}
-            <div className="w-full flex justify-between border-y border-gray-200 py-1">
+            <div
+                className={`w-full flex justify-between border-y border-gray-200 py-1 `}
+            >
                 <div className="flex cursor-pointer " onClick={() => {}}>
+                    <div
+                        className={`${
+                            deviceType === "desktop" || deviceType === "laptop"
+                                ? "hidden"
+                                : "flex"
+                        } items-center px-1  hover:text-primary`}
+                        onClick={() => {
+                            navigate("/chat")
+                        }}
+                    >
+                        <MdOutlineArrowBackIosNew className="text-xl"></MdOutlineArrowBackIosNew>
+                    </div>
                     <div className="w-14 h-14 p-2 ">
                         <div className="rounded-[50%] w-full h-full border border-primary">
                             {currentOtherUser?.avatar ? (
@@ -1003,12 +1045,12 @@ const ChatPage = () => {
             {/* post information  */}
             {currentChat?.post ? (
                 <div
-                    className="h-[80px] px-2 py-2 w-full flex gap-x-4 border-b border-gray-200 cursor-pointer hover:bg-slate-100"
+                    className="h-[80px] pl-8 py-2 w-full flex gap-x-4 border-b border-gray-200 cursor-pointer hover:bg-slate-100"
                     onClick={() => {
                         navigate(`/posts/${currentChat?.post?.post_url}`)
                     }}
                 >
-                    <div className="w-[12%] h-full rounded-md">
+                    <div className="w-[80px] h-full rounded-md">
                         {currentChat?.post ? (
                             <img
                                 src={currentChat?.post.images[0]?.imageUrl}
@@ -1096,7 +1138,13 @@ const ChatPage = () => {
                 )}
             </div>
             {/* input field */}
-            <div className="flex justify-between items-end py-3 px-2">
+            <div
+                className={`flex justify-between items-end  py-3 px-2 ${
+                    deviceType === "desktop" || deviceType === "laptop"
+                        ? "py-3"
+                        : "pt-3 pb-6"
+                }`}
+            >
                 <div className="flex items-end">
                     <div className="w-7 h-7 flex items-end justify-center rounded-[50%] border border-transparent hover:border-gray-200 hover:bg-slate-100 cursor-pointer">
                         <AiFillPlusCircle className="w-full h-full text-primary" />
@@ -1167,10 +1215,24 @@ const ChatPage = () => {
                 <ChatErrorPage statusCode={403} message={"Forbidden Error"} />
             ) : (
                 <div className="laptop:w-laptop mx-auto w-full h-full bg-white border border-slate-200 flex">
-                    <div className="w-[45%] h-full border-r border-r-gray-100">
+                    <div
+                        className={`${
+                            deviceType === "desktop" || deviceType === "laptop"
+                                ? "block w-[45%]"
+                                : "hidden"
+                        }  h-full border-r border-r-gray-100`}
+                    >
                         {ChatListField}
                     </div>
-                    <div className="w-[55%] h-full">{ChatBoxField}</div>
+                    <div
+                        className={`${
+                            deviceType === "desktop" || deviceType === "laptop"
+                                ? "w-[55%]"
+                                : "w-full px-2"
+                        }   h-full`}
+                    >
+                        {ChatBoxField}
+                    </div>
                 </div>
             )}
         </div>
