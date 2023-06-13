@@ -409,7 +409,26 @@ const Layout = () => {
                     </div>
                     <div className="font-light">Trang chủ</div>
                 </div>
-
+                <div
+                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
+                    onClick={() => {
+                        if (!isLoggedIn) {
+                            if (
+                                window.location.href ===
+                                "http://localhost:3000/login"
+                            ) {
+                                return handleShowToast("Vui lòng đăng nhập")
+                            }
+                            return navigate("/login")
+                        }
+                        navigate("/posts/new-post")
+                    }}
+                >
+                    <div className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-blue-400">
+                        <MdPostAdd className="text-white scale-[1.1]" />
+                    </div>
+                    <div className="font-light">Đăng tin</div>
+                </div>
                 <div
                     className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
                     onClick={() => {
