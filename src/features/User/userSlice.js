@@ -195,6 +195,14 @@ const userSlice = createSlice({
             const index = action.payload
             state.otherUser.followers.splice(index, 1)
         },
+        removeUserFromFollowedUsers(state, action) {
+            const index = action.payload
+            state.followedUsers.splice(index, 1)
+        },
+        removeUserFromNonFollowedUsers(state, action) {
+            const index = action.payload
+            state.nonFollowedUsers.splice(index, 1)
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -269,6 +277,8 @@ export const {
     toggleIsUserFollowed,
     addVisitingUserToFollowers,
     removeVisitingUserToFollowers,
+    removeUserFromFollowedUsers,
+    removeUserFromNonFollowedUsers,
 } = userSlice.actions
 
 export default userSlice.reducer

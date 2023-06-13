@@ -7,6 +7,7 @@ import {
     followUserThunk,
     toggleIsUserFollowed,
     unfollowUserThunk,
+    removeUserFromFollowedUsers,
 } from "./userSlice"
 import { addChatByUserIdThunk } from "../Chat/chatSlice"
 import { toTimeAgo } from "../../utils/DateUtils"
@@ -155,6 +156,7 @@ const FollowedUsersListPage = () => {
             >
                 <div className="flex justify-center items-center">
                     <Link
+                        to={`/user/${id}`}
                         className={`rounded-[50%]  ${
                             deviceType === "smallMobile"
                                 ? "h-12 w-12"
@@ -173,7 +175,10 @@ const FollowedUsersListPage = () => {
                     </Link>
                 </div>
                 <div className="flex flex-col justify-between">
-                    <Link className="text-lg my-2 font-semibold">
+                    <Link
+                        to={`/user/${id}`}
+                        className="text-lg my-2 font-semibold"
+                    >
                         {userName ? userName : ""}
                         <span
                             className={
@@ -300,6 +305,9 @@ const FollowedUsersListPage = () => {
                                     onClick={(event) => {
                                         event.stopPropagation()
                                         toggleUserMenu(index)
+                                        dispatch(
+                                            removeUserFromFollowedUsers(index)
+                                        )
                                     }}
                                 >
                                     Xóa, gỡ
