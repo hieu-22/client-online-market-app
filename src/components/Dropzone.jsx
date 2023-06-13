@@ -10,6 +10,7 @@ const Dropzone = ({
     className,
     closeDropzone,
     saveImages,
+    deviceType,
 }) => {
     const onDrop = useCallback((acceptedFiles) => {
         // Do something with the files
@@ -26,7 +27,7 @@ const Dropzone = ({
 
     return (
         <div
-            className={`fixed shadow-big max-w-[80vw] rounded-md bg-white cursor-pointer w-[600px] ${className}`}
+            className={`fixed shadow-big max-w-[90vw] rounded-md bg-white cursor-pointer w-[600px] ${className}`}
             onClick={(event) => {
                 event.stopPropagation()
             }}
@@ -54,12 +55,29 @@ const Dropzone = ({
                 )}
 
                 {images.length === 1 ? (
-                    <div className="mx-20 my-6" {...getRootProps()}>
+                    <div
+                        className={`${
+                            deviceType === "smallMobile"
+                                ? "mx-8"
+                                : deviceType === "mobile"
+                                ? "mx-16"
+                                : "mx-20"
+                        } my-6`}
+                        {...getRootProps()}
+                    >
                         <input {...getInputProps()} />
                         {images.map((image, index) => {
                             return (
                                 <div className="relative" key={index}>
-                                    <div className="relative h-[400px] w-full p-1 border-[1px] border-gray-200 rounded-md bg-white ">
+                                    <div
+                                        className={`relative  ${
+                                            deviceType === "smallMobile"
+                                                ? "h-[260px]"
+                                                : deviceType === "mobile"
+                                                ? "h-[360px]"
+                                                : "h-[400px]"
+                                        }  w-full p-1 border-[1px] border-gray-200 rounded-md bg-white`}
+                                    >
                                         <img
                                             className={`object-cover w-full h-full rounded-[50%]`}
                                             src={image.imageURL}

@@ -285,7 +285,7 @@ const Layout = () => {
                             <div className={`relative h-10 w-10 rounded-[50%]`}>
                                 {user?.avatar ? (
                                     <img
-                                        className="w-full h-full object-cover rounded-[50%]"
+                                        className="w-full h-full object-cover rounded-[50%] image-rendering-pixelated"
                                         src={user.avatar}
                                         alt="avatar"
                                     />
@@ -497,40 +497,6 @@ const Layout = () => {
                     </div>
                     <div className="font-light">Quản lí tin</div>
                 </div>
-                {/* <div
-                    className="flex items-center gap-x-2 py-2 px-4 bg-stale hover:bg-background cursor-pointer"
-                    onClick={() => {
-                        if (!isLoggedIn) {
-                            if (
-                                window.location.href ===
-                                "http://localhost:3000/login"
-                            ) {
-                                return handleShowToast("Vui lòng đăng nhập")
-                            }
-                            return navigate("/login")
-                        }
-                        handleShowToast("Chức năng đang cập nhật!", "info")
-                    }}
-                >
-                    <div
-                        className="flex items-center justify-center w-6 h-6 rounded-[50%] bg-yellow-500"
-                        onClick={() => {
-                            if (!isLoggedIn) {
-                                if (
-                                    window.location.href ===
-                                    "http://localhost:3000/login"
-                                ) {
-                                    return handleShowToast("Vui lòng đăng nhập")
-                                }
-                                return navigate("/login")
-                            }
-                            handleShowToast("Chức năng đang cập nhật!", "info")
-                        }}
-                    >
-                        <BsStarFill className="text-white" />
-                    </div>
-                    <div className="font-light">Đánh giá từ tôi</div>
-                </div> */}
             </div>
             {/* Khác */}
             <div>
@@ -762,7 +728,7 @@ const Layout = () => {
                                     <div className="w-6 h-6 rounded-[50%]">
                                         {user?.avatar ? (
                                             <img
-                                                className="w-full h-full object-cover rounded-[50%]"
+                                                className="w-full h-full object-cover rounded-[50%] image-rendering-pixelated"
                                                 src={user.avatar}
                                                 alt="avatar"
                                             />

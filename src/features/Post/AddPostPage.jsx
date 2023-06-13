@@ -57,8 +57,7 @@ const AddPostPage = () => {
         onDrop,
     })
 
-    /**HANDLERS */
-
+    /*HANDLERS */
     const handleAddPost = async () => {
         if (!postTitle) {
             setPostTitleEmpty(true)
@@ -120,6 +119,45 @@ const AddPostPage = () => {
         })
     }
 
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    /**
+     * to asign the `deviceType` state
+     * @first set `const [deviceType, setDeviceType] = useState(null)`
+     * @secondly set: `useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])`
+     * @result `deviceType` value is one of array items ["smallMobile", "mobile", "tablet", "laptop", "desktop"]
+     */
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
     const ImagesUploader = (
         <>
             <h1 className="text-lg font-semibold my-2">Ảnh / video sản phẩm</h1>
@@ -148,7 +186,11 @@ const AddPostPage = () => {
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-3 gap-4">
+                <div
+                    className={`grid ${
+                        deviceType === "tablet" ? "grid-cols-6" : "grid-cols-3"
+                    } gap-4`}
+                >
                     <div className="border-dotted border-2 border-primary  bg-customWhite w-full">
                         <div
                             {...getRootProps()}
@@ -520,7 +562,10 @@ const AddPostPage = () => {
                         setShowAddressForm(false)
                     }}
                 >
-                    <AddressForm showAddressForm={setShowAddressForm} />
+                    <AddressForm
+                        showAddressForm={setShowAddressForm}
+                        deviceType={deviceType}
+                    />
                 </div>
             ) : (
                 <></>
@@ -535,9 +580,29 @@ const AddPostPage = () => {
                 setShowProductConditionOption(false)
             }}
         >
-            <div className="laptop:w-laptop bg-white p-6 rounded-md m-auto flex gap-x-12">
-                <div className="w-2/6">{ImagesUploader}</div>
-                <div className="w-4/6">
+            <div
+                className={`laptop:w-laptop ${
+                    deviceType === "desktop" || deviceType === "laptop"
+                        ? "flex"
+                        : ""
+                }  gap-x-12 bg-white p-6 rounded-md m-auto `}
+            >
+                <div
+                    className={`w-full ${
+                        deviceType === "desktop" || deviceType === "laptop"
+                            ? "w-2/6"
+                            : ""
+                    }`}
+                >
+                    {ImagesUploader}
+                </div>
+                <div
+                    className={`w-full ${
+                        deviceType === "desktop" || deviceType === "laptop"
+                            ? "w-4/6"
+                            : ""
+                    }`}
+                >
                     <div className="">{ProductInput}</div>
                     <div className="flex items-center justify-between gap-x-6 mt-9">
                         <button className=" block w-[50%] py-2 border border-primary text-primary rounded-md hover:bg-hover-primary  ">

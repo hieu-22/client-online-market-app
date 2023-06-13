@@ -168,11 +168,14 @@ const SinglePostPage = () => {
         // Get the current URL
         const url = window.location.href
 
-        // Copy the URL to the clipboard
-        navigator.clipboard.writeText(url)
-
-        // Notify the user that the URL has been copied
-        alert("Đã copy Link")
+        navigator.clipboard.readText().then((clipboardText) => {
+            if (clipboardText === url) {
+                return
+            } else {
+                navigator.clipboard.writeText(url)
+                handleShowToast("Đã lưu Link", "info")
+            }
+        })
     }
 
     const handleGoAuthorPage = async () => {
@@ -265,6 +268,44 @@ const SinglePostPage = () => {
             setDeviceType("laptop")
         } else {
             setDeviceType("desktop")
+        }
+    }
+
+    // ---handle show toast
+    const [isToastActive, setIsToastActive] = useState(false)
+    /**
+     * Show a toast with specified message and in specified status
+     * @param {string} message - The message that you want to show.
+     * @param {string} status - Should be included in ["info","warn","error"].
+     * @example
+     * // Display a toast with message "Something's wrong" in warn type
+     * handleShowToast("Something's wrong", "warn")
+     */
+    const handleShowToast = (message, status) => {
+        if (!isToastActive) {
+            if (status === "info") {
+                toast.info(message, {
+                    autoClose: 1000,
+                })
+            } else if (status === "warn") {
+                toast.warn(message, {
+                    autoClose: 1000,
+                })
+            } else if (status === "error") {
+                toast.error(message, {
+                    autoClose: 1000,
+                })
+            } else {
+                toast(message, {
+                    autoClose: 1000,
+                })
+            }
+
+            setIsToastActive(true)
+            setTimeout(() => {
+                setIsToastActive(false)
+            }, 3000)
+            return
         }
     }
 
@@ -415,11 +456,24 @@ const SinglePostPage = () => {
                             onClick={() => {
                                 if (!showAuthorPhoneNumber)
                                     return setShowAuthorPhoneNumber(true)
-
-                                navigator.clipboard.writeText(
-                                    author?.phoneNumber
-                                )
-                                alert("Đã sao chép SĐT")
+                                navigator.clipboard
+                                    .readText()
+                                    .then((clipboardText) => {
+                                        if (
+                                            clipboardText ===
+                                            author?.phoneNumber
+                                        ) {
+                                            return
+                                        } else {
+                                            navigator.clipboard.writeText(
+                                                author?.phoneNumber
+                                            )
+                                            handleShowToast(
+                                                "Đã lưu số điện thoại",
+                                                "info"
+                                            )
+                                        }
+                                    })
                             }}
                         >
                             {author?.phoneNumber ? (

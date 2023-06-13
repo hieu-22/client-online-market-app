@@ -492,12 +492,13 @@ const AuthorizedUserPage = () => {
             <Dropzone
                 className={"top-[120px]"}
                 text="Tải ảnh lên"
-                title="Cập nhập ảnh đại diện"
+                title="Cập nhật ảnh đại diện"
                 setImages={setAvatarImage}
                 images={avatarImage}
                 isCircle="true"
                 closeDropzone={handleCloseImageUploader}
                 saveImages={handleUpdateAvatar}
+                deviceType={deviceType}
             />
         </div>
     )

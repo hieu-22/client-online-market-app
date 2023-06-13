@@ -138,6 +138,32 @@ const UserSettingPage = () => {
         dispatch(resetError())
     }, window.performance.navigation.type === 1)
 
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
     const handleCloseImageUploader = () => {
         if (showImageUploader) {
             setShowImageUploader(false)
@@ -191,7 +217,11 @@ const UserSettingPage = () => {
             onClick={handleCloseImageUploader}
         >
             <Dropzone
-                className={"top-[100px]"}
+                className={`${
+                    deviceType === "laptop" || deviceType === "desktop"
+                        ? "top-[100px]"
+                        : "top-[20%]"
+                } `}
                 text="Tải ảnh lên"
                 title="Cập nhập ảnh đại diện"
                 setImages={setAvatarImage}
@@ -199,6 +229,7 @@ const UserSettingPage = () => {
                 isCircle="true"
                 closeDropzone={handleCloseImageUploader}
                 saveImages={handleUpdateAvatar}
+                deviceType={deviceType}
             />
         </div>
     )
@@ -552,8 +583,26 @@ const UserSettingPage = () => {
                 {/* Hồ sơ cá nhân */}
                 <div>
                     <div className="text-lg font-bold">Hồ sơ cá nhân</div>
-                    <div className="flex gap-x-2">
-                        <div className="w-[40%] p-4">{userAvatarFiled}</div>
+                    <div
+                        className={`flex gap-x-2 ${
+                            deviceType === "laptop" ||
+                            deviceType === "desktop" ||
+                            deviceType === "tablet"
+                                ? ""
+                                : "flex-col"
+                        }`}
+                    >
+                        <div
+                            className={`${
+                                deviceType === "laptop" ||
+                                deviceType === "desktop" ||
+                                deviceType === "tablet"
+                                    ? "w-[40%]"
+                                    : "w-full"
+                            } p-4`}
+                        >
+                            {userAvatarFiled}
+                        </div>
                         <div className="flex-1 p-4 pt-5">
                             <div className="py-2">{UserEmailField}</div>
                             <div className="py-2">{UserNameField}</div>
@@ -589,7 +638,13 @@ const UserSettingPage = () => {
                 link1={`/user/myProfile`}
                 title2={"Cài đặt tài khoản"}
             ></Breadcrumb>
-            <div className="laptop:w-laptop m-auto">{ChangeProfileField}</div>
+            <div
+                className={`laptop:max-w-[1024px] m-auto ${
+                    deviceType === "desktop" ? "px-0" : "px-6"
+                }`}
+            >
+                {ChangeProfileField}
+            </div>
             {showImageUploader ? ImageUploader : <></>}
         </div>
     )

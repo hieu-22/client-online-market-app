@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useState } from "react"
 import { useEffect } from "react"
 
-const AddressForm = ({ showAddressForm }) => {
+const AddressForm = ({ showAddressForm, deviceType }) => {
     const dispatch = useDispatch()
 
     const address = useSelector(selectAddress)
@@ -479,9 +479,11 @@ const AddressForm = ({ showAddressForm }) => {
 
     return (
         <div
-            className={
-                "fixed z-[99] w-[500px] py-6 px-6 bg-white translate-y-[35%] rounded-md shadow-big"
-            }
+            className={`fixed z-[99] ${
+                deviceType === "smallMobile" || deviceType === "mobile"
+                    ? "w-[80vw]"
+                    : "w-[500px]"
+            } py-6 px-6 bg-white translate-y-[35%] rounded-md shadow-big`}
             onClick={(event) => {
                 event.stopPropagation()
                 setShowProvincesList(false)
