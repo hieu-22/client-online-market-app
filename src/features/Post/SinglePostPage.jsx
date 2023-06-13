@@ -175,7 +175,7 @@ const SinglePostPage = () => {
         alert("Đã copy Link")
     }
 
-    const handleLookPoster = async () => {
+    const handleGoAuthorPage = async () => {
         const userId = post?.user_id
         navigate(`/user/${userId}`)
     }
@@ -242,6 +242,33 @@ const SinglePostPage = () => {
         navigate(`/chat/${chatId}`)
     }
 
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
+    /**COMPONENTS */
     const quickQuestionList = []
 
     const ProductImageSlider = (
@@ -260,6 +287,188 @@ const SinglePostPage = () => {
                   })
                 : ""}
         </Slider>
+    )
+
+    const AuthorFiled = (
+        <div
+            className={`${
+                authorFieldFixed &&
+                (deviceType === "laptop" || deviceType === "desktop")
+                    ? "fixed top-0 w-[340px]"
+                    : "relative"
+            } border-t border-t-gray-200 py-2 ${
+                deviceType === "laptop" || deviceType === "desktop"
+                    ? "w-[340px]"
+                    : "w-full"
+            }`}
+        >
+            <div
+                className="flex justify-start cursor-pointer bg-customWhite py-2 rounded-md px-2"
+                onClick={handleGoAuthorPage}
+            >
+                <div className="w-12 h-12 rounded-[50%] border border-primary mr-4 ">
+                    {author?.avatar ? (
+                        <img
+                            src={author.avatar}
+                            alt="avatar"
+                            className="w-full h-full object-cover rounded-[50%]"
+                        />
+                    ) : (
+                        <>
+                            <FaUserCircle className="w-full h-full text-gray-400 rounded-[50%]"></FaUserCircle>
+                        </>
+                    )}
+                </div>
+                <div className="flex-1 flex flex-col">
+                    <div className="">
+                        <div className="flex items-center gap-x-2 text-base text-blue-800 font-medium hover:text-gray-700 hover:underline line-clamp-1">
+                            {author?.userName ? author.userName : ""}
+                        </div>
+                        <div className="flex items-center gap-x-2">
+                            <div
+                                className={
+                                    `w-2 h-2 rounded-[50%] ` +
+                                    (author?.isOnline
+                                        ? "bg-green-600"
+                                        : "bg-gray-600")
+                                }
+                            ></div>
+                            <div
+                                className={
+                                    "text-2xs font-medium " +
+                                    (author?.isOnline
+                                        ? "text-green-700"
+                                        : "text-gray-600")
+                                }
+                            >
+                                {author?.isOnline ? (
+                                    "Đang hoạt động"
+                                ) : (
+                                    <>{toTimeAgo(author?.updatedAt)}</>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="my-2 py-2 border-t border-b border-gray-200">
+                <div className="text-gray-400 text-sm font-semibold">
+                    Đánh giá:{" "}
+                    <span className="px-2"> {true ? "---" : "starts"}</span>
+                </div>
+            </div>
+            <div>
+                {user?.id === post?.user_id ? (
+                    <>
+                        <div
+                            className={`${
+                                deviceType === "tablet" ? "w-[50%]" : "w-full"
+                            } my-2 flex items-center justify-center text-sm bg-light-primary rounded-md py-3 px-3  cursor-pointer font-semibold text-white hover:bg-primary`}
+                            onClick={(event) => {
+                                event.stopPropagation()
+                                setShowDeletPostByIdConfirmation(true)
+                            }}
+                        >
+                            <div className="flex">
+                                <div className="mr-2">
+                                    <BiHide className="w-6 h-6" />
+                                </div>
+                            </div>
+                            <div className="font-semibold  hover:underline">
+                                Đã bán/Ẩn tin
+                            </div>
+                        </div>
+                        <div
+                            className={`${
+                                deviceType === "tablet" ? "w-[50%]" : "w-full"
+                            } my-2 flex items-end justify-center border border-gray-300  rounded-md py-3 px-3  text-sm cursor-pointer hover:bg-slate-100 text-gray-700
+                        `}
+                            onClick={() => {
+                                navigate(`/update-post/${post?.post_url}`)
+                            }}
+                        >
+                            <div className="flex">
+                                <div className="mr-2">
+                                    <AiOutlineEdit className="w-6 h-6" />
+                                </div>
+                            </div>
+                            <div className="font-semibold  hover:underline">
+                                Sửa tin
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div
+                            className={
+                                `${
+                                    deviceType === "tablet"
+                                        ? "w-[50%]"
+                                        : "w-full"
+                                }` +
+                                " my-2 flex items-end" +
+                                (author?.phoneNumber && showAuthorPhoneNumber
+                                    ? " justify-around "
+                                    : " justify-between ") +
+                                "border border-gray-300 rounded-md py-3 px-3 text-sm cursor-pointer font-semibold text-gray-700 hover:bg-gray-200"
+                            }
+                            onClick={() => {
+                                if (!showAuthorPhoneNumber)
+                                    return setShowAuthorPhoneNumber(true)
+
+                                navigator.clipboard.writeText(
+                                    author?.phoneNumber
+                                )
+                                alert("Đã sao chép SĐT")
+                            }}
+                        >
+                            {author?.phoneNumber ? (
+                                showAuthorPhoneNumber ? (
+                                    author.phoneNumber
+                                ) : (
+                                    <>
+                                        <div className="flex items-end">
+                                            <div>
+                                                <BsFillTelephoneForwardFill className="w-6 h-6 mt-[2px]" />
+                                            </div>
+                                            <div className="pl-4">
+                                                {author?.phoneNumber.slice(
+                                                    0,
+                                                    -5
+                                                ) + "*****"}
+                                            </div>
+                                        </div>
+
+                                        <div className="font-semibold ">
+                                            Bấm để hiện số
+                                        </div>
+                                    </>
+                                )
+                            ) : (
+                                "...loading"
+                            )}
+
+                            {}
+                        </div>
+                        <div
+                            className={`${
+                                deviceType === "tablet" ? "w-[50%]" : "w-full"
+                            } my-2 flex items-end justify-between  rounded-md py-3 px-3 text-sm cursor-pointer bg-light-primary text-white hover:opacity-80`}
+                            onClick={handleChatWithAuthour}
+                        >
+                            <div className="flex">
+                                <div>
+                                    <TbMessageCircle2Filled className="w-7 h-7" />
+                                </div>
+                            </div>
+                            <div className="font-semibold ">
+                                Chat với người bán
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
     )
 
     const PostField = (
@@ -327,41 +536,21 @@ const SinglePostPage = () => {
                 </p>
             </div>
 
-            {/* phone Number, true to hide phoneNumber, false to show phoneNumber */}
-            <div className=" text-sm">
+            {/* Người bán  */}
+            <div
+                className={`${
+                    deviceType === "laptop" || deviceType === "desktop"
+                        ? "hidden"
+                        : "block "
+                }`}
+            >
                 <div className="text-base font-semibold text-gray-500">
-                    Liên hệ
+                    Người bán
                 </div>
-                <p
-                    className={
-                        `text-blue-400 underline cursor-pointer` +
-                        (showAuthorPhoneNumber
-                            ? "no-underline !text-black"
-                            : "")
-                    }
-                >
-                    {showAuthorPhoneNumber
-                        ? "Số điện thoại: "
-                        : "Nhấn để hiện số: "}
-
-                    <span
-                        className={"font-bold hover:underline"}
-                        onClick={() => {
-                            if (!showAuthorPhoneNumber)
-                                return setShowAuthorPhoneNumber(true)
-
-                            navigator.clipboard.writeText(author?.phoneNumber)
-                            alert("Đã copy số điện thoại")
-                        }}
-                    >
-                        {author?.phoneNumber
-                            ? showAuthorPhoneNumber
-                                ? author.phoneNumber
-                                : author?.phoneNumber.slice(0, -5) + "*****"
-                            : "...loading"}
-                    </span>
-                </p>
+                {AuthorFiled}
             </div>
+
+            {/* phone Number, true to hide phoneNumber, false to show phoneNumber */}
 
             {/* Areas  */}
             <div className="pb-3 text-sm">
@@ -413,175 +602,6 @@ const SinglePostPage = () => {
         </div>
     )
 
-    const AuthorFiled = (
-        <div
-            className={
-                (authorFieldFixed ? " fixed top-0 w-[376px] " : " relative ") +
-                `border-t border-t-gray-200 py-2`
-            }
-        >
-            <div
-                className="flex gap-x-3 justify-between cursor-pointer"
-                onClick={handleLookPoster}
-            >
-                <div className="w-14 h-14 rounded-[50%] p-[1px] border border-primary">
-                    {author?.avatar ? (
-                        <img
-                            src={author.avatar}
-                            alt="avatar"
-                            className="w-full h-full object-cover rounded-[50%]"
-                        />
-                    ) : (
-                        <>
-                            <FaUserCircle className="w-full h-full text-gray-400 rounded-[50%]"></FaUserCircle>
-                        </>
-                    )}
-                </div>
-                <div className="flex flex-col justify-between ml-[-12px]">
-                    <div className="text-base text-blue-800 font-medium hover:text-gray-700 hover:underline ">
-                        {author?.userName ? author.userName : ""}
-                    </div>
-                    <div className="flex items-center gap-x-2 w-[140px] mb-2">
-                        <div
-                            className={
-                                `w-2 h-2 rounded-[50%] ` +
-                                (author?.isOnline
-                                    ? "bg-green-600"
-                                    : "bg-gray-600")
-                            }
-                        ></div>
-                        <div
-                            className={
-                                "text-2xs font-medium " +
-                                (author?.isOnline
-                                    ? "text-green-700"
-                                    : "text-gray-600")
-                            }
-                        >
-                            {author?.isOnline ? (
-                                "Đang hoạt động"
-                            ) : (
-                                <>{toTimeAgo(author?.updatedAt)}</>
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div className="px-3 py-2 mt-2 text-white bg-primary rounded-[20px] hover:bg-light-primary text-sm font-medium">
-                        Xem người đăng
-                    </div>
-                </div>
-            </div>
-            <div className="my-2 py-2 border-t border-b border-gray-200">
-                <div className="text-gray-400 text-sm font-semibold">
-                    Đánh giá:{" "}
-                    <span className="px-2"> {true ? "---" : "starts"}</span>
-                </div>
-            </div>
-            <div>
-                {user?.id === post?.user_id ? (
-                    <>
-                        <div
-                            className={
-                                " my-2 flex items-center justify-center text-sm bg-light-primary rounded-md py-3 px-3 w-full  cursor-pointer font-semibold text-white hover:bg-primary"
-                            }
-                            onClick={(event) => {
-                                event.stopPropagation()
-                                setShowDeletPostByIdConfirmation(true)
-                            }}
-                        >
-                            <div className="flex">
-                                <div className="mr-2">
-                                    <BiHide className="w-6 h-6" />
-                                </div>
-                            </div>
-                            <div className="font-semibold  hover:underline">
-                                Đã bán/Ẩn tin
-                            </div>
-                        </div>
-                        <div
-                            className="my-2 flex items-end justify-center border border-gray-300  rounded-md py-3 px-3 w-full text-sm cursor-pointer hover:bg-slate-100 text-gray-700 "
-                            onClick={() => {
-                                navigate(`/update-post/${post?.post_url}`)
-                            }}
-                        >
-                            <div className="flex">
-                                <div className="mr-2">
-                                    <AiOutlineEdit className="w-6 h-6" />
-                                </div>
-                            </div>
-                            <div className="font-semibold  hover:underline">
-                                Sửa tin
-                            </div>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div
-                            className={
-                                " my-2 flex items-end" +
-                                (author?.phoneNumber && showAuthorPhoneNumber
-                                    ? " justify-around "
-                                    : " justify-between ") +
-                                "border border-gray-300 rounded-md py-3 px-3 w-full text-sm cursor-pointer font-semibold text-gray-700 hover:bg-gray-200"
-                            }
-                            onClick={() => {
-                                if (!showAuthorPhoneNumber)
-                                    return setShowAuthorPhoneNumber(true)
-
-                                navigator.clipboard.writeText(
-                                    author?.phoneNumber
-                                )
-                                alert("Đã sao chép SĐT")
-                            }}
-                        >
-                            {author?.phoneNumber ? (
-                                showAuthorPhoneNumber ? (
-                                    author.phoneNumber
-                                ) : (
-                                    <>
-                                        <div className="flex items-end">
-                                            <div>
-                                                <BsFillTelephoneForwardFill className="w-6 h-6 mt-[2px]" />
-                                            </div>
-                                            <div className="pl-4">
-                                                {author?.phoneNumber.slice(
-                                                    0,
-                                                    -5
-                                                ) + "*****"}
-                                            </div>
-                                        </div>
-
-                                        <div className="font-semibold ">
-                                            Bấm để hiện số
-                                        </div>
-                                    </>
-                                )
-                            ) : (
-                                "...loading"
-                            )}
-
-                            {}
-                        </div>
-                        <div
-                            className="my-2 flex items-end justify-between  rounded-md py-3 px-3 w-full text-sm cursor-pointer bg-light-primary text-white hover:opacity-80"
-                            onClick={handleChatWithAuthour}
-                        >
-                            <div className="flex">
-                                <div>
-                                    <TbMessageCircle2Filled className="w-7 h-7" />
-                                </div>
-                            </div>
-                            <div className="font-semibold ">
-                                Chat với người bán
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-        </div>
-    )
-
     return (
         <div className="bg-customWhite">
             {postError?.statusCode ? (
@@ -591,16 +611,42 @@ const SinglePostPage = () => {
                 />
             ) : (
                 <>
-                    <div className="laptop:w-laptop bg-white m-auto px-6">
-                        <Breadcrumb
-                            title1={"Bài đăng"}
-                            link1={"/"}
-                            title2={post?.title ? post.title : "...loading"}
-                        ></Breadcrumb>
-                    </div>
-                    <div className="laptop:w-laptop m-auto bg-white flex">
-                        <div className="w-[600px] pl-6 pb-3">{PostField}</div>
-                        <div className="flex-1 px-6 pb-3">{AuthorFiled}</div>
+                    <Breadcrumb
+                        title1={"Bài đăng"}
+                        link1={"/"}
+                        title2={post?.title ? post.title : "...loading"}
+                    ></Breadcrumb>
+                    <div
+                        className={` ${
+                            deviceType === "desktop" || deviceType === "laptop"
+                                ? "max-w-[1024px]"
+                                : ""
+                        } ${
+                            deviceType === "desktop" ? "px-0" : "px-6"
+                        }  m-auto`}
+                    >
+                        <div className={`bg-white flex py-6`}>
+                            <div
+                                className={` ${
+                                    deviceType === "desktop" ||
+                                    deviceType === "laptop"
+                                        ? "w-[600px] pl-6 pb-3"
+                                        : "w-full px-6"
+                                }  `}
+                            >
+                                {PostField}
+                            </div>
+                            <div
+                                className={`${
+                                    deviceType === "laptop" ||
+                                    deviceType === "desktop"
+                                        ? "flex-1 flex px-6 pb-3"
+                                        : "hidden"
+                                } `}
+                            >
+                                {AuthorFiled}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Other Windows  */}

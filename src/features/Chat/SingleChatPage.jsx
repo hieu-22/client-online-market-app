@@ -967,7 +967,7 @@ const ChatPage = () => {
                         </div>
                     </div>
                     <div className="flex flex-col justify-between ">
-                        <div className="text-lg text-blue-800 font-medium hover:text-gray-700 hover:underline ">
+                        <div className="text-lg text-blue-800 font-medium hover:text-gray-700 hover:underline text-ellipsis line-clamp-1">
                             {currentOtherUser?.userName
                                 ? currentOtherUser.userName
                                 : "loading..."}

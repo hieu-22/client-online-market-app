@@ -305,7 +305,7 @@ const Layout = () => {
                             </div>
                             <div className="flex-1  ">
                                 <div
-                                    className="text-lg font-medium hover:opacity-70 truncate"
+                                    className="text-lg font-medium hover:opacity-70 truncate text-ellipsis line-clamp-1"
                                     onClick={(event) => {
                                         handleCloseAllWindows()
                                         const currentUrl = location.pathname
@@ -772,7 +772,7 @@ const Layout = () => {
                                             </>
                                         )}
                                     </div>
-                                    <div className="text-text">
+                                    <div className="text-text text-ellipsis line-clamp-1">
                                         {user?.userName ? user.userName : ""}
                                     </div>
                                     <div>

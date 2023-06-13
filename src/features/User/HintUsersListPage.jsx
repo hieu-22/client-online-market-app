@@ -17,7 +17,7 @@ import { IoOptions } from "react-icons/io5"
 import { BsChatFill } from "react-icons/bs"
 import { MdOutlineDone } from "react-icons/md"
 import { ImCancelCircle } from "react-icons/im"
-import { FaUserCheck, FaUserPlus } from "react-icons/fa"
+import { FaUserCheck, FaUserPlus, FaUserAltSlash } from "react-icons/fa"
 //
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import Breadcrumb from "../../components/Breadcrumb"
@@ -39,6 +39,31 @@ const HintUsersListPage = () => {
         }
     }, [user])
 
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
     // handlers
     const handleFollowUser = async (userId, index) => {
         const followerId = user.id
@@ -119,14 +144,20 @@ const HintUsersListPage = () => {
     }) => {
         return (
             <div
-                className="relative select-none flex gap-x-5 w-[500px] border rounded-lg bg-white px-5 py-5"
+                className={`relative select-none flex gap-x-5 w-[100%] border rounded-lg bg-white px-5  ${
+                    deviceType === "smallMobile" ? "pt-1 pb-3" : "py-5"
+                }`}
                 onClick={() => {
                     handleCloseAllMenu()
                 }}
             >
-                <div className="flex justify-center">
+                <div className="flex justify-center items-center">
                     <Link
-                        className={`rounded-[50%] h-20 w-20 border-2 border-primary cursor-pointer`}
+                        className={`rounded-[50%]  ${
+                            deviceType === "smallMobile"
+                                ? "h-12 w-12"
+                                : "h-20 w-20"
+                        } border-2 border-primary cursor-pointer`}
                     >
                         {avatar ? (
                             <img
@@ -148,18 +179,28 @@ const HintUsersListPage = () => {
                                 (isOnline ? "bg-green-600" : "bg-gray-600")
                             }
                         ></span>
-                        {isOnline ? (
-                            <span className="text-green-600 text-xs">
-                                Đang hoạt động
-                            </span>
+                        {deviceType === "smallMobile" ? (
+                            <></>
                         ) : (
-                            <span className="text-gray-600 text-xs">
-                                Không hoạt động
-                            </span>
+                            <>
+                                {isOnline ? (
+                                    <span className="text-green-600 text-xs">
+                                        Đang hoạt động
+                                    </span>
+                                ) : (
+                                    <span className="text-gray-600 text-xs">
+                                        Không hoạt động
+                                    </span>
+                                )}
+                            </>
                         )}
                     </Link>
                     <div
-                        className="flex gap-x-4"
+                        className={`flex gap-x-4 ${
+                            deviceType === "smallMobile"
+                                ? "text-xs"
+                                : "text-base"
+                        }`}
                         onClick={(event) => {
                             event.stopPropagation()
                         }}
@@ -216,7 +257,11 @@ const HintUsersListPage = () => {
                         event.stopPropagation()
                         toggleUserMenu(index)
                     }}
-                    className="group w-8 h-8 absolute top-3 right-7 select-none cursor-pointer rounded-[20px] border-gray-500 font-extrabold text-center"
+                    className={`group w-8 h-8 absolute  ${
+                        deviceType === "smallMobile"
+                            ? "right-3 top-2"
+                            : "top-3 right-7"
+                    } select-none cursor-pointer rounded-[20px] border-gray-500 font-extrabold text-center`}
                 >
                     <div
                         className={`w-8 h-8 text-slate-600 ${
@@ -269,9 +314,19 @@ const HintUsersListPage = () => {
     return (
         <div className="bg-customWhite">
             <Breadcrumb title1={"users > gợi ý"} />
-            <div className="laptop:w-laptop m-auto pb-10">
+            <div
+                className={`laptop:w-laptop ${
+                    deviceType === "desktop" ? "px-0" : "px-6"
+                } m-auto pb-10 mt-[-4px]`}
+            >
                 <div className="mb-4 mr-2 border-b ">{Header}</div>
-                <div className="grid grid-cols-2 gap-x-2 gap-y-2">
+                <div
+                    className={`grid ${
+                        deviceType === "desktop" || deviceType === "laptop"
+                            ? "grid-cols-2"
+                            : "grid-cols-1"
+                    } gap-x-2 gap-y-2`}
+                >
                     {nonFollowingUsers ? (
                         nonFollowingUsers.map((user, index) => {
                             return (
@@ -288,7 +343,21 @@ const HintUsersListPage = () => {
                             )
                         })
                     ) : (
-                        <></>
+                        <div
+                            className={`${
+                                deviceType === "desktop" ||
+                                deviceType === "laptop"
+                                    ? "w-[200%]"
+                                    : "w-full"
+                            } bg-white m-auto flex flex-col items-center rounded-xl  py-6`}
+                        >
+                            <div className="text-[40px] text-slate-400">
+                                <FaUserAltSlash></FaUserAltSlash>
+                            </div>
+                            <h2 className="text-gray-800 text-lg">
+                                Bạn chưa có gợi ý nào!
+                            </h2>
+                        </div>
                     )}
                 </div>
             </div>

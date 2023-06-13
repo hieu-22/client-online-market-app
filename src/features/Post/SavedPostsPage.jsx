@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import Breadcrumb from "../../components/Breadcrumb"
 import { useDispatch, useSelector } from "react-redux"
 import { selectUser } from "../Auth/authSlice"
@@ -45,6 +45,33 @@ const SavedPostsPage = () => {
         console.log("At ProductCard, handleDeleteSavedPost res: ", res)
         dispatch(resetStatus())
     }
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
+    /**COMPONENTS */
     const SavedPostField = (
         <div>
             {savedPosts?.length > 0 ? (
@@ -54,25 +81,37 @@ const SavedPostsPage = () => {
                         return (
                             <div
                                 key={index}
-                                className="h-[140px] p-4 w-full flex gap-x-4 border-b border-gray-300 cursor-pointer hover:bg-slate-100"
+                                className="relative h-[120px] py-4 pr-4 w-full flex border-b border-gray-300 cursor-pointer hover:bg-slate-100"
                                 onClick={() => {
                                     navigate(
                                         `/posts/${savedpost.post?.post_url}`
                                     )
                                 }}
                             >
-                                <div className="w-[15%] h-full">
+                                <div
+                                    className={` ${
+                                        deviceType === "desktop" ||
+                                        deviceType === "laptop"
+                                            ? "w-[100px] flex items-center mx-4"
+                                            : "w-[70px] mr-2"
+                                    } h-full min-w-[70px] rounded-[12px] `}
+                                >
                                     <img
                                         src={
                                             savedpost.post?.images[0]?.imageUrl
                                         }
                                         alt="post image"
-                                        className="w-full h-full object-cover"
+                                        className={`${
+                                            deviceType === "desktop" ||
+                                            deviceType === "laptop"
+                                                ? "w-[100px] h-[90px]"
+                                                : "w-[70px] h-[60px] translate-y-2"
+                                        } object-cover rounded-[12px]`}
                                     />
                                 </div>
-                                <div className="relative w-[70%] inline-flex flex-col justify-between">
+                                <div className="max-w-[75%] inline-flex flex-col justify-between">
                                     <div>
-                                        <div className="font-semibold text-gray-800 text-lg">
+                                        <div className="font-semibold text-gray-800 text-lg truncate line-clamp-1">
                                             {savedpost.post?.title}
                                         </div>
                                         <div className="text-red-500 text-base">
@@ -84,44 +123,42 @@ const SavedPostsPage = () => {
                                         <div className="text-sm w-full truncate">
                                             {savedpost.post?.description}
                                         </div>
-                                    </div>
-                                    <div className="inline-flex items-center gap-x-2 text-sm text-gray-500 ">
-                                        <div>
-                                            {savedpost.post?.address
-                                                ? savedpost.post.address
-                                                : "---"}
+                                        <div className="inline-flex items-center gap-x-2 text-sm text-gray-500 truncate line-clamp-1">
+                                            <div>
+                                                {savedpost.post?.address
+                                                    ? savedpost.post.address
+                                                    : "---"}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div
-                                        className="absolute bottom-0 -right-[120px]"
-                                        onClick={(event) => {
-                                            event.stopPropagation()
-                                        }}
-                                    >
-                                        {handleCheckPostSaved(
-                                            savedpost.post.id
-                                        ) ? (
-                                            <div
-                                                onClick={() => {
-                                                    handleDeleteSavedPost(
-                                                        savedpost.post.id
-                                                    )
-                                                }}
-                                            >
-                                                <AiFillHeart className=" text-red-700 text-2xl  hover:scale-[1.2]" />
-                                            </div>
-                                        ) : (
-                                            <div
-                                                onClick={() => {
-                                                    handleSavedPost(
-                                                        savedpost.post.id
-                                                    )
-                                                }}
-                                            >
-                                                <AiOutlineHeart className=" text-red-700 text-2xl  hover:scale-[1.2]" />
-                                            </div>
-                                        )}
-                                    </div>
+                                </div>
+                                <div
+                                    className={`absolute bottom-3 right-2`}
+                                    onClick={(event) => {
+                                        event.stopPropagation()
+                                    }}
+                                >
+                                    {handleCheckPostSaved(savedpost.post.id) ? (
+                                        <div
+                                            onClick={() => {
+                                                handleDeleteSavedPost(
+                                                    savedpost.post.id
+                                                )
+                                            }}
+                                        >
+                                            <AiFillHeart className=" text-red-700 text-2xl  hover:scale-[1.2]" />
+                                        </div>
+                                    ) : (
+                                        <div
+                                            onClick={() => {
+                                                handleSavedPost(
+                                                    savedpost.post.id
+                                                )
+                                            }}
+                                        >
+                                            <AiOutlineHeart className=" text-red-700 text-2xl  hover:scale-[1.2]" />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )
@@ -151,12 +188,16 @@ const SavedPostsPage = () => {
     return (
         <div className=" bg-customWhite pb-20">
             <Breadcrumb title1={`Tin đăng đã lưu`}></Breadcrumb>
-            <div className="laptop:w-laptop m-auto bg-white px-4">
-                <div className="pt-2 pb-1 border-b border-gray-200">
-                    Tin Đăng Đã Lưu -{" "}
-                    <span className="text-gray-400">{savedPosts.length}</span>
+            <div className="laptop:w-laptop m-auto px-4">
+                <div className="bg-white ">
+                    <div className="p-2 border-b border-gray-200">
+                        Tin Đăng Đã Lưu -{" "}
+                        <span className="text-gray-400">
+                            {savedPosts.length}
+                        </span>
+                    </div>
+                    <div className="pb-5 px-4">{SavedPostField}</div>
                 </div>
-                <div className="pb-5">{SavedPostField}</div>
             </div>
         </div>
     )

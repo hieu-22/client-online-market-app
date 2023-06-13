@@ -127,6 +127,32 @@ const PostDashboard = () => {
         dispatch(resetStatus())
     }
 
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
     /**COMPONENTS */
     // tailwindcss styles variables
     const style_active = "!text-black !border-b-[3px] !border-primary"
@@ -147,7 +173,7 @@ const PostDashboard = () => {
                 )}
             </div>
             <div className="pl-4">
-                <div className="text-lg my-1 font-semibold">
+                <div className="text-lg my-1 font-semibold text-ellipsis line-clamp-1">
                     {user?.userName ? user.userName : ""}
                     <span
                         className={
@@ -200,7 +226,14 @@ const PostDashboard = () => {
                     <>
                         {nonexpiredPosts.map((post, index) => {
                             return (
-                                <div className="mx-20 hover:bg-slate-50 relative ">
+                                <div
+                                    className={`${
+                                        deviceType === "smallMobile" ||
+                                        deviceType === "mobile"
+                                            ? "mx-0"
+                                            : "mx-10"
+                                    } hover:bg-gray-100 mb-2 relative`}
+                                >
                                     <div
                                         key={index}
                                         className="p-4 w-full h-[116px] border border-gray-300 border-t-0 border-b-0 cursor-pointer"
@@ -209,7 +242,15 @@ const PostDashboard = () => {
                                         }}
                                     >
                                         <div className="flex gap-x-4 h-full">
-                                            <div className="w-[15%] h-full rounded-sm">
+                                            <div
+                                                className={`${
+                                                    deviceType ===
+                                                        "smallMobile" ||
+                                                    deviceType === "mobile"
+                                                        ? "w-[84px] h-[84px]"
+                                                        : "w-[15%] h-full"
+                                                } rounded-sm`}
+                                            >
                                                 <img
                                                     src={
                                                         post?.images
@@ -335,7 +376,14 @@ const PostDashboard = () => {
                     <>
                         {expiredPosts.map((post, index) => {
                             return (
-                                <div className="mx-20 bg-gray-200 mb-2  relative">
+                                <div
+                                    className={`${
+                                        deviceType === "smallMobile" ||
+                                        deviceType === "mobile"
+                                            ? "mx-0"
+                                            : "mx-10"
+                                    } bg-gray-200 mb-2  relative`}
+                                >
                                     <div
                                         key={index}
                                         className="p-4 w-full h-[116px] border border-gray-300 border-t-0 border-b-0"
@@ -344,7 +392,15 @@ const PostDashboard = () => {
                                         }}
                                     >
                                         <div className="flex gap-x-4 h-full">
-                                            <div className="w-[15%] h-full rounded-sm">
+                                            <div
+                                                className={`${
+                                                    deviceType ===
+                                                        "smallMobile" ||
+                                                    deviceType === "mobile"
+                                                        ? "w-[84px] h-[84px]"
+                                                        : "w-[15%] h-full"
+                                                } rounded-sm`}
+                                            >
                                                 <img
                                                     src={
                                                         post.images[0]?.imageUrl
@@ -448,33 +504,37 @@ const PostDashboard = () => {
     return (
         <>
             <div className="bg-customWhite pb-20">
-                <div className="laptop:w-laptop bg-white m-auto px-6">
-                    <Breadcrumb
-                        title1={"Quản lí tin"}
-                        link1={"/dashboard/posts"}
-                        title2={
-                            postType === 1
-                                ? "Tin đang đăng"
-                                : postType === 2
-                                ? "Tin hết hạn"
-                                : ""
-                        }
-                    ></Breadcrumb>
-                </div>
-                <div className="laptop:w-laptop m-auto bg-white px-6">
-                    <div className="text-base font-semibold text-gray-800 border-b border-gray-200 pb-2">
-                        Quản lí tin
-                    </div>
-                    {/* // user field  */}
-
-                    <div className="py-2">{UserField}</div>
-                    <div>{PostControlField}</div>
-                    <div className="pb-4">
-                        {postType === 1
-                            ? nonExpiredPostsField
+                <Breadcrumb
+                    title1={"Quản lí tin"}
+                    link1={"/dashboard/posts"}
+                    title2={
+                        postType === 1
+                            ? "Tin đang đăng"
                             : postType === 2
-                            ? expiredPostsField
-                            : ""}
+                            ? "Tin hết hạn"
+                            : ""
+                    }
+                ></Breadcrumb>
+                <div
+                    className={`laptop:max-w-[1024px] ${
+                        deviceType === "desktop" ? "px-0" : "px-6"
+                    } m-auto  px-6`}
+                >
+                    <div className="bg-white">
+                        {" "}
+                        <div className="text-base font-semibold text-gray-800 border-b border-gray-200 p-2">
+                            Quản lí tin
+                        </div>
+                        {/* // user field  */}
+                        <div className="py-2 px-6">{UserField}</div>
+                        <div>{PostControlField}</div>
+                        <div className="pb-4">
+                            {postType === 1
+                                ? nonExpiredPostsField
+                                : postType === 2
+                                ? expiredPostsField
+                                : ""}
+                        </div>{" "}
                     </div>
                 </div>
                 {showDeletPostByIdConfirmation ? (

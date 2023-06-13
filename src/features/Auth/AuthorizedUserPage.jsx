@@ -126,14 +126,66 @@ const AuthorizedUserPage = () => {
         dispatch(resetStatus())
     }
 
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
     /**COMPONENTS */
     const userInformatiion = (
-        <div className="laptop:w-laptop m-auto my-5 bg-white grid grid-cols-2 ] py-5 rounded-md shadow-md">
+        <div
+            className={`bg-white grid ${
+                deviceType === "laptop" ||
+                deviceType === "desktop" ||
+                deviceType === "tablet"
+                    ? "grid-cols-2"
+                    : "grid-cols-1 gap-y-6"
+            } py-5 rounded-md shadow-md`}
+        >
             {/* left side*/}
-            <div className="flex ">
-                <div className="w-3/12 flex justify-center">
+            <div
+                className={`flex ${
+                    deviceType === "smallMobile" ||
+                    deviceType === "mobile" ||
+                    deviceType === "tablet"
+                        ? "text-sm"
+                        : ""
+                }`}
+            >
+                <div
+                    className={`${
+                        deviceType === "smallMobile"
+                            ? "w-16 h-16 mx-4"
+                            : "w-20 h-20 mx-4"
+                    }   flex justify-center`}
+                >
                     <div
-                        className={`rounded-[50%] h-20 w-20 border-2 border-primary translate-y-2 cursor-pointer hover:opacity-90 `}
+                        className={`rounded-[50%] ${
+                            deviceType === "smallMobile"
+                                ? "w-16 h-16"
+                                : "w-20 h-20"
+                        } border-2 border-primary translate-y-2 cursor-pointer hover:opacity-90 `}
                         onClick={(event) => {
                             event.stopPropagation()
                             setShowImageUploader(true)
@@ -153,26 +205,51 @@ const AuthorizedUserPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="w-[70%] relative border-r border-gray-200">
-                    <div className="text-lg font-semibold">
-                        {user?.userName ? user.userName : ""}
-                        <span
-                            className={
-                                `ml-3 inline-block mx-1  w-2 h-2 rounded-[50%] ` +
-                                (user?.isOnline
-                                    ? "bg-green-600"
-                                    : "bg-gray-600")
-                            }
-                        ></span>
+                <div
+                    className={` ${
+                        deviceType === "laptop" ||
+                        deviceType === "desktop" ||
+                        deviceType === "tablet"
+                            ? "w-[100%] border-r border-gray-200"
+                            : "flex-1 pr-4"
+                    } relative `}
+                >
+                    <div className="text-lg w-[80%] font-semibold">
+                        <div className="translate-y-2 text-ellipsis line-clamp-1">
+                            {user?.userName ? user.userName : ""}
+                        </div>
+                        <div className="">
+                            <span
+                                className={
+                                    `inline-block mr-1 w-2 h-2 rounded-[50%] ` +
+                                    (user?.isOnline
+                                        ? "bg-green-600"
+                                        : "bg-gray-600")
+                                }
+                            ></span>
+                            {user?.isOnline ? (
+                                <span className=" text-green-600 text-xs">
+                                    Đang hoạt động
+                                </span>
+                            ) : (
+                                <span className=" text-gray-600 text-xs">
+                                    {toTimeAgo(user?.updatedAt)}
+                                </span>
+                            )}
+                        </div>
                     </div>
-                    <div className="flex justify-left gap-x-2 text-sm mt-[1px] pr-[120px]">
+                    <div
+                        className={`flex justify-left gap-x-2 mt-[1px] ${
+                            deviceType === "smallMobile" ? "text-xs" : ""
+                        }`}
+                    >
                         <div>
                             <span className="font-semibold">
                                 {followers?.length || 0}
                             </span>{" "}
                             Người theo dõi
                         </div>
-                        <div className="w-[1px] h-4 translate-y-[2px] bg-gray-600"></div>
+                        <div className="w-[1px] h-4 translate-y-[2px] bg-gray-400"></div>
                         <div>
                             <span className="font-semibold">
                                 {followingUsers?.length || 0}
@@ -192,7 +269,7 @@ const AuthorizedUserPage = () => {
                     </div>
                     <button
                         onClick={handleSwitchUserMenu}
-                        className="group w-8 h-8 absolute top-0 right-4 select-none cursor-pointer rounded-[20px] border-gray-500 font-extrabold text-center"
+                        className="group w-8 h-8 absolute top-1 right-3 select-none cursor-pointer rounded-[20px] border-gray-500 font-extrabold text-center"
                     >
                         <div
                             className={`w-8 h-8 text-slate-600 ${
@@ -247,7 +324,13 @@ const AuthorizedUserPage = () => {
                 </div>
             </div>
             {/* right side*/}
-            <div>
+            <div
+                className={` px-6 ${
+                    deviceType === "smallMobile" || deviceType === "mobile"
+                        ? "border-t border-gray-200 pt-4"
+                        : ""
+                }`}
+            >
                 <div className="flex items-center gap-x-2 py-1">
                     <div>
                         <BsStar className="text-gray-400 w-5 h-5" />
@@ -299,7 +382,7 @@ const AuthorizedUserPage = () => {
     )
 
     const UserPostsField = (
-        <div className="laptop:w-laptop m-auto my-5 bg-white py-5 px-4 rounded-md shadow-md">
+        <div className={`bg-white px-4 pt-0 pb-5 rounded-md shadow-mds`}>
             <div className="py-2  border-b-[1px] border-gray-300">
                 <span>Tin đang đăng</span>
                 <span className="px-2">-</span>
@@ -315,16 +398,28 @@ const AuthorizedUserPage = () => {
                             return (
                                 <div
                                     key={index}
-                                    className="h-[140px] p-4 w-full flex gap-x-4 border-b border-gray-300 cursor-pointer hover:bg-slate-100"
+                                    className={`${
+                                        deviceType === "mobile" ||
+                                        deviceType === "smallMobile"
+                                            ? "h-[100px] p-2"
+                                            : "h-[140px] p-4"
+                                    }   w-full flex gap-x-4 border-b border-gray-300 cursor-pointer hover:bg-slate-100`}
                                     onClick={() => {
                                         navigate(`/posts/${post.post_url}`)
                                     }}
                                 >
-                                    <div className="w-[15%] h-full">
+                                    <div
+                                        className={`${
+                                            deviceType === "mobile" ||
+                                            deviceType === "smallMobile"
+                                                ? "w-[80px] h-[80px]"
+                                                : "w-[15%] h-full"
+                                        }  rounded-[8px]`}
+                                    >
                                         <img
                                             src={post.images[0]?.imageUrl}
                                             alt="post image"
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover rounded-[8px] shadow-boxMd"
                                         />
                                     </div>
                                     <div className="w-[70%] inline-flex flex-col justify-between">
@@ -342,7 +437,14 @@ const AuthorizedUserPage = () => {
                                                 {post.description}
                                             </div>
                                         </div>
-                                        <div className="inline-flex items-center gap-x-2 text-sm text-gray-500 ">
+                                        <div
+                                            className={`${
+                                                deviceType === "mobile" ||
+                                                deviceType === "smallMobile"
+                                                    ? "hidden"
+                                                    : "inline-flex"
+                                            }  items-center gap-x-2 text-sm text-gray-500 `}
+                                        >
                                             <div>{post.timeAgo}</div>
 
                                             <div className="w-[1px] h-[1rem] bg-gray-500"></div>
@@ -403,8 +505,22 @@ const AuthorizedUserPage = () => {
     return (
         <div className="bg-customWhite " onClick={handleCloseAllWindows}>
             <Breadcrumb title1={`Trang cá nhân của ${user?.userName}`} />
-            {userInformatiion}
-            {UserPostsField}
+            <div
+                className={` laptop:max-w-[1024px] m-auto   ${
+                    deviceType === "desktop" ? "px-0" : "px-6"
+                }  my-5 `}
+            >
+                {userInformatiion}
+            </div>
+
+            <div
+                className={` laptop:max-w-[1024px] m-auto   ${
+                    deviceType === "desktop" ? "px-0" : "px-6"
+                }  my-5 `}
+            >
+                {UserPostsField}
+            </div>
+
             {showImageUploader ? ImageUploader : <></>}
         </div>
     )

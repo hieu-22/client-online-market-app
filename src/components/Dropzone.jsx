@@ -26,7 +26,7 @@ const Dropzone = ({
 
     return (
         <div
-            className={`fixed shadow-big rounded-md bg-white cursor-pointer w-[600px] ${className}`}
+            className={`fixed shadow-big max-w-[80vw] rounded-md bg-white cursor-pointer w-[600px] ${className}`}
             onClick={(event) => {
                 event.stopPropagation()
             }}
