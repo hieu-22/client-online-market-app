@@ -111,19 +111,19 @@ const SavedPostsPage = () => {
                                 </div>
                                 <div className="max-w-[75%] inline-flex flex-col justify-between">
                                     <div>
-                                        <div className="font-semibold text-gray-800 text-lg truncate line-clamp-1">
+                                        <div className="font-semibold text-gray-800 text-lg text-ellipsis line-clamp-1">
                                             {savedpost.post?.title}
                                         </div>
-                                        <div className="text-red-500 text-base">
+                                        <div className="text-red-500 text-base text-ellipsis line-clamp-1">
                                             {numeral(savedpost.post?.price)
                                                 .format("0,0 ₫")
                                                 .replaceAll(",", ".")}
                                             &nbsp;đ
                                         </div>
-                                        <div className="text-sm w-full truncate">
+                                        <div className="text-sm w-full text-ellipsis line-clamp-1">
                                             {savedpost.post?.description}
                                         </div>
-                                        <div className="inline-flex items-center gap-x-2 text-sm text-gray-500 truncate line-clamp-1">
+                                        <div className="inline-flex items-center gap-x-2 text-sm text-gray-500 text-ellipsis line-clamp-1">
                                             <div>
                                                 {savedpost.post?.address
                                                     ? savedpost.post.address

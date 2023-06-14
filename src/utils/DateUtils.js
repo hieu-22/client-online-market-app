@@ -8,6 +8,12 @@ import {
     differenceInSeconds,
 } from "date-fns"
 
+/**
+ *
+ * @param {array} array The array to be added timeAgo in each item.
+ * @param {string} timeStampProp Attribute's name of the object eg.{"createAt" || "updatedAt"}.
+ * @returns A new array which have the timAgo properties in each object item.
+ */
 export const addTimeAgo = async (array, timeStampProp) => {
     // return a new array of posts with timeAgo in each post
     const updatedArray = await array.map((item) => {

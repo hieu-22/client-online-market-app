@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
 import { FaUserCircle } from "react-icons/fa"
@@ -28,7 +28,7 @@ const ProductCard = ({
     const user = useSelector(selectUser)
     const savedPosts = user?.savedPosts
 
-    /**HANDLERS */
+    /* HANDLERS */
     const handleSavedPost = async () => {
         const userId = user?.id
 
@@ -54,8 +54,43 @@ const ProductCard = ({
         return checkRes
     }
 
+    // -- HANDLE DEVICE TYPE
+    const [deviceType, setDeviceType] = useState(null)
+    useEffect(() => {
+        handleSetDeviceType()
+    }, [])
+    useEffect(() => {
+        window.addEventListener("resize", handleSetDeviceType)
+        return () => {
+            window.addEventListener("resize", handleSetDeviceType)
+        }
+    }, [])
+    const handleSetDeviceType = () => {
+        const width = window.innerWidth
+        if (width < 576) {
+            setDeviceType("smallMobile")
+        } else if (width >= 576 && width < 786) {
+            setDeviceType("mobile")
+        } else if (width >= 786 && width < 1024) {
+            setDeviceType("tablet")
+        } else if (width >= 1024 && width < 1280) {
+            setDeviceType("laptop")
+        } else {
+            setDeviceType("desktop")
+        }
+    }
+
+    /* Components */
     const productImage = (
-        <div className={`relative h-[240px]  p-4 pb-0`}>
+        <div
+            className={`relative ${
+                deviceType === "desktop" || deviceType === "laptop"
+                    ? "h-[220px]"
+                    : deviceType === "tablet"
+                    ? "h-[200px]"
+                    : "h-[260px]"
+            }   p-4 pb-0`}
+        >
             <img
                 className="object-cover h-full w-full rounded-sm"
                 src={imageUrl ? `${imageUrl}` : ""}
@@ -124,11 +159,11 @@ const ProductCard = ({
                 <span className="px-[2px] -translate-y-[1px]">
                     &nbsp;·&nbsp;{" "}
                 </span>
-                <div className="">{timeAgo}</div>
+                <div className="text-ellipsis line-clamp-1">{timeAgo}</div>
                 <span className="px-[2px] -translate-y-[1px]">
                     &nbsp;·&nbsp;{" "}
                 </span>
-                <div className="truncate w-[100px]">
+                <div className="max-w-[100px] text-ellipsis line-clamp-1">
                     {address
                         ? address.split(",")[address.split(",").length - 1]
                         : ""}

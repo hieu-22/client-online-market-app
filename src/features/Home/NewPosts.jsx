@@ -152,7 +152,7 @@ const NewPosts = () => {
                         {fetchedPosts.map((post, index) => {
                             return (
                                 <div
-                                    className={`${
+                                    className={`hover:translate-y-[-1px] ${
                                         deviceType === "smallMobile"
                                             ? "my-2"
                                             : ""

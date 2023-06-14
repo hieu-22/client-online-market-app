@@ -38,10 +38,7 @@ import {
     selectAuthError,
     selectError,
 } from "../features/Auth/authSlice"
-import {
-    selectPostError,
-    fetchPostsBySearchKeysThunk,
-} from "../features/Post/postSlice"
+import { selectPostError } from "../features/Post/postSlice"
 import { selectChatError } from "../features/Chat/chatSlice"
 import { selectUserError } from "../features/User/userSlice"
 
@@ -129,22 +126,6 @@ const Layout = () => {
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [location.pathname])
-
-    useEffect(() => {
-        let timerId
-        ;(async () => {
-            // Cancel any previous timer
-            clearTimeout(timerId)
-            // Set a new timer to trigger the API call after a certain delay (e.g., 500ms)
-            timerId = setTimeout(async () => {
-                const res = await dispatch(
-                    fetchPostsBySearchKeysThunk(searchkeys)
-                ).unwrap()
-            }, 500)
-        })()
-        // Cleanup function to cancel the timer if the component is unmounted or query changes
-        return () => clearTimeout(timerId)
-    }, [searchkeys])
 
     // -- handle show go to handler
     const prevScrollPosRef = useRef(0)
@@ -814,7 +795,7 @@ const Layout = () => {
                     <input
                         className="px-4 w-full rounded border-[1px] border-gray-200 shadow-boxMd py-2  text-sm p-1 focus:outline-4 outline-primary"
                         type="text"
-                        placeholder="Tìm kiếm bài đăng . . ."
+                        placeholder="Tìm kiếm ..."
                         name="searchkey"
                         value={searchkeys}
                         onChange={(event) => {
@@ -825,55 +806,16 @@ const Layout = () => {
                                 setSearchHintsShowed(true)
                             }
                         }}
+                        autoComplete="true"
                     />
-                    <span className="absolute  right-0  inline-flex items-center justify-center  rounded-r  bg-button h-9 w-9 bg-primary active:opacity-80 cursor-pointer ">
+                    <button
+                        className="absolute  right-0  inline-flex items-center justify-center  rounded-r  bg-button h-9 w-9 bg-primary active:opacity-80 cursor-pointer"
+                        onClick={() => {
+                            navigate(`search?q=${searchkeys}`)
+                        }}
+                    >
                         <FiSearch className="text-white "></FiSearch>
-                    </span>
-                    {searchHintsShowed ? (
-                        <div
-                            className="absolute z-20 top-[40px] shadow-big w-full bg-white rounded-sm pb-2"
-                            onClick={(event) => {
-                                event.stopPropagation()
-                            }}
-                        >
-                            <div className="text-gray-400 font-normal text-sm pl-4 mt-2 mb-1">
-                                Kết quả:
-                            </div>
-                            {searchedPosts?.length > 0 ? (
-                                <div className="">
-                                    {searchedPosts.map((post, index) => {
-                                        return (
-                                            <div
-                                                className="cursor-pointer hover:bg-slate-100 py-2 pl-4 text-sm text-gray-800"
-                                                key={index}
-                                                onClick={() => {
-                                                    setSearchHintsShowed(false)
-                                                    setSearchKeys(post.title)
-                                                }}
-                                            >
-                                                {post?.title ? post.title : ""}
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            ) : (
-                                <>
-                                    {searchedPosts ? (
-                                        <div className="bg-hover-primary py-2 pl-4 text-sm text-gray-800">
-                                            Không tìm thấy nội dung phù hợp
-                                        </div>
-                                    ) : (
-                                        <div className="pb-1 pl-4 text-sm text-gray-800">
-                                            {" "}
-                                            Nhập từ khóa để tìm kiếm
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    ) : (
-                        <></>
-                    )}
+                    </button>
                 </div>
                 <div
                     className={`hidden items-center justify-end gap-x-1 flex-row min-w-[160px]

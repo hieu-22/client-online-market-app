@@ -4,6 +4,7 @@ import locationReducer from "../features/Post/locationSlice"
 import postReducer from "../features/Post/postSlice"
 import userReducer from "../features/User/userSlice"
 import chatReducer from "../features/Chat/chatSlice"
+import searchReducer from "../features/Home/seachSlice"
 
 import {
     persistStore,
@@ -18,6 +19,7 @@ import {
 export const store = configureStore({
     reducer: {
         auth: authReducer,
+        search: searchReducer,
         location: locationReducer,
         post: postReducer,
         user: userReducer,

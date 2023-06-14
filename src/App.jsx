@@ -19,6 +19,7 @@ import SingleChatPage from "./features/Chat/SingleChatPage"
 import NotFoundPage from "./features/Error/NotFoundPage"
 import HintUsersListPage from "./features/User/HintUsersListPage"
 import FollowedUsersListPage from "./features/User/FollowedUsersListPage"
+import SearchResultPage from "./features/Home/SearchResultPage"
 
 import { socket } from "./socket"
 import { useSelector } from "react-redux"
@@ -43,6 +44,7 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Layout />}>
                     <Route index element={<Homepage />} />
+                    <Route path="search" element={<SearchResultPage />} />
                     <Route path="login" element={<LoginForm />} />
                     <Route path="register" element={<RegisterForm />} />
                     <Route
