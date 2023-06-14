@@ -129,11 +129,13 @@ const NewPosts = () => {
 
     return (
         <div className="w-full my-5 bg-white">
+            {/* head  */}
             <div className="">
                 <h3 className="text-text text-lg py-2 font-semibold px-5">
                     Tin đăng mới
                 </h3>
             </div>
+            {/* POSTS */}
             <div>
                 {fetchedPosts?.length > 0 ? (
                     <div
@@ -194,7 +196,7 @@ const NewPosts = () => {
                     </div>
                 )}
             </div>
-
+            {/* bottom */}
             <div className="flex justify-center py-1 border-t border-gray-100 bg-customWhite">
                 {noMorePost ? (
                     <button

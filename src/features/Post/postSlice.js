@@ -135,46 +135,6 @@ export const getNextPostsThunk = createAsyncThunk(
     }
 )
 
-export const fetchPostsBySearchKeysThunk = createAsyncThunk(
-    "post/fetchPostsBySearchKeysThunk",
-    async (searchKeys, { rejectWithValue }) => {
-        try {
-            const data = await fetchPostsBySearchKeys(searchKeys)
-            return data
-        } catch (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                return rejectWithValue({
-                    code: error.code,
-                    message: error.response.data.message,
-                    statusCode: error.response.status,
-                    statusText: error.response.statusText,
-                })
-            } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                return rejectWithValue({
-                    code: error.code,
-                    message: error.message,
-                    statusCode: 503,
-                    statusText: "Service Unavailable",
-                })
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.log("Error", error.message)
-                rejectWithValue({
-                    code: error.code,
-                    message: error.message,
-                    statusCode: 400,
-                    statusText: "Bad Request",
-                })
-            }
-        }
-    }
-)
-
 export const updatePostThunk = createAsyncThunk(
     "post/updatePostThunk",
     async ({ newPost, postId }, { rejectWithValue }) => {
@@ -269,17 +229,6 @@ const postSlice = createSlice({
                 state.status = "failed"
                 // console.log(">>>rejected payload: ", action.payload)
                 state.error = action.payload
-            })
-            .addCase(fetchPostsBySearchKeysThunk.pending, (state) => {
-                state.status = "loading"
-            })
-            .addCase(fetchPostsBySearchKeysThunk.fulfilled, (state, action) => {
-                state.status = "succeeded"
-                state.searchedPosts = action.payload.matchedPosts
-            })
-            .addCase(fetchPostsBySearchKeysThunk.rejected, (state, action) => {
-                state.status = "failed"
-                // console.log(">>>rejected payload: ", action.payload)
             })
             // updatePostThunk
             .addCase(updatePostThunk.pending, (state) => {
