@@ -591,7 +591,7 @@ const SearchResultPage = () => {
     }
     const UsersListField = (
         <div
-            className={`grid ${
+            className={`grid py-6  ${
                 deviceType === "desktop" || deviceType === "laptop"
                     ? "grid-cols-2"
                     : "grid-cols-1"
@@ -652,7 +652,7 @@ const SearchResultPage = () => {
             <Breadcrumb title1={"Kết quả tìm kiếm"} />
 
             <div
-                className={`pb-3 mx-auto px-6
+                className={`pb-6 mx-auto px-6 
                 desktop:max-w-[1024px] desktop:px-0
                 laptop:max-w-[1024px] `}
                 onClick={handleCloseAllWindow}
