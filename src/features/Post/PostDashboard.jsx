@@ -479,7 +479,7 @@ const PostDashboard = () => {
                                             navigator.clipboard.writeText(
                                                 `http://localhost:3000/posts/${postUrl}`
                                             )
-                                            alert("Đã copy post")
+                                            toast("Đã copy post")
                                         }}
                                     >
                                         <AiOutlineShareAlt className="w-7 h-7 text-gray-700"></AiOutlineShareAlt>

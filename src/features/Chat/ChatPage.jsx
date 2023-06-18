@@ -52,7 +52,7 @@ const ChatPage = () => {
                     { conversationId: chatId, userId: user.id },
                     (error, data) => {
                         if (error) {
-                            return alert(error)
+                            return toast(error)
                         }
                         const chat = data.chat
                         dispatch(addChatToChats(chat))
@@ -83,7 +83,7 @@ const ChatPage = () => {
             },
             (error, data) => {
                 if (error) {
-                    return alert(error.errorMessage)
+                    return toast(error.errorMessage)
                 }
                 console.log(data)
                 const chats = data
