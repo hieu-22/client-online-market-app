@@ -9,4 +9,5 @@ const URL =
 export const socket = io(URL, {
     forceNew: true,
     autoConnect: false,
+    transports: ["websocket"],
 })
