@@ -22,7 +22,8 @@ export const addTimeAgo = async (array, timeStampProp) => {
     const updatedArray = await array.map((item) => {
         const now = new Date()
         // if output of sequelize timestamp convert incorrecly (from +07:00 to utc > without convert and add UTC) => MINUS 7:00
-        const from = zonedTimeToUtc(new Date(item[timeStampProp]), "+07:00")
+        // const from = zonedTimeToUtc(new Date(item[timeStampProp]), "+07:00")
+        const from = new Date(item[timeStampProp])
         console.log("from:", item[timeStampProp], "to", from)
 
         const timeAgoInMinutes = differenceInMinutes(now, from)
