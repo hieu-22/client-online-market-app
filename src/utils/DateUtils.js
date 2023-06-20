@@ -8,7 +8,7 @@ import {
     differenceInSeconds,
 } from "date-fns"
 
-import { zonedTimeToUtc, utcToZonedTime, format as timezoneFormat } from ('date-fns-timezone')
+import { zonedTimeToUtc } from "date-fns-tz"
 
 /**
  *
