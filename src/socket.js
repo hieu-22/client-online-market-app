@@ -7,7 +7,5 @@ const URL =
         : "http://localhost:3001"
 
 export const socket = io(URL, {
-    forceNew: true,
     autoConnect: false,
-    transports: ["websocket"],
 })

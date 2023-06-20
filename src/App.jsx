@@ -36,7 +36,6 @@ const App = () => {
                 socket.disconnect()
             }
         }
-        socket.disconnect()
     }, [user])
 
     return (
