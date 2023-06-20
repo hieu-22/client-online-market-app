@@ -113,8 +113,8 @@ const Layout = () => {
         }
     }, [])
     useEffect(() => {
-        const currentUrl = window.location.href
-        if (currentUrl.startsWith("http://localhost:3000/chat")) {
+        const currentPath = window.location.pathname
+        if (currentPath.startsWith("/chat")) {
             setFooterHidden(true)
             setIsfullScreenAndNoScroll(true)
             return

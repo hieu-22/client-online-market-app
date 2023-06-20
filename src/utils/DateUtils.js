@@ -20,8 +20,11 @@ import { zonedTimeToUtc } from "date-fns-tz"
 export const addTimeAgo = async (array, timeStampProp) => {
     // return a new array of posts with timeAgo in each post
     const updatedArray = await array.map((item) => {
-        const now = zonedTimeToUtc(new Date(), "+07:00") // get the current time of +07:00 timezone
-        const from = zonedTimeToUtc(new Date(item[timeStampProp]), "+07:00")
+        const time = new Date()
+        const timeZoneOffset = "+07:00"
+        const now = zonedTimeToUtc(time, timeZoneOffset) // get the current time of +07:00 timezone
+
+        const from = new Date(item[timeStampProp])
 
         const timeAgoInMinutes = differenceInMinutes(now, from)
         if (timeAgoInMinutes < 61) {
@@ -66,7 +69,9 @@ export const addTimeAgo = async (array, timeStampProp) => {
 export const toTimeAgo = (timeStamp) => {
     if (!timeStamp) return
 
-    const now = zonedTimeToUtc(new Date(), "+07:00")
+    const time = new Date()
+    const timeZoneOffset = "+07:00"
+    const now = zonedTimeToUtc(time, timeZoneOffset) // get the current time of +07:00 timezone
     const from = new Date(timeStamp)
 
     const timeAgoInSeconds = differenceInSeconds(now, from)

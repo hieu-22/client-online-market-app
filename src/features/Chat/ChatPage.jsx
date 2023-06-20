@@ -178,7 +178,12 @@ const ChatPage = () => {
                                     to={`/chat/${chat.id}`}
                                 >
                                     {onDeleteChatMode ? (
-                                        <div className="flex align-middle mr-1">
+                                        <div
+                                            className="flex align-middle mr-1"
+                                            onClick={(event) => {
+                                                event.stopPropagation()
+                                            }}
+                                        >
                                             <input
                                                 type="checkbox"
                                                 onChange={(event) => {
