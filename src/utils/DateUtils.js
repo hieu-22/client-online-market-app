@@ -21,7 +21,7 @@ export const addTimeAgo = async (array, timeStampProp) => {
     // return a new array of posts with timeAgo in each post
     const updatedArray = await array.map((item) => {
         const now = zonedTimeToUtc(new Date(), "+07:00") // get the current time of +07:00 timezone
-        const from = new Date(item[timeStampProp])
+        const from = zonedTimeToUtc(new Date(item[timeStampProp]), "+07:00")
 
         const timeAgoInMinutes = differenceInMinutes(now, from)
         if (timeAgoInMinutes < 61) {

@@ -286,7 +286,7 @@ const Layout = () => {
                             </div>
                             <div className="flex-1">
                                 <div
-                                    className="text-lg max-w-[70%] font-medium hover:opacity-70 truncate text-ellipsis line-clamp-1"
+                                    className="text-lg max-w-[100%] font-medium hover:opacity-70 truncate text-ellipsis line-clamp-1"
                                     onClick={(event) => {
                                         handleCloseAllWindows()
                                         const currentUrl = location.pathname
