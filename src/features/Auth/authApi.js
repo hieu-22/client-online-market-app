@@ -61,7 +61,7 @@ export const getPostByUserId = async ({ userId }) => {
     if (!posts) {
         return responses.data
     }
-    const updatedPosts = await addTimeAgo(posts, "createAt")
+    const updatedPosts = await addTimeAgo(posts, "createdAt")
     const updatedReponse = { ...responses.data, posts: updatedPosts }
     return updatedReponse
 }
@@ -98,7 +98,7 @@ export const deletePostById = async ({ postId, userId }) => {
     if (!posts) {
         return responses.data
     }
-    const updatedPosts = await addTimeAgo(posts, "createAt")
+    const updatedPosts = await addTimeAgo(posts, "createdAt")
     const updatedReponse = { ...responses.data, posts: updatedPosts }
     return updatedReponse
 }

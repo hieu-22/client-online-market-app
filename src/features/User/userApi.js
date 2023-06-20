@@ -5,7 +5,7 @@ export const getUserById = async (userId) => {
     const response = await axios.get(`/user/${userId}`)
     const user = response.data.user
     const posts = user.posts
-    const updatedPosts = await addTimeAgo(posts, "createAt")
+    const updatedPosts = await addTimeAgo(posts, "createdAt")
     const updatedUser = { ...user, posts: updatedPosts }
     return updatedUser
 }
