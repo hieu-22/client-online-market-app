@@ -18,14 +18,17 @@ import { zonedTimeToUtc } from "date-fns-tz"
  */
 
 export const addTimeAgo = async (array, timeStampProp) => {
-    // return a new array of posts with timeAgo in each post
     const updatedArray = await array.map((item) => {
-        const now = zonedTimeToUtc(new Date(), "+07:00")
-        // if output of sequelize timestamp convert incorrecly (from +07:00 to utc > without convert and add UTC) => MINUS 7:00
-        // const from = zonedTimeToUtc(new Date(item[timeStampProp]), "+07:00")
+        const now = new Date()
         const from = new Date(item[timeStampProp])
 
         const timeAgoInMinutes = differenceInMinutes(now, from)
+        if (timeAgoInMinutes < 0) {
+            return {
+                ...item,
+                timeAgo: `1 phút trước`,
+            }
+        }
         if (timeAgoInMinutes < 61) {
             return {
                 ...item,
