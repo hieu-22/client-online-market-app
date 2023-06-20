@@ -21,7 +21,9 @@ export const addTimeAgo = async (array, timeStampProp) => {
     // return a new array of posts with timeAgo in each post
     const updatedArray = await array.map((item) => {
         const now = new Date()
-        const from = new Date(item[timeStampProp])
+        // if output of sequelize timestamp convert incorrecly (from +07:00 to utc > without convert and add UTC) => MINUS 7:00
+        const from = zonedTimeToUtc(new Date(item[timeStampProp]), "-07:00")
+        console.log("from:", item[timeStampProp], "to", from)
 
         const timeAgoInMinutes = differenceInMinutes(now, from)
         if (timeAgoInMinutes < 61) {
