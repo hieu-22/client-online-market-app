@@ -284,9 +284,9 @@ const Layout = () => {
                                     <RiPencilFill className="h-3 w-3 text-white" />
                                 </div>
                             </div>
-                            <div className="flex-1  ">
+                            <div className="flex-1">
                                 <div
-                                    className="text-lg font-medium hover:opacity-70 truncate text-ellipsis line-clamp-1"
+                                    className="text-lg max-w-[70%] font-medium hover:opacity-70 truncate text-ellipsis line-clamp-1"
                                     onClick={(event) => {
                                         handleCloseAllWindows()
                                         const currentUrl = location.pathname
@@ -311,7 +311,9 @@ const Layout = () => {
                                         navigate(`/user/myProfile`)
                                     }}
                                 >
-                                    {user?.userName ? user.userName : ""}
+                                    <span className="inline-block max-h-">
+                                        {user?.userName ? user.userName : ""}
+                                    </span>
                                     <span
                                         className={
                                             `ml-3 inline-block mx-1  w-2 h-2 rounded-[50%] ` +
@@ -320,15 +322,6 @@ const Layout = () => {
                                                 : "bg-gray-600")
                                         }
                                     ></span>
-                                    {user?.isOnline ? (
-                                        <span className="text-green-600 text-xs">
-                                            Đang hoạt động
-                                        </span>
-                                    ) : (
-                                        <span className="text-gray-600 text-xs">
-                                            Không hoạt động
-                                        </span>
-                                    )}
                                 </div>
 
                                 <div className=" inline-flex items-center text-xs">
