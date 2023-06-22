@@ -216,8 +216,10 @@ To add a new feature (Chat feature, for example), follow these steps:
 └── tailwind.config.js
 ```
 ### 2. Website Layout
-The app use style at `./src/components/Layout.jsx` for whole website. The <Outlet /> represent for the actual page component (e.g. ChatPage.jsx).
+The Layout styles at `./src/components/Layout.jsx` affect to multiple components. The <Outlet /> in Layout represent for the actual page component (e.g. ChatPage.jsx).
 Read [`<Outlet>`](https://reactrouter.com/en/main/components/outlet)
+
+Therefore, when modifying `Layout.jsx`, it's important to make sure that the changes do not break any other UI or functionalities.
 ```javascript
 const Layout = () => {
   // ...
@@ -241,7 +243,6 @@ const Layout = () => {
 export default Layout
 
 ```
-Therefore, when modifying `Layout.jsx`, it's important to make sure that the changes do not break any other UI or functionalities.
 
 ## License
 I'm happy that someone appreciates my project and use it for their studying or any purposes. It's free to use this project.
