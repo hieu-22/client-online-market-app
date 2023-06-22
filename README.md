@@ -2,6 +2,8 @@
 
 This project is a simple e-commerce web app with core features are posting product, real-time chating which are built using popular technologies such as ReactJS, NodeJS, SocketIo, PostgreSQL, etc.
 
+The app uses Node.js v18 as development environment.
+
 Source:
 - [Client](https://github.com/hieu-22/client-online-market-app.git)
 - [Server](https://github.com/hieu-22/server-online-market-app.git)
@@ -15,11 +17,11 @@ Source:
 - [License](#license)
 
 ## Installation
-Clone the repository
+Clone the repository:
 ```sh
 $git clone https://github.com/hieu-22/server-online-market-app.git
 ```
-Install dependencies by running npm install
+Install dependencies by running `npm install`:
 ```sh
 npm install
 ```
@@ -36,7 +38,8 @@ REACT_APP_CLOUDINARY_NAME="duhbzyhtj"
 REACT_APP_CLOUDINARY_UNSIGNED_UPLOAD_PRESET="qtfrqrsg"
 ```
 If you want to use your own Cloudinary for image storage, read [React SDK](https://cloudinary.com/documentation/react_integration) for more information.
-Run app
+
+Run app:
 ```sh
 npm start
 ```
