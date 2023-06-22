@@ -17,6 +17,8 @@ Source:
 - [License](#license)
 
 ## Installation
+Note: The app uses Node.js v18 as development environment.
+
 Clone the repository:
 ```sh
 $git clone https://github.com/hieu-22/server-online-market-app.git
