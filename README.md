@@ -202,7 +202,7 @@ To add a new feature (Chat feature, for example), follow these steps:
   
   ```
 
-#### structure
+#### Folder structure:
 ```sh
 ├── public
 ├── src
@@ -216,7 +216,8 @@ To add a new feature (Chat feature, for example), follow these steps:
 └── tailwind.config.js
 ```
 ### 2. Website Layout
-The app use style at `./src/components/Layout.jsx` for whole website. The <Outlet /> represent for the actual page component (e.g. ChatPage.jsx). Read [<Outlet/>](https://reactrouter.com/en/main/components/outlet)
+The app use style at `./src/components/Layout.jsx` for whole website. The <Outlet /> represent for the actual page component (e.g. ChatPage.jsx).
+Read [`<Outlet>`](https://reactrouter.com/en/main/components/outlet)
 ```javascript
 const Layout = () => {
   // ...
